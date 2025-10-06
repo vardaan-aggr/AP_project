@@ -12,7 +12,7 @@ class loginError {
 
         f.getContentPane().setBackground(new Color(237, 217, 132));
 
-        l1.setBounds(80, 30, 250, 50);
+        l1.setBounds(80, 30, 300, 50);
         f.add(l1);
 
         f.setSize(400, 120);
