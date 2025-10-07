@@ -1,3 +1,5 @@
+package edu.univ.erp.ui.instructor;
+
 import javax.swing.*;
 
 class instructorDashboard {

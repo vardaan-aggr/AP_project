@@ -1,3 +1,5 @@
+package edu.univ.erp.ui.auth;
+
 import javax.swing.*;
 
 class loginPage {
