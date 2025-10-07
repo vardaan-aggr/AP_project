@@ -1,29 +1,31 @@
-import java.io.*;
 import javax.swing.*;
 
 class adminDashboard {
 
     public static void main(String[] args)
     {
-        // Creating instance of JFrame
         JFrame frame = new JFrame();
 
-        // Creating instance of JButton
-        JButton button = new JButton(" GFG WebSite Click");
+        JButton userManagement = new JButton("User Management");
+        userManagement.setBounds(0, 100, 220, 50);
+        frame.add(userManagement);
 
-        // x axis, y axis, width, height
-        button.setBounds(150, 200, 220, 50);
+        JButton courseManagement = new JButton("User Management");
+        courseManagement.setBounds(300, 100, 220, 50);
+        frame.add(courseManagement);
+    
+        JButton instructorAssignment = new JButton("Instructor Assignment");
+        instructorAssignment.setBounds(0, 500, 220, 50);
+        frame.add(instructorAssignment);
 
-        // adding button in JFrame
-        frame.add(button);
+        JButton maintenanceMode = new JButton("Maintenance Mode");
+        maintenanceMode.setBounds(300, 500, 220, 50);
+        frame.add(maintenanceMode);
 
-        // 400 width and 500 height
+
         frame.setSize(500, 600);
-
-        // using no layout managers
         frame.setLayout(null);
-
-        // making the frame visible
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
 }
