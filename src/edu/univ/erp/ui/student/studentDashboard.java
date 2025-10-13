@@ -32,5 +32,36 @@ class studentDashboard {
         studentDashboard.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         studentDashboard.setLocationRelativeTo(null); 
         studentDashboard.setVisible(true);
+
+
+                // actionlisteners
+        courseBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                
+            }
+        });
+        timetableBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+        registrationBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
+        transcriptBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
+        gradesBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
     }
 }
