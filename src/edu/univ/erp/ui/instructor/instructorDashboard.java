@@ -1,6 +1,8 @@
 package edu.univ.erp.ui.instructor;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 
 class instructorDashboard {
 
@@ -24,5 +26,22 @@ class instructorDashboard {
         frame.setLayout(null);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+
+        // actionlisteners
+        mySections.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                
+            }
+        });
+        gradeBook.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+        classStats.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
     }
 }
