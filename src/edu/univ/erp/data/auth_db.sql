@@ -1,8 +1,8 @@
-CREATE DATABASE auth_db ;
+CREATE DATABASE IF NOT EXISTS auth_db;
 
 USE auth_db;
 
-CREATE TABLE users_auth (
+CREATE TABLE IF NOT EXISTS users_auth (
     user_id INT PRIMARY KEY AUTO_INCREMENT,  -- A unique ID for each user
     username VARCHAR(50) UNIQUE NOT NULL,    -- The username, must be unique
     role VARCHAR(20) NOT NULL,               -- 'student', 'instructor', or 'admin'

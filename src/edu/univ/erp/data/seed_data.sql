@@ -1,10 +1,9 @@
 USE auth_db;
 
 INSERT INTO users_auth (user_id, username, role, password_hash) 
-VALUES (1, 'Chandrapal', 'admin', 'your_generated_bcrypt_hash_here');
+VALUES (1, 'student1', 'student', 'your_generated_bcrypt_hash_here');
+-- mdo1
 
-select * from users_auth;
-
-UPDATE users_auth
-SET password_hash = '$2a$10$GNPhgEPY6HE4xIGePzDD3OiRGVy7gBcu3fkoiUGfyibbzyCnUER7a'
-WHERE user_id = 1;
+INSERT INTO users_auth (user_id, username, role, password_hash) 
+VALUES (2, 'instructor1', 'instructor', 'your_generated_bcrypt_hash_here');
+-- mdo2

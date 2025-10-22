@@ -1,11 +1,12 @@
 package edu.univ.erp.ui.auth;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;   
+import java.awt.event.ActionListener;  
 
 class loginPage {
     public static void main(String[] args) {
         JFrame loginFrame = new JFrame("University ERP Login"); 
-
 
         loginFrame.setSize(450, 300); 
         loginFrame.setLayout(null);
@@ -34,5 +35,12 @@ class loginPage {
         loginFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         loginFrame.setLocationRelativeTo(null); 
         loginFrame.setVisible(true);
+
+        // actionlisteners
+        loginBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                
+            }
+        });
     }
 }
