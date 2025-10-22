@@ -5,7 +5,11 @@ import java.sql.*;
 public class DatabaseConnector {
 
     private static final String DB_USER = "root"; 
-    private static final String DB_PASS = "mdo)&&*"; 
+    private static final String DB_PASS = "enter password"; // <-- IMPORTANT: Change this!
+
+    // --- Connection Strings ---
+    // These URLs tell JDBC where to find your databases
+    // CORRECT URLS (using the mariadb format)
     private static final String AUTH_DB_URL = "jdbc:mariadb://localhost:3306/auth_db";
 
     public static Connection getAuthConnection() throws SQLException {

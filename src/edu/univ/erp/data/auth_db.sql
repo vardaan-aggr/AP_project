@@ -10,3 +10,5 @@ CREATE TABLE IF NOT EXISTS users_auth (
     status VARCHAR(20) DEFAULT 'active',     -- e.g., 'active', 'locked'
     last_login TIMESTAMP NULL                -- The last time they logged in
 );
+
+select * from users_auth;
