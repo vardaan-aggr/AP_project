@@ -1,0 +1,9 @@
+{
+    "java.project.sourcePaths": [
+        "."
+    ],
+    "java.project.referencedLibraries": [
+        "c:\\Users\\DELL\\Desktop\\SEM 3\\AP\\project\\AP_project\\lib\\jbcrypt-0.4.jar",
+        "c:\\Users\\DELL\\Desktop\\SEM 3\\AP\\project\\AP_project\\lib\\mariadb-java-client-3.5.6.jar"
+    ]
+}
