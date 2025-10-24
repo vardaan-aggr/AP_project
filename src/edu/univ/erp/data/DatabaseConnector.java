@@ -5,7 +5,7 @@ import java.sql.*;
 public class DatabaseConnector {
 
     private static final String DB_USER = "root"; 
-    private static final String DB_PASS = "mdo)&&*"; // <-- IMPORTANT: Change this!
+    private static final String DB_PASS = "NewPassword"; // <-- IMPORTANT: Change this!
 
     // --- Connection Strings ---
     // These URLs tell JDBC where to find your databases

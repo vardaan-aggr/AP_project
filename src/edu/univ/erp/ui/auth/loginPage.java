@@ -47,10 +47,10 @@ class loginPage {
                 String password = new String(passText.getPassword());
 
                 // 2. Create the login "brain"
-                AuthService authService = new AuthService();
+                AuthService AuthService = new AuthService();
 
                 // 3. Check the password by calling the login() method
-                if (authService.login(username, password)) {
+                if (AuthService.login(username, password)) {
                     // Success!
                     System.out.println("Login Successful!");
                     // Later, you will close this window and open a dashboard
