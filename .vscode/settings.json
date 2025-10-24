@@ -1,7 +1,8 @@
 {
     "java.project.referencedLibraries": [
         "lib/mariadb-java-client-3.5.6.jar",
-        "/home/prabal/Documents/JavaProject/AP_project/lib/jbcrypt-0.4.jar"
+        "/home/prabal/Documents/JavaProject/AP_project/lib/jbcrypt-0.4.jar",
+        "lib/jbcrypt-0.4.jar"
     ],
     "java.project.sourcePaths": [
         "src"

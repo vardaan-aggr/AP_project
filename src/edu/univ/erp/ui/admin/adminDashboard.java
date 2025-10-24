@@ -1,3 +1,5 @@
+package edu.univ.erp.ui.admin;
+
 import javax.swing.*;
 
 class adminDashboard {
