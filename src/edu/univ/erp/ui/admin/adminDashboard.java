@@ -12,7 +12,7 @@ class adminDashboard {
         userManagement.setBounds(0, 100, 220, 50);
         frame.add(userManagement);
 
-        JButton courseManagement = new JButton("User Management");
+        JButton courseManagement = new JButton("Course Management");
         courseManagement.setBounds(300, 100, 220, 50);
         frame.add(courseManagement);
     
