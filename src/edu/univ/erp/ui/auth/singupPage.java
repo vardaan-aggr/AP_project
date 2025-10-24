@@ -11,7 +11,7 @@ import edu.univ.erp.auth.AuthService;
 
 public class singupPage {
     public static void main(String[] args) {
-        JFrame singupFrame = new JFrame("University ERP Singup"); 
+        JFrame singupFrame = new JFrame("University ERP SingupLOL"); 
 
         singupFrame.setSize(450, 300); 
         singupFrame.setLayout(null);
