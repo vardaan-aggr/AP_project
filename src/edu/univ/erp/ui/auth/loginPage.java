@@ -1,6 +1,9 @@
 package edu.univ.erp.ui.auth;
 
 import javax.swing.*;
+
+import edu.univ.erp.auth.AuthService;
+
 import java.awt.event.ActionEvent;   
 import java.awt.event.ActionListener;  
 
@@ -36,10 +39,26 @@ class loginPage {
         loginFrame.setLocationRelativeTo(null); 
         loginFrame.setVisible(true);
 
-        // actionlisteners
+        // action listener
         loginBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                
+                // 1. Get text from the fields
+                String username = userText.getText();
+                String password = new String(passText.getPassword());
+
+                // 2. Create the login "brain"
+                AuthService authService = new AuthService();
+
+                // 3. Check the password by calling the login() method
+                if (authService.login(username, password)) {
+                    // Success!
+                    System.out.println("Login Successful!");
+                    // Later, you will close this window and open a dashboard
+                } else {
+                    // Failure
+                    System.out.println("Login Failed: Incorrect username or password.");
+                    // Later, you will show a pop-up error message
+                }
             }
         });
     }
