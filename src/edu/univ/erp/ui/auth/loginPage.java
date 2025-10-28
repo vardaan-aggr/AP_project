@@ -2,6 +2,9 @@ package edu.univ.erp.ui.auth;
 
 import javax.swing.*;
 import edu.univ.erp.auth.AuthService;
+import edu.univ.erp.ui.instructor.instructorDashboard;
+import edu.univ.erp.ui.student.studentDashboard;
+
 import java.awt.event.ActionEvent;   
 import java.awt.event.ActionListener;  
 
@@ -32,37 +35,29 @@ class loginPage {
         loginBtn.setBounds(150, 170, 100, 30);
         loginFrame.add(loginBtn);
 
-        // Final configuration
         loginFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         loginFrame.setLocationRelativeTo(null); 
         loginFrame.setVisible(true);
 
-        // action listener
         loginBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // 1. Get text from the fields
                 String username = userText.getText();
                 String password = new String(passText.getPassword());
 
-                // 2. Create the login "brain"
                 AuthService AuthService = new AuthService();
                 String role = AuthService.login(username, password);
 
-                // 3. Check the password by calling the login() method
                 if ("student".equals(role)) {
-                    // Success!
-                    System.out.println("Write code for opening student assboard!");
-                    // Later, you will close this window and open a dashboard
+                    new studentDashboard();
+                    loginFrame.dispose();
                 }
                 if ("instructor".equals(role)) {
-                    // Success!
-                    System.out.println("Write code for opening instructor assboard!");
-                    // Later, you will close this window and open a dashboard
+                    new instructorDashboard();
+                    loginFrame.dispose();
                 } 
                 else {
-                    // Failure
-                    System.out.println(role);
-                    // Later, you will show a pop-up error message
+                    System.out.println(role); 
+                    JOptionPane.showMessageDialog(loginFrame, role);
                 }
             }
         });

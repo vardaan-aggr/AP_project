@@ -3,7 +3,7 @@ CREATE DATABASE erp_db;
 USE erp_db;
 
 CREATE TABLE students (
-    user_id INT PRIMARY KEY,                 -- This MUST match the user_id from auth_db
+    user_id INT PRIMARY KEY,             
     roll_no VARCHAR(20) UNIQUE NOT NULL,
     program VARCHAR(100),
     year INT,
