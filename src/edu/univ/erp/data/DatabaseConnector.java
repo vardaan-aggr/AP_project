@@ -5,8 +5,7 @@ import java.sql.*;
 public class DatabaseConnector {
 
     private static final String DB_USER = "root"; 
-    private static final String DB_PASS = "mdo)&&*"; // <-- IMPORTANT: Change this!
-
+    private static final String DB_PASS = System.getenv("DB_PASS");
     // --- Connection Strings ---
     // These URLs tell JDBC where to find your databases
     // CORRECT URLS (using the mariadb format)
