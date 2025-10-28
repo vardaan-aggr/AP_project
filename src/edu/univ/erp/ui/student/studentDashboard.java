@@ -4,14 +4,12 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;   
 import java.awt.event.ActionListener;  
 
-class studentDashboard {
+public class studentDashboard {
     public static void main(String[] args) {
         JFrame studentDashboard = new JFrame("Dashboard"); 
 
-
         studentDashboard.setSize(450, 300); 
         studentDashboard.setLayout(null);
-        
 
         JButton courseBtn = new JButton("Course Catalog");
         courseBtn.setBounds(900, 200, 200, 100);
@@ -36,7 +34,6 @@ class studentDashboard {
         studentDashboard.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         studentDashboard.setLocationRelativeTo(null); 
         studentDashboard.setVisible(true);
-
 
                 // actionlisteners
         courseBtn.addActionListener(new ActionListener() {
