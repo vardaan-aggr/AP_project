@@ -1,5 +1,4 @@
 CREATE DATABASE IF NOT EXISTS erp_db;
-
 USE erp_db;
 
 CREATE TABLE IF NOT EXISTS students (
