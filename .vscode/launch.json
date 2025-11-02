@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Run YourJavaApp", // This name might be different
+            "request": "launch",
+            "mainClass": "edu.univ.erp.ui.auth.loginPage", // Make sure this is your main class
+            // ...other settings...
+
+            // THIS IS THE IMPORTANT PART
+            "env": {
+                "DB_PASS": "mdo)&&*"
+            }
+        }
+    ]
+}

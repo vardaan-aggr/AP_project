@@ -4,17 +4,30 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List; // Import List
+
+// Import your service and domain classes
+import edu.univ.erp.service.studentService;
+import edu.univ.erp.domain.Course;
 
 public class RegistrationFrame {
 
     private JFrame frame;
+    private studentService service; // The "brain"
+    private JTable catalogTable;
+    private DefaultTableModel catalogModel;
+    
+    // You'll need these later for the other table
+    // private JTable mySectionsTable;
+    // private DefaultTableModel mySectionsModel;
 
     public RegistrationFrame() {
+        this.service = new studentService(); // Create the service
+
         frame = new JFrame("Course Registration");
         frame.setSize(800, 600);
         frame.setLayout(null);
         frame.setLocationRelativeTo(null);
-        // Use DISPOSE_ON_CLOSE so it only closes this window, not the whole app
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); 
 
         // --- 1. Course Catalog (for Registering) ---
@@ -23,18 +36,17 @@ public class RegistrationFrame {
         catalogLabel.setBounds(20, 20, 300, 20);
         frame.add(catalogLabel);
 
-        // Table for course catalog
-        String[] catalogCols = {"Code", "Title", "Credits", "Capacity", "Instructor"};
-        Object[][] catalogData = {
-            {"CS101", "Intro to CS", 3, 50, "Dr. Turing"},
-            {"MATH101", "Calculus I", 4, 60, "Dr. Newton"},
-            {"PHY101", "Physics I", 4, 40, "Dr. Curie"},
-            // In a real app, you load this from your 'service' layer
-        };
-        JTable catalogTable = new JTable(new DefaultTableModel(catalogData, catalogCols));
+        // --- REAL TABLE SETUP ---
+        String[] catalogCols = {"Code", "Title", "Credits"};
+        // Create a model, but with 0 rows
+        catalogModel = new DefaultTableModel(null, catalogCols);
+        catalogTable = new JTable(catalogModel);
+        
         JScrollPane catalogScrollPane = new JScrollPane(catalogTable);
         catalogScrollPane.setBounds(20, 50, 740, 200);
         frame.add(catalogScrollPane);
+        
+        // --- End of table setup ---
 
         JButton registerButton = new JButton("Register for Selected Section");
         registerButton.setBounds(20, 260, 250, 30);
@@ -48,11 +60,9 @@ public class RegistrationFrame {
 
         // Table for registered sections
         String[] mySectionsCols = {"Code", "Title", "Instructor", "Time/Room"};
-        Object[][] mySectionsData = {
-            {"CS101", "Intro to CS", "Dr. Turing", "Mon 10:00"},
-            // Load this from your service layer
-        };
-        JTable mySectionsTable = new JTable(new DefaultTableModel(mySectionsData, mySectionsCols));
+        // Create an empty model for now
+        DefaultTableModel mySectionsModel = new DefaultTableModel(null, mySectionsCols);
+        JTable mySectionsTable = new JTable(mySectionsModel);
         JScrollPane mySectionsScrollPane = new JScrollPane(mySectionsTable);
         mySectionsScrollPane.setBounds(20, 340, 740, 150);
         frame.add(mySectionsScrollPane);
@@ -71,39 +81,47 @@ public class RegistrationFrame {
         // --- Action Listeners ---
         backButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new studentDashboard(); // Open the dashboard
-                frame.dispose(); // Close this window
+                new studentDashboard(); 
+                frame.dispose(); 
             }
         });
 
         registerButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // 1. Get selected row from catalogTable
-                int selectedRow = catalogTable.getSelectedRow();
-                if (selectedRow == -1) {
-                    JOptionPane.showMessageDialog(frame, "Please select a course to register.", "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                // 2. Call your "service.register(...)" method
-                // 3. Show success/error based on spec (e.g., "Section full", "duplicate")
-                JOptionPane.showMessageDialog(frame, "Registration Successful! (Mockup)");
-                // 4. Reload "My Registered Sections" table
+                // ... (Logic for this button will be your next step) ...
+                JOptionPane.showMessageDialog(frame, "Register button clicked!");
             }
         });
 
         dropButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // 1. Get selected row from mySectionsTable
-                int selectedRow = mySectionsTable.getSelectedRow();
-                if (selectedRow == -1) {
-                    JOptionPane.showMessageDialog(frame, "Please select a section to drop.", "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                // 2. Call your "service.drop(...)" method
-                JOptionPane.showMessageDialog(frame, "Section Dropped! (Mockup)");
-                // 3. Reload "My Registered Sections" table
+                // ... (Logic for this button will be your next step) ...
+                JOptionPane.showMessageDialog(frame, "Drop button clicked!");
             }
         });
+
+        // --- FINALLY, LOAD THE DATA ---
+        loadCourseCatalog();
+    }
+
+    /**
+     * A new method to fetch data from the service
+     * and load it into the JTable.
+     */
+    private void loadCourseCatalog() {
+        // 1. Get data from the "brain"
+        List<Course> courseList = service.getCourseCatalog();
+        
+        // 2. Clear any old data from the table
+        catalogModel.setRowCount(0); 
+        
+        // 3. Add each course to the table model
+        for (Course course : courseList) {
+            Object[] row = new Object[3];
+            row[0] = course.getCode();
+            row[1] = course.getTitle();
+            row[2] = course.getCredits();
+            catalogModel.addRow(row);
+        }
     }
 }
-

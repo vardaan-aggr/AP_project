@@ -51,7 +51,7 @@ class loginPage {
                     new studentDashboard();
                     loginFrame.dispose();
                 }
-                if ("instructor".equals(role)) {
+                else if ("instructor".equals(role)) {
                     new instructorDashboard();
                     loginFrame.dispose();
                 } 
