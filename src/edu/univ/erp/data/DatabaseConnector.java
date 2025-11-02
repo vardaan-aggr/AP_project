@@ -10,7 +10,7 @@ public class DatabaseConnector {
     // These URLs tell JDBC where to find your databases
     // CORRECT URLS (using the mariadb format)
     private static final String AUTH_DB_URL = "jdbc:mariadb://localhost:3306/auth_db";
-    private static final String ERP_DB_URL = "jdbc:mariadb://localhost:3306/auth_db";
+    private static final String ERP_DB_URL = "jdbc:mariadb://localhost:3306/erp_db";
 
     public static Connection getAuthConnection() throws SQLException {
         try {
@@ -31,26 +31,5 @@ public class DatabaseConnector {
             return null;
         }
         return DriverManager.getConnection(ERP_DB_URL, DB_USER, DB_PASS);
-    }
-
-    public static void main(String[] args) {
-        Connection authConn = null;
-        try {
-            // 1. connect to the Auth DB
-            authConn = getAuthConnection();
-            
-            // 2. Check if connection was successful
-            if (authConn != null) {
-                System.out.println("SUCCESS: Connected to the Auth DB!");
-                authConn.close(); // Close the connection
-            } else {
-                System.out.println("FAILURE: Failed to get Auth DB connection.");
-            }
-            
-        } catch (SQLException e) {
-            // catch errors like "wrong password" or "database not found"
-            System.out.println("FAILURE: SQL Exception occurred!");
-            e.printStackTrace();
-        }
     }
 }

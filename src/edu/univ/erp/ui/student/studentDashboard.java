@@ -55,7 +55,7 @@ public class studentDashboard {
         logoutBtn.setBounds(325, 400, 150, 40);
         dashboardFrame.add(logoutBtn);
 
-        dashboardFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        dashboardFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         dashboardFrame.setVisible(true);
 
         // --- Action Listeners ---

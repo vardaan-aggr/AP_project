@@ -16,58 +16,45 @@ public class AuthService {
      * @param password The plain-text password entered by the user.
      * @return true if login is successful, false otherwise.
      */
+    // ... inside AuthService.java
     public String login(String username, String password) {
-        String storedHash = null; // Variable to hold the hash from the DB
+        String storedHash = null;
         String userRole = null;
         
-        // This SQL query finds the user and gets their hashed password
+        // SQL query now gets both hash and role
         String sql = "SELECT password_hash, role FROM users_auth WHERE username = ?";
 
-        // Get a connection from your DatabaseConnector
-        // This is a "try-with-resources" block, which automatically closes the connection
         try (Connection conn = DatabaseConnector.getAuthConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            // Set the username in the SQL query
             stmt.setString(1, username);
 
-            // Execute the query
             try (ResultSet rs = stmt.executeQuery()) {
-                
-                // Check if a user was found
                 if (rs.next()) {
-                    // A user was found, get their stored password hash
                     storedHash = rs.getString("password_hash");
                     userRole = rs.getString("role");
                 } else {
-                    // No user with that username exist"Login Error: Password hash is empty."s
-                    System.out.println("Login Error: No user found.");
-                    return userRole; 
+                    return "Login Error: No user found."; // Return error
                 }
             }
         } catch (SQLException e) {
-            // e.printStackTrace();
-            return "Login Error: Database connection failed."; // Database error
+            e.printStackTrace();
+            return "Login Error: Database connection failed."; // Return error
         }
 
-        // --- This is the most important part ---
-        
-        // If storedHash is null (shouldn't happen if user was found) or empty
         if (storedHash == null || storedHash.isEmpty()) {
-            return "Login Error: Password hash is empty.";
+            return "Login Error: Password hash is empty."; // Return error
         }
 
-        // Now, check if the entered password matches the stored hash
+        // Check password
         if (BCrypt.checkpw(password, storedHash)) {
-            // Passwords match!
-            return userRole;
+            return userRole; // <-- SUCCESS! Return the role.
         } else {
-            // Passwords do not match.
-            return "Login Error: Passwords do not match.";
+            return "Login Error: Passwords do not match."; // Return error
         }
     }
 
-/**
+    /**
      * Registers a new user in the database.
      *
      * @param username The username for the new account.

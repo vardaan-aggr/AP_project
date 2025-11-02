@@ -39,25 +39,42 @@ class loginPage {
         loginFrame.setLocationRelativeTo(null); 
         loginFrame.setVisible(true);
 
+        // Inside loginPage.java
         loginBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                // 1. Get text from the fields
                 String username = userText.getText();
                 String password = new String(passText.getPassword());
 
-                AuthService AuthService = new AuthService();
-                String role = AuthService.login(username, password);
+                // 2. Create the login "brain"
+                AuthService authService = new AuthService();
 
+                // 3. Call login() ONLY ONCE and save the result
+                String role = authService.login(username, password);
+
+                // 4. Use "if-else if-else" and .equals() to check the role
                 if ("student".equals(role)) {
-                    new studentDashboard();
-                    loginFrame.dispose();
-                }
-                else if ("instructor".equals(role)) {
-                    new instructorDashboard();
-                    loginFrame.dispose();
-                } 
-                else {
-                    System.out.println(role); 
-                    JOptionPane.showMessageDialog(loginFrame, role);
+                    // Success!
+                    System.out.println("Opening student dashboard!");
+                    new studentDashboard(); // Open student dashboard
+                    loginFrame.dispose();   // Close login window
+
+                } else if ("instructor".equals(role)) {
+                    // Success!
+                    System.out.println("Opening instructor dashboard!");
+                    new instructorDashboard(); // Open instructor dashboard
+                    loginFrame.dispose(); // Close login window
+                
+                } else if ("admin".equals(role)) {
+                    // Success!
+                    System.out.println("Opening admin dashboard!");
+                    new adminDashboard(); // Open admin dashboard
+                    loginFrame.dispose(); // Close login window
+
+                } else {
+                    // Failure - 'role' contains the error message
+                    System.out.println(role); // This will print the error message from AuthService
+                    JOptionPane.showMessageDialog(loginFrame, role); // Show pop-up
                 }
             }
         });
