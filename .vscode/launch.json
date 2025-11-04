@@ -3,12 +3,16 @@
     "configurations": [
         {
             "type": "java",
-            "name": "Run YourJavaApp", // This name might be different
+            "name": "HashGenerator",
             "request": "launch",
-            "mainClass": "edu.univ.erp.ui.auth.loginPage", // Make sure this is your main class
-            // ...other settings...
-
-            // THIS IS THE IMPORTANT PART
+            "mainClass": "edu.univ.erp.util.HashGenerator",
+            "projectName": "AP_project_25a853fc"
+        },
+        {
+            "type": "java",
+            "name": "Run YourJavaApp",
+            "request": "launch",
+            "mainClass": "edu.univ.erp.ui.auth.loginPage",
             "env": {
                 "DB_PASS": "mdo)&&*"
             }
