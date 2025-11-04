@@ -10,7 +10,7 @@ Create table IF NOT EXIST instructors {
     department varchar(50)
 };
 Create table IF NOT EXIST courses {
-    code varchar(50),
+    course_code varchar(50),
     title varchar (50),
     section varchar(50),
     credits int,
@@ -21,8 +21,8 @@ Create table IF NOT EXIST enrollments {
     status varchar(50)
 };
 Create table IF NOT EXIST sections {
-    course_id varchar(50),
-    instructor_id varchar(50),
+    course_code varchar(50),
+    roll_no varchar(50),
     day_time varchar (50),
     room varchar (50),
     capacity int,
