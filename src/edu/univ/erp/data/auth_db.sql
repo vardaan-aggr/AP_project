@@ -1,11 +1,13 @@
-Create database IF NOT EXIST auth_db;
-use auth_db;
-Create table  IF NOT EXIST auth {
-    user_id varchar (255),
-    username varchar(255),
-    role varchar(255),
-    hash_password varchar(255),
-    varchar(255) status
-};
+CREATE DATABASE IF NOT EXISTS auth_db;
+USE auth_db;
 
--- user id, username, role, password hash, status, last login)
+CREATE TABLE IF NOT EXISTS auth (
+    user_id integer (7),
+    username VARCHAR(255),
+    role VARCHAR(255),
+    hash_password VARCHAR(255),
+    status boolean,
+    last_login DATETIME
+);
+
+-- user id, username, role, password hash, status, last login
