@@ -24,7 +24,6 @@ class adminDashboard {
         maintenanceMode.setBounds(300, 500, 220, 50);
         frame.add(maintenanceMode);
 
-
         frame.setSize(500, 600);
         frame.setLayout(null);
         frame.setLocationRelativeTo(null);
