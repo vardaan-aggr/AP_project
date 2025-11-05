@@ -1,3 +1,4 @@
 *.class
 .vscode/
-config.properties
+Authdatabase.properties
+Erpdatabase.properties
