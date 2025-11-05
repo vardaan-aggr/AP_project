@@ -1,5 +1,4 @@
-package edu.univ.erp.ui.auth;
-
+package edu.univ.erp.ui.student;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,14 +16,13 @@ import edu.univ.erp.ui.instructor.InstructorDashboard;
 import java.awt.event.ActionEvent;   
 import java.awt.event.ActionListener;
 
-public class LoginPage {
+public class RegisterFrame {
     public static void main(String[] args) {
-        JFrame loginFrame = new JFrame("University ERP Login"); 
-
+    JFrame loginFrame = new JFrame("Registration"); 
         loginFrame.setSize(450, 300); 
         loginFrame.setLayout(null);
 
-        JLabel userLabel = new JLabel("Username:");
+        JLabel userLabel = new JLabel("Course Code:");
         userLabel.setBounds(50, 60, 100, 30);
         loginFrame.add(userLabel);
         
@@ -32,7 +30,7 @@ public class LoginPage {
         userText.setBounds(150, 60, 250, 30);
         loginFrame.add(userText);
         
-        JLabel passLabel = new JLabel("Password:");
+        JLabel passLabel = new JLabel("Section:");
         passLabel.setBounds(50, 110, 100, 30);
         loginFrame.add(passLabel);
         
@@ -40,20 +38,20 @@ public class LoginPage {
         passText.setBounds(150, 110, 250, 30);
         loginFrame.add(passText);
         
-        JButton loginBtn = new JButton("Login");
-        loginBtn.setBounds(150, 170, 100, 30);
-        loginFrame.add(loginBtn);
+        JButton regBtn = new JButton("Register");
+        regBtn.setBounds(150, 170, 100, 30);
+        loginFrame.add(regBtn);
 
         loginFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         loginFrame.setLocationRelativeTo(null); 
         loginFrame.setVisible(true);
-    
-    loginBtn.addActionListener(new ActionListener() {
+
+        regBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // 1. Get text from the fields
-                String username_input = userText.getText();
-                String password_input = new String(passText.getPassword());
-                try (Connection connection = DatabaseConnector.getAuthConnection()) {
+                String courseCode_in = userText.getText();
+                String section_in = new String(passText.getPassword());
+                try (Connection connection = DatabaseConnector.getErpConnection()) {
                     try (PreparedStatement statement = connection.prepareStatement("""
                                 Select hash_password, role FROM auth_table WHERE username = ?; 
                             """)) {
@@ -65,7 +63,7 @@ public class LoginPage {
                                 String hash_pass_db = resultSet.getString("hash_password");
                                 String role_db = resultSet.getString("role");
                                 // System.out.println("Billi kre meow meow 🙀: "+ hash_pass_db);
-                                if (BCrypt.checkpw(password_input, hash_pass_db)) {
+                                if (BCrypt.checkpw(section_in, hash_pass_db)) {
                                     System.out.println("\nCorrect Password\n");
                                     if (role_db.equals("student")) {
                                         loginFrame.dispose();
@@ -98,5 +96,3 @@ public class LoginPage {
         });
     }
 }
-
-
