@@ -2,7 +2,7 @@ package edu.univ.erp.ui.admin;
 
 import javax.swing.*;
 
-class adminDashboard {
+public class AdminDashboard {
 
     public static void main(String[] args)
     {
