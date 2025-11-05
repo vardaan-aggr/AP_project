@@ -4,7 +4,7 @@ import org.mindrot.jbcrypt.BCrypt;
 
 public class HashGenerator {
     public static void main(String[] args) {
-        String password = "admin2";
+        String password = "mdo1";
         String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
         System.out.println(hashedPassword);
     }
