@@ -5,9 +5,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import javax.swing.*;
+
 import edu.univ.erp.data.DatabaseConnector;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;   
 import java.awt.event.ActionListener;
 
@@ -50,7 +51,7 @@ public class LoginPage {
                 String password = new String(passText.getPassword());
                 try (Connection connection = DatabaseConnector.getAuthConnection()) {
                     try (PreparedStatement statement = connection.prepareStatement("""
-                                Select hash_password FROM auth_table WHERE username = '?'; 
+                                Select hash_password FROM auth_table WHERE username = ?; 
                             """)) {
                         statement.setString(1, username);
                         try (ResultSet resultSet = statement.executeQuery()) {
@@ -58,8 +59,8 @@ public class LoginPage {
                             while (resultSet.next()) {
                                 empty = false;
                                 String hash_password = resultSet.getString("hash_password");
-                                System.out.println("Billi kre meow meow 🙀: "+hash_password);
-                            }
+                                System.out.println("Billi kre meow meow 🙀: "+ hash_password);
+                            } 
                             if (empty) {
                                 System.out.println("\t (no data)");
                             }
