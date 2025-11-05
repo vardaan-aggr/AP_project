@@ -7,13 +7,14 @@ import java.sql.SQLException;
 
 import javax.swing.*;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 import edu.univ.erp.data.DatabaseConnector;
 
 import java.awt.event.ActionEvent;   
 import java.awt.event.ActionListener;
 
 public class LoginPage {
-
     public static void main(String[] args) {
         JFrame loginFrame = new JFrame("University ERP Login"); 
 
@@ -44,22 +45,28 @@ public class LoginPage {
         loginFrame.setLocationRelativeTo(null); 
         loginFrame.setVisible(true);
     
-    loginBtn.addActionListener(new ActionListener() {
+        loginBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // 1. Get text from the fields
-                String username = userText.getText();
-                String password = new String(passText.getPassword());
+                String username_input = userText.getText();
+                String password_input = new String(passText.getPassword());
                 try (Connection connection = DatabaseConnector.getAuthConnection()) {
                     try (PreparedStatement statement = connection.prepareStatement("""
                                 Select hash_password FROM auth_table WHERE username = ?; 
                             """)) {
-                        statement.setString(1, username);
+                        statement.setString(1, username_input);
                         try (ResultSet resultSet = statement.executeQuery()) {
                             boolean empty = true;
                             while (resultSet.next()) {
                                 empty = false;
-                                String hash_password = resultSet.getString("hash_password");
-                                System.out.println("Billi kre meow meow 🙀: "+ hash_password);
+                                String hash_pass_db = resultSet.getString("hash_password");
+                                // System.out.println("Billi kre meow meow 🙀: "+ hash_pass_db);
+                                if (BCrypt.checkpw(password_input, hash_pass_db)) {
+                                    System.out.println("--Correct Password--");
+
+                                } else {
+                                    System.out.println("WrongPassword");
+                                }
                             } 
                             if (empty) {
                                 System.out.println("\t (no data)");
