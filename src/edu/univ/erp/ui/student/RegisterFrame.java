@@ -5,6 +5,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
 
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -18,31 +20,44 @@ import java.awt.event.ActionListener;
 
 public class RegisterFrame {
     public static void main(String[] args) {
-    JFrame loginFrame = new JFrame("Registration"); 
-        loginFrame.setSize(450, 300); 
-        loginFrame.setLayout(null);
+        JFrame loginFrame = new JFrame("Registration");
+        // Use BorderLayout for the main frame
+        loginFrame.setLayout(new BorderLayout());
+
+        // 1. Create a panel for the form fields with a GridLayout
+        JPanel formPanel = new JPanel(new GridLayout(3, 2, 10, 10)); // 3 rows, 2 cols, 10px gaps
+        formPanel.setBorder(new EmptyBorder(15, 15, 15, 15)); // Add padding
 
         JLabel userLabel = new JLabel("Course Code:");
-        userLabel.setBounds(50, 60, 100, 30);
-        loginFrame.add(userLabel);
+        formPanel.add(userLabel);
         
         JTextField userText = new JTextField();
-        userText.setBounds(150, 60, 250, 30);
-        loginFrame.add(userText);
+        formPanel.add(userText);
         
-        JLabel passLabel = new JLabel("Section:");
-        passLabel.setBounds(50, 110, 100, 30);
-        loginFrame.add(passLabel);
+        JLabel sectionLabel = new JLabel("Section:"); // Renamed from passLabel
+        formPanel.add(sectionLabel);
         
-        JPasswordField passText = new JPasswordField();
-        passText.setBounds(150, 110, 250, 30);
-        loginFrame.add(passText);
+        JTextField sectionText = new JTextField(); // Changed from JPasswordField
+        formPanel.add(sectionText);
+
+        JLabel rollLabel = new JLabel("Roll No:"); // Fixed label text
+        formPanel.add(rollLabel);
         
+        JTextField rollText = new JTextField(); // Changed from JPasswordField
+        formPanel.add(rollText);
+        
+        // 2. Create a panel for the button (to center it)
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton regBtn = new JButton("Register");
-        regBtn.setBounds(150, 170, 100, 30);
-        loginFrame.add(regBtn);
+        regBtn.setPreferredSize(new Dimension(100, 30)); // Give button a preferred size
+        buttonPanel.add(regBtn);
+
+        // 3. Add panels to the frame
+        loginFrame.add(formPanel, BorderLayout.CENTER);  // Form goes in the middle
+        loginFrame.add(buttonPanel, BorderLayout.SOUTH); // Button goes at the bottom
 
         loginFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        loginFrame.pack(); // Automatically sizes the window to fit components
         loginFrame.setLocationRelativeTo(null); 
         loginFrame.setVisible(true);
 
@@ -53,16 +68,18 @@ public class RegisterFrame {
                 String section_in = new String(passText.getPassword());
                 try (Connection connection = DatabaseConnector.getErpConnection()) {
                     try (PreparedStatement statement = connection.prepareStatement("""
-                                Select hash_password, role FROM auth_table WHERE username = ?; 
+                                Insert into enrollments (roll_no, section_id, status) values 
+                                    ('?', '?', '?');
                             """)) {
-                        statement.setString(1, username_input);
+                        statement.setString(1, );
+                        statement.setString(2, section_in);
+                        statement.setString(3, "enrolled");
                         try (ResultSet resultSet = statement.executeQuery()) {
                             boolean empty = true;
                             while (resultSet.next()) {
                                 empty = false;
                                 String hash_pass_db = resultSet.getString("hash_password");
                                 String role_db = resultSet.getString("role");
-                                // System.out.println("Billi kre meow meow 🙀: "+ hash_pass_db);
                                 if (BCrypt.checkpw(section_in, hash_pass_db)) {
                                     System.out.println("\nCorrect Password\n");
                                     if (role_db.equals("student")) {
