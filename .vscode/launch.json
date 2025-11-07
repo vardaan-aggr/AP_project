@@ -3,6 +3,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "LoginPage",
+            "request": "launch",
+            "mainClass": "edu.univ.erp.ui.auth.LoginPage",
+            "projectName": "AP_project_25a853fc"
+        },
+        {
+            "type": "java",
             "name": "HashGenerator",
             "request": "launch",
             "mainClass": "edu.univ.erp.util.HashGenerator",
