@@ -1,5 +1,5 @@
 package edu.univ.erp.ui.student;
 
-public class transFrame {
+public class transcriptFrame {
     
 }
