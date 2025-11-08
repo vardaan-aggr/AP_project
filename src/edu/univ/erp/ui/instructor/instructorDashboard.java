@@ -4,11 +4,12 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;   
 import java.awt.event.ActionListener;  
 
-public class instructorDashboard {
+public class InstructorDashboard {
     
     private JFrame dashboardFrame; 
 
-    public instructorDashboard() {
+    public InstructorDashboard(String username) {
+        String instructorName = username;
         dashboardFrame = new JFrame("Instructor Dashboard");
         dashboardFrame.setSize(500, 600); // Made height taller
         dashboardFrame.setLayout(null);
@@ -34,7 +35,7 @@ public class instructorDashboard {
         dashboardFrame.add(viewcourses);
         
         JButton logoutBtn = new JButton("Logout");
-        logoutBtn.setBounds(185, 400, 130, 40); // Moved down
+        logoutBtn.setBounds(140, 400, 100, 40); 
         dashboardFrame.add(logoutBtn);
 
         dashboardFrame.setVisible(true);
@@ -42,8 +43,8 @@ public class instructorDashboard {
         // --- ACTION LISTENERS ---
         mySections.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new MySectionsFrame();
                 dashboardFrame.dispose(); 
+                new MySectionsFrame();
             }
         });
         
@@ -69,6 +70,7 @@ public class instructorDashboard {
             }
         });
 
+
         logoutBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JOptionPane.showMessageDialog(dashboardFrame, "Logged out.");
@@ -76,5 +78,6 @@ public class instructorDashboard {
                 dashboardFrame.dispose();
             }
         });
+
     }
 }
