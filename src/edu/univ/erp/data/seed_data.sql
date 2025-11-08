@@ -11,3 +11,8 @@ Insert into enrollments (roll_no, section_id, status) values
     ('3', 'N', 'enrolled');
 Insert into sections (course_code, instructor_id, day_time, room, capacity, semester, year) values
     ('ECE250', '2', 'Fri_9:00-11:00', 'C102', '600', 'Monsoon', '2025');
+Insert into grades (roll_no, course_code, grade) values
+    ('1', 'ECE250', 'A-');
+use erp_db;
+Insert into sections (course_code, roll_no, day_time, room, capacity, semester, year) values
+    ('ECE250', '2', 'Wed-(10:30-12:00), Fri-(8:30-11:00)', 'C102', '600', 'Monsoon', '2025')
