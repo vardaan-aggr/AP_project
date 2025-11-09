@@ -47,6 +47,9 @@ public class registerFrame {
         f.setLocationRelativeTo(null);
         f.setVisible(true);
     
+        JButton b2 = new JButton("Back");
+        b2.setBounds(300, 210, 100, 30);
+        f.add(b2);
 
         b1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -69,6 +72,13 @@ public class registerFrame {
                 } catch (SQLException ex) {
                     System.out.println("Error: Couldn't register, " + ex);
                 }
+                f.dispose();
+                new studentDashboard(username, role, in_pass, roll_no);
+            }
+        });
+
+        b2.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
                 f.dispose();
                 new studentDashboard(username, role, in_pass, roll_no);
             }

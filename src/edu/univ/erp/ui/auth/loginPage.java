@@ -10,14 +10,14 @@ import javax.swing.*;
 import org.mindrot.jbcrypt.BCrypt;
 
 import edu.univ.erp.data.DatabaseConnector;
-import edu.univ.erp.ui.student.StudentDashboard;
-import edu.univ.erp.ui.admin.AdminDashboard;
+import edu.univ.erp.ui.student.studentDashboard;
+import edu.univ.erp.ui.admin.adminDashboard;
 import edu.univ.erp.ui.instructor.InstructorDashboard;
 
 import java.awt.event.ActionEvent;   
 import java.awt.event.ActionListener;
 
-public class LoginPage {
+public class loginPage {
     public static void main(String[] args) {
         JFrame loginFrame = new JFrame("University ERP Login"); 
 
@@ -28,17 +28,17 @@ public class LoginPage {
         userLabel.setBounds(50, 60, 100, 30);
         loginFrame.add(userLabel);
         
-        JTextField userText = new JTextField();
-        userText.setBounds(150, 60, 250, 30);
-        loginFrame.add(userText);
+        JTextField t1 = new JTextField();
+        t1.setBounds(150, 60, 250, 30);
+        loginFrame.add(t1);
         
         JLabel passLabel = new JLabel("Password:");
         passLabel.setBounds(50, 110, 100, 30);
         loginFrame.add(passLabel);
         
-        JPasswordField passText = new JPasswordField();
-        passText.setBounds(150, 110, 250, 30);
-        loginFrame.add(passText);
+        JPasswordField t2 = new JPasswordField();
+        t2.setBounds(150, 110, 250, 30);
+        loginFrame.add(t2);
         
         JButton loginBtn = new JButton("Login");
         loginBtn.setBounds(150, 170, 100, 30);
@@ -50,12 +50,11 @@ public class LoginPage {
     
     loginBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // 1. Get text from the fields
-                String username_input = userText.getText();
-                String password_input = new String(passText.getPassword());
+                String username_input = t1.getText();
+                String password_input = new String(t2.getPassword());
                 try (Connection connection = DatabaseConnector.getAuthConnection()) {
                     try (PreparedStatement statement = connection.prepareStatement("""
-                                Select hash_password, role FROM auth_table WHERE username = ?; 
+                                Select hash_password, role, roll_no FROM auth_table WHERE username = ?; 
                             """)) {
                         statement.setString(1, username_input);
                         try (ResultSet resultSet = statement.executeQuery()) {

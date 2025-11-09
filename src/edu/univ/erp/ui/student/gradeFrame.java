@@ -43,7 +43,7 @@ public class gradeFrame {
                         data.add(new String[]{courseCode, grade});
                     } 
                     if (empty) {
-                        System.out.println("\t (no data)");
+                        System.out.println("\t (no courses in grade table)");
                     }
                 }
             } 

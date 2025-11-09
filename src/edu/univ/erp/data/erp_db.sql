@@ -17,14 +17,15 @@ Create table IF NOT EXISTS courses (
     credits int 
 );
 Create table IF NOT EXISTS enrollments (
-    roll_no INT ,
-    section_id varchar(50),
+    roll_no int,
+    course_code varchar(50),
+    section varchar(50),
     status varchar(50)
 );
 Create table IF NOT EXISTS sections (
     course_code varchar(50),
-    
-    roll_no INT ,       -- instructor id
+    section varchar(50),
+    roll_no varchar(50),
     day_time varchar (50),
     room varchar (50),
     capacity INT  ,

@@ -1,25 +1,23 @@
 package edu.univ.erp.ui.student;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-import java.util.ArrayList;
-
 import javax.swing.*;
 
 import edu.univ.erp.data.DatabaseConnector;
 
-public class timetableFrame {
-    public timetableFrame(String roll_no) {
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
+public class courseCatalogFrame {
+    public courseCatalogFrame(String rollNo) {
         JFrame f = new JFrame();
-        f.setSize(600,600);
-        
-        String data[][] = dataPull(roll_no);
-        String columName[] = {"Code", "Day_Time", "Room"};
-        JTable t = new JTable(data, columName);
-        
+        f.setSize(600, 600);
+
+        String[][] data = dataPull(rollNo);
+        String[] columNames = {"Course Code", "Title", "Section", "Credits"};
+        JTable t = new JTable(data, columNames);
         JScrollPane sp = new JScrollPane(t);
         f.add(sp);
 
@@ -27,14 +25,13 @@ public class timetableFrame {
         f.setVisible(true);
     }
 
-    private String[][] dataPull(String roll_no) {
+    public String[][] dataPull(String rollNo) {
         ArrayList<String[]> arrList1 = new ArrayList<>();
-        ArrayList<String[]> arrList2 = new ArrayList<>();
         try (Connection connection = DatabaseConnector.getErpConnection()) {
             try (PreparedStatement statement = connection.prepareStatement("""
-                        Select course_code, section FROM enrollments WHERE roll_no = ? and status = ?; 
+                        Select course_code, section FROM enrollments WHERE roll_no = ? and status = ?;
                     """)) {
-                statement.setString(1, String.valueOf(roll_no));
+                statement.setString(1, String.valueOf(rollNo));
                 statement.setString(2, "enrolled");
                 try (ResultSet resultSet = statement.executeQuery()) {
                     boolean empty = true;
@@ -45,32 +42,33 @@ public class timetableFrame {
                         arrList1.add(new String[]{courseCode, section});
                     } 
                     if (empty) {
-                        System.out.println("\t (no enrollments)");
+                        System.out.println("\t (no courses enrolled)");
                     }
                 }
             } 
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
-        for (int i = 0; i < arrList1.size(); i++) {
-            String v1 = arrList1.get(i)[0];
-            String v2 = arrList1.get(i)[1];
+        ArrayList<String[]> arrList2 = new ArrayList<>();
+        for (int i = 0; i <  arrList1.size(); i++) {
             try (Connection connection = DatabaseConnector.getErpConnection()) {
                 try (PreparedStatement statement = connection.prepareStatement("""
-                            Select day_time, room, semester, year FROM sections WHERE course_code = ? AND section = ?; 
+                            Select course_code, title, section, credits FROM courses WHERE course_code = ? and section = ?; 
                         """)) {
-                    statement.setString(1, String.valueOf(v1));
-                    statement.setString(2, String.valueOf(v2));
+                    statement.setString(1, arrList1.get(i)[0]);
+                    statement.setString(2, arrList1.get(i)[1]);
                     try (ResultSet resultSet = statement.executeQuery()) {
                         boolean empty = true;
                         while (resultSet.next()) {
                             empty = false;
-                            String day_time = resultSet.getString("day_time"); 
-                            String room = resultSet.getString("room"); 
-                            arrList2.add(new String[]{v1, day_time, room});
-                        }
+                            String courseCode = resultSet.getString("course_code");
+                            String title = resultSet.getString("title"); 
+                            String section = resultSet.getString("section"); 
+                            String credits = resultSet.getString("credits"); 
+                            arrList2.add(new String[]{courseCode, title, section, credits});
+                        } 
                         if (empty) {
-                            System.out.println("\t (no section with given inputs exists)");
+                            System.out.println("\t (no course with given enrollments)");
                         }
                     }
                 } 
@@ -78,9 +76,8 @@ public class timetableFrame {
                 ex.printStackTrace();
             }
         }
-
-        String[][] strArr = new String[arrList2.size()][3];
-        arrList2.toArray(strArr);
-        return strArr;
+        String[][] strArray = new String[arrList1.size()][4];
+        arrList2.toArray(strArray);
+        return strArray;
     }
 }

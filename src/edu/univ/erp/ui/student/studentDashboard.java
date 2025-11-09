@@ -14,7 +14,7 @@ public class studentDashboard {
         l1.setBounds(275, 30, 300, 30); 
         f.add(l1);
 
-        JButton b1 = new JButton("Course Catalog / Register");
+        JButton b1 = new JButton("Register");
         b1.setBounds(100, 120, 250, 100);
         f.add(b1);
 
@@ -34,7 +34,7 @@ public class studentDashboard {
         b5.setBounds(450, 400, 250, 40); 
         f.add(b5);
 
-        JButton b6 = new JButton("Change Password");
+        JButton b6 = new JButton("Course Catalog");
         b6.setBounds(100, 400, 250, 40); 
         f.add(b6);
 
@@ -74,6 +74,13 @@ public class studentDashboard {
         b5.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JOptionPane.showMessageDialog(f, "Logged out.");
+            }
+        });
+
+        b6.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                f.dispose();
+                new courseCatalogFrame(roll_no);
             }
         });
     }
