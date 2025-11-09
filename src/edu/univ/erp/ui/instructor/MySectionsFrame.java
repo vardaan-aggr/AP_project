@@ -25,7 +25,7 @@ public class MySectionsFrame {
 
         backButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new instructorDashboard();
+                new InstructorDashboard();
                 frame.dispose();
             }
         });
