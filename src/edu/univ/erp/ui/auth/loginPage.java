@@ -47,12 +47,11 @@ public class loginPage {
     
         b1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // 1. Get text from the fields
                 String username_input = t1.getText();
                 String password_input = new String(t2.getPassword());
                 try (Connection connection = DatabaseConnector.getAuthConnection()) {
                     try (PreparedStatement statement = connection.prepareStatement("""
-                                Select hash_password, role FROM auth_table WHERE username = ?; 
+                                Select hash_password, role, roll_no FROM auth_table WHERE username = ?; 
                             """)) {
                         statement.setString(1, username_input);
                         try (ResultSet resultSet = statement.executeQuery()) {
@@ -64,7 +63,7 @@ public class loginPage {
                                 String roll_no = resultSet.getString("roll_no");
                                 // System.out.println("Billi kre meow meow 🙀: "+ hash_pass_db);
                                 if (BCrypt.checkpw(password_input, hash_pass_db)) {
-                                    System.out.println("\nCorrect Password");
+                                    System.out.println("\nCorrect Password\n");
                                     if (role_db.equals("student")) {
                                         f.dispose();
                                         System.out.println("--- Opening Student Dashboard");
