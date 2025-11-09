@@ -2,11 +2,7 @@ package edu.univ.erp.ui.common;
 
 import javax.swing.*;
 
-import org.mindrot.jbcrypt.BCrypt;
-
-// import edu.univ.erp.ui.admin.AdminDashboard;
 import edu.univ.erp.ui.instructor.InstructorDashboard;
-import edu.univ.erp.ui.student.studentDashboard;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -21,7 +17,7 @@ import java.awt.event.ActionListener;
 
 public class AllCourses {
 
-    public AllCourses(String username, String role) {
+    public AllCourses(String username, String role, String roll_no) {
 
         JFrame f = new JFrame("All Courses");
         f.setSize(600,600);
@@ -61,9 +57,6 @@ public class AllCourses {
                 }
             }
         });
-
-    
-        
     }
 
     private String[][] dataPull() {
@@ -94,8 +87,5 @@ public class AllCourses {
         String[][] strArr = new String[arrList.size()][4];
         arrList.toArray(strArr);
         return strArr;
-    }
-
-
-    
+    }    
 }

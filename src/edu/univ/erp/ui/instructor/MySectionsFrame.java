@@ -9,8 +9,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import javax.swing.table.DefaultTableModel;
-
 import edu.univ.erp.data.DatabaseConnector;
 
 public class MySectionsFrame {
