@@ -87,5 +87,4 @@ public class ClassStatisticsFrame {
         arrList.toArray(strArr);
         return strArr;
     }
-    }
 }

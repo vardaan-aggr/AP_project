@@ -3,6 +3,7 @@ package edu.univ.erp.ui.student;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 public class studentDashboard {
     public studentDashboard(String username, String role, String in_pass, String roll_no) {
@@ -45,29 +46,34 @@ public class studentDashboard {
         // --- Action Listeners ---
         b1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                f.dispose();
                 new registerFrame(username, role, in_pass, roll_no);
+                f.dispose();
             }
         });
 
         b2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                f.dispose();
                 new timetableFrame(roll_no);
+                f.dispose();
             }
         });
 
         b3.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                f.dispose();
                 new gradeFrame(roll_no);
+                f.dispose();
             }
         });
 
         b4.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                f.dispose();
-                new transcriptFrame();
+                try {
+                    new transcriptFrame(roll_no);
+                    f.dispose();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "Error opening transcript: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
 
@@ -79,8 +85,8 @@ public class studentDashboard {
 
         b6.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                f.dispose();
                 new courseCatalogFrame(roll_no);
+                f.dispose();
             }
         });
     }
