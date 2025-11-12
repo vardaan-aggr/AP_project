@@ -17,7 +17,7 @@ import java.awt.event.ActionListener;
 
 public class AllCourses {
 
-    public AllCourses(String username, String role, String roll_no) {
+    public AllCourses(String roll_no, String role) {
 
         JFrame f = new JFrame("All Courses");
         f.setSize(600,600);
