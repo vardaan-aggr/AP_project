@@ -66,7 +66,7 @@ public class InstructorDashboard {
         viewcourses.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 dashboardFrame.dispose();
-                new AllCourses(roll_no, "instructor", roll_no);
+                new AllCourses(roll_no, "instructor");
             }
         });
 
