@@ -66,20 +66,21 @@ public class loginPage {
                                 // System.out.println("Billi kre meow meow 🙀: "+ hash_pass_db);
                                 if (BCrypt.checkpw(password_input, hash_pass_db)) {
                                     System.out.println("\nCorrect Password\n");
+                                    String roll_no = resultSet.getString("roll_no");
                                     if (role_db.equals("student")) {
                                         loginFrame.dispose();
                                         System.out.println("--- Opening Student Dashboard");
-                                        new StudentDashboard();
+                                        new studentDashboard(username_input, role_db, password_input, roll_no);
                                     }
                                     else if (role_db.equals("instructor")) {
                                         loginFrame.dispose();
                                         System.out.println("--- Opening Instructor Dashboard");
-                                        new InstructorDashboard();
+                                        new InstructorDashboard(roll_no);
                                     }
                                     else if (role_db.equals("admin")) {
                                         loginFrame.dispose();
                                         System.out.println("--- Opening Admin Dashboard");
-                                        new AdminDashboard();
+                                        // new AdminDashboard();
                                     }
                                 } else {
                                     System.out.println("WrongPassword");
@@ -96,6 +97,5 @@ public class loginPage {
             }
         });
     }
+
 }
-
-

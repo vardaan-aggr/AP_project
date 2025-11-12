@@ -53,15 +53,15 @@ public class ClassStatisticsFrame {
                 double stats =computeStats(courseCode_input, section_input);
 
                 
-                JOptionPane.showMessageDialog(f, " grades updated successfully.");
+                JOptionPane.showMessageDialog(f, " Average grades = " + stats) ;
                 new InstructorDashboard(roll_no);
                 f.dispose();
             }
         });
     }
 
-    private double computeStats(String courseCode, String section) {
-        ArrayList<String[]> arrList = new ArrayList<>();
+    private String[] gradesArr(String courseCode, String section) {
+        ArrayList<String> arrList = new ArrayList<>();
                     try (Connection connection = DatabaseConnector.getErpConnection()) {
             try (PreparedStatement statement = connection.prepareStatement("""
                         Select grade FROM grades WHERE  course_code = ? AND section = ?; 
@@ -72,8 +72,8 @@ public class ClassStatisticsFrame {
                     boolean empty = true;
                     while (resultSet.next()) {
                         empty = false;
-                        
-                        arrList.add(new String[]{});
+                        String grade = resultSet.getString("grade");
+                        arrList.add(grade);
                     } 
                     if (empty) {
                         System.out.println("\t (no data)");
@@ -83,9 +83,35 @@ public class ClassStatisticsFrame {
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
-        String[][] strArr = new String[arrList.size()][3];
+        String[] strArr = new String[arrList.size()];
         arrList.toArray(strArr);
         return strArr;
     }
+    
+    private double computeStats( String courseCode, String section) {
+        String[] grades = gradesArr(courseCode, section);
+        int totalPoints = 0;
+        for (String grade : grades) {
+            switch (grade) {
+                case "A":
+                    totalPoints += 4;
+                    break;
+                case "B":
+                    totalPoints += 3;
+                    break;
+                case "C":
+                    totalPoints += 2;
+                    break;
+                case "D":
+                    totalPoints += 1;
+                    break;
+                case "F":
+                    totalPoints += 0;
+                    break;
+            }
+        }
+        return grades.length == 0 ? 0.0 : (double) totalPoints / grades.length;
     }
+
 }
+
