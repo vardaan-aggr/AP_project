@@ -9,48 +9,73 @@ import javax.swing.*;
 import edu.univ.erp.util.HashGenerator;
 import edu.univ.erp.data.DatabaseConnector;
 
-import java.awt.event.ActionEvent;   
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class registerFrame {
     public registerFrame(String username, String role, String in_pass, String roll_no) {
         JFrame f = new JFrame();
-        f.setSize(450,300);
+        // Updated frame size
+        f.setSize(800, 600);
         f.setLayout(null);
-        
+        f.getContentPane().setBackground(Color.decode("#d8d0c1"));
+
+        JLabel l0 = new JLabel("REGISTER");
+        // Updated banner size
+        l0.setBounds(0, 0, 800, 60);
+        l0.setBackground(Color.decode("#051072"));
+        l0.setForeground(Color.decode("#d8d0c4"));
+        l0.setFont(new Font("Arial", Font.BOLD, 28));
+        l0.setOpaque(true);
+        l0.setHorizontalAlignment(SwingConstants.CENTER);
+        f.add(l0);
+
+        // --- Centered and resized form components ---
         JLabel l1 = new JLabel("Course code: ");
-        l1.setBounds(50, 60, 100, 30);
+        l1.setBounds(145, 150, 100, 30);
         f.add(l1);
+
         JTextField t1 = new JTextField(50);
-        t1.setBounds(150, 60, 250, 30);
+        t1.setBounds(255, 150, 400, 30);
         f.add(t1);
-        
+
         JLabel l2 = new JLabel("Section: ");
-        l2.setBounds(50, 110, 100, 30);
+        l2.setBounds(145, 220, 100, 30);
         f.add(l2);
+
         JTextField t2 = new JTextField();
-        t2.setBounds(150, 110, 250, 30);
+        t2.setBounds(255, 220, 400, 30);
         f.add(t2);
 
         JLabel l3 = new JLabel("Roll num: ");
-        l3.setBounds(50, 160, 100, 30);
+        l3.setBounds(145, 290, 100, 30);
         f.add(l3);
+
         JTextField t3 = new JTextField();
-        t3.setBounds(150, 160, 250, 30);
-        f.add(t3); 
+        t3.setBounds(255, 290, 400, 30);
+        f.add(t3);
 
         JButton b1 = new JButton("Register");
-        b1.setBounds(150, 210, 100, 30);
+        b1.setBounds(270, 400, 120, 40); // Updated size and position
+        b1.setBackground(Color.decode("#2f77b1"));
+        b1.setForeground(Color.WHITE);
+        b1.setFont(new Font("Arial", Font.BOLD, 14));
         f.add(b1);
+
+        JButton b2 = new JButton("Back");
+        b2.setBounds(410, 400, 120, 40); // Updated size and position
+        b2.setBackground(Color.decode("#2f77b1"));
+        b2.setForeground(Color.WHITE);
+        b2.setFont(new Font("Arial", Font.BOLD, 14));
+        f.add(b2);
 
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.setLocationRelativeTo(null);
         f.setVisible(true);
-    
-        JButton b2 = new JButton("Back");
-        b2.setBounds(300, 210, 100, 30);
-        f.add(b2);
 
+        // --- Action Listeners (Logic Unchanged) ---
         b1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try (Connection connection = DatabaseConnector.getErpConnection()) {
@@ -68,57 +93,22 @@ public class registerFrame {
                         } else {
                             System.out.println("Registered Successfully.");
                         }
-                    } 
+                    }
                 } catch (SQLException ex) {
-                    System.out.println("Error: Couldn't register, " + ex);
+                    JOptionPane.showMessageDialog(null, "Error registering: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
+                    ex.printStackTrace();
                 }
-                f.dispose();
                 new studentDashboard(username, role, in_pass, roll_no);
+                f.dispose();
             }
         });
 
         b2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                f.dispose();
+                System.out.println("Going back to Student Dashboard..");
                 new studentDashboard(username, role, in_pass, roll_no);
+                f.dispose();
             }
         });
     }
 }
-
-
-        // JPanel formPanel = new JPanel(new GridLayout(3, 2, 10, 10)); // 3 rows, 2 cols, 10px gaps
-        // formPanel.setBorder(new EmptyBorder(15, 15, 15, 15)); // Add padding
-
-        // JLabel userLabel = new JLabel("Course Code:");
-        // formPanel.add(userLabel);
-        
-        // JTextField userText = new JTextField();
-        // formPanel.add(userText);
-        
-        // JLabel sectionLabel = new JLabel("Section:"); // Renamed from passLabel
-        // formPanel.add(sectionLabel);
-        
-        // JTextField sectionText = new JTextField(); // Changed from JPasswordField
-        // formPanel.add(sectionText);
-
-        // JLabel rollLabel = new JLabel("Roll No:"); // Fixed label text
-        // formPanel.add(rollLabel);
-        
-        // JTextField rollText = new JTextField(); // Changed from JPasswordField
-        // formPanel.add(rollText);
-        
-        // // 2. Create a panel for the button (to center it)
-        // JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        // JButton regBtn = new JButton("Register");
-        // regBtn.setPreferredSize(new Dimension(100, 30)); // Give button a preferred size
-        // buttonPanel.add(regBtn);
-
-        // // 3. Add panels to the frame
-        // f.add(formPanel, BorderLayout.CENTER);  // Form goes in the middle
-        // f.add(buttonPanel, BorderLayout.SOUTH); // Button goes at the bottom
-
-        // f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        // f.pack(); // Automatically sizes the window to fit components
-        // f.setLocationRelativeTo(null); 
-        // f.setVisible(true);
