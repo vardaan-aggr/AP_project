@@ -24,19 +24,28 @@ public class AllCourses {
         f.setLayout(null);
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
         f.setLocationRelativeTo(null);
-        
         f.setVisible(true);
-
+        
+        
         String data[][] = dataPull();
         String columName[] = {" course Code ", " Title ", " section ", " credits "};
         JTable t = new JTable(data, columName);
         JScrollPane sp = new JScrollPane(t);
         
         f.add(sp);
+        sp.setVisible(true);
+        sp.setBounds(30, 70, 520, 400);
+
+        JButton serchButton = new JButton(" 🔍 Search ");
+        serchButton.setBounds(200, 20, 100, 30);
+        f.add(serchButton);
+        JTextField t1 = new JTextField(50);
+        t1.setBounds(310, 20, 200, 30);
+        f.add(t1);
         
         JButton backButton = new JButton("<- Back");
-        backButton.setBounds(500, 30, 100, 30);
-        sp.add(backButton);
+        backButton.setBounds(450, 500, 100, 30);
+        f.add(backButton);
        
 
 
@@ -54,6 +63,19 @@ public class AllCourses {
                 else if (role.equals("admin")) {
                     f.dispose();
                     // new AdminDashboard(String username);
+                }
+            }
+        });
+
+        serchButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String course_code_input = t1.getText();
+                int rowNumber = courseFinder(course_code_input);
+                if (rowNumber != -1) {
+                    t.setRowSelectionInterval(rowNumber - 1, rowNumber-1 );
+                    t.scrollRectToVisible(t.getCellRect(rowNumber - 1, 0, true));
+                } else {
+                    JOptionPane.showMessageDialog(f, "Course not found: " + course_code_input);
                 }
             }
         });
@@ -88,4 +110,31 @@ public class AllCourses {
         arrList.toArray(strArr);
         return strArr;
     }    
+    
+    private int courseFinder(String course_code) {
+        int rowNumber = -1;
+        try (Connection connection = DatabaseConnector.getErpConnection()) {
+            String sql = """
+                SELECT row_num 
+                FROM (
+                    SELECT course_code, ROW_NUMBER() OVER (ORDER BY course_code) AS row_num
+                    FROM courses
+                ) AS numbered
+                WHERE course_code = ?;
+            """;
+            
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, course_code);
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    if (resultSet.next()) {
+                        rowNumber = resultSet.getInt("row_num");
+                    }
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return rowNumber;
+    }
+
 }
