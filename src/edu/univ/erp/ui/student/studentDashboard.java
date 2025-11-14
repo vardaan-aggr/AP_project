@@ -14,7 +14,6 @@ public class studentDashboard {
         f.setLayout(null);
         f.getContentPane().setBackground(Color.decode("#d8d0c1"));
 
-        // Banner at the top
         JLabel l0 = new JLabel("STUDENT DASHBOARD");
         l0.setBounds(0, 0, 800, 60);  
         l0.setBackground(Color.decode("#051072"));
@@ -39,14 +38,14 @@ public class studentDashboard {
         f.add(b2);
 
         JButton b3 = new JButton("My Grades");
-        b3.setBounds(100, 230, 250, 100);
+        b3.setBounds(100, 240, 250, 100);
         b3.setBackground(Color.decode("#2f77b1")); 
         b3.setForeground(Color.WHITE); 
         b3.setFont(new Font("Arial", Font.BOLD, 14));
         f.add(b3);
 
         JButton b4 = new JButton("Download Transcript");
-        b4.setBounds(450, 230, 250, 100);
+        b4.setBounds(450, 240, 250, 100);
         b4.setBackground(Color.decode("#2f77b1")); 
         b4.setForeground(Color.WHITE); 
         b4.setFont(new Font("Arial", Font.BOLD, 14));
@@ -60,16 +59,23 @@ public class studentDashboard {
         f.add(b6);
 
         JButton b5 = new JButton("Logout");
-        b5.setBounds(450, 380, 250, 100); 
+        b5.setBounds(600, 500, 100, 30); 
         b5.setBackground(Color.decode("#2f77b1")); 
         b5.setForeground(Color.WHITE); 
         b5.setFont(new Font("Arial", Font.BOLD, 14));
         f.add(b5);
 
+        JButton b7 = new JButton("Drop Course");
+        b7.setBounds(450, 380, 250, 100); 
+        b7.setBackground(Color.decode("#2f77b1")); 
+        b7.setForeground(Color.WHITE); 
+        b7.setFont(new Font("Arial", Font.BOLD, 14));
+        f.add(b7);
+
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
         f.setLocationRelativeTo(null); 
         f.setVisible(true);
-
+        
         // --- Action Listeners ---
         b1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -122,6 +128,14 @@ public class studentDashboard {
                 new courseCatalogFrame(username, role, in_pass, roll_no);
                 f.dispose();
             }
+        });
+
+        b7.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("\tOpening Drop Course Portal..");
+                new dropCourseFrame(username, role, in_pass, roll_no);
+                f.dispose();
+            }   
         });
     }
 }

@@ -13,14 +13,14 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class registerFrame {
-    public registerFrame(String username, String role, String in_pass, String roll_no) {
+public class dropCourseFrame {
+    public dropCourseFrame(String username, String role, String in_pass, String roll_no) {
         JFrame f = new JFrame();
         f.setSize(800, 600);
         f.setLayout(null);
         f.getContentPane().setBackground(Color.decode("#d8d0c1"));
 
-        JLabel l0 = new JLabel("REGISTER");
+        JLabel l0 = new JLabel("Drop Course");
         l0.setBounds(0, 0, 800, 60);
         l0.setBackground(Color.decode("#051072"));
         l0.setForeground(Color.decode("#d8d0c4"));
@@ -37,13 +37,13 @@ public class registerFrame {
         t1.setBounds(255, 150, 400, 30);
         f.add(t1);
 
-        JLabel l2 = new JLabel("Section: ");
-        l2.setBounds(145, 220, 100, 30);
-        f.add(l2);
+        // JLabel l2 = new JLabel("Section: ");
+        // l2.setBounds(145, 220, 100, 30);
+        // f.add(l2);
 
-        JTextField t2 = new JTextField();
-        t2.setBounds(255, 220, 400, 30);
-        f.add(t2);
+        // JTextField t2 = new JTextField();
+        // t2.setBounds(255, 220, 400, 30);
+        // f.add(t2);
 
         // JLabel l3 = new JLabel("Roll num: ");
         // l3.setBounds(145, 290, 100, 30);
@@ -53,7 +53,7 @@ public class registerFrame {
         // t3.setBounds(255, 290, 400, 30);
         // f.add(t3);
 
-        JButton b1 = new JButton("Register");
+        JButton b1 = new JButton("Drop");
         b1.setBounds(270, 400, 120, 40); 
         b1.setBackground(Color.decode("#2f77b1"));
         b1.setForeground(Color.WHITE);
@@ -76,23 +76,21 @@ public class registerFrame {
             public void actionPerformed(ActionEvent e) {
                 try (Connection connection = DatabaseConnector.getErpConnection()) {
                     try (PreparedStatement statement = connection.prepareStatement("""
-                                INSERT INTO enrollments(roll_no, course_code , section, status) VALUES (?, ?, ?, ?);
+                                delete from enrollments where roll_no = ? and course_code = ?;
                             """)) {
                         statement.setString(1, roll_no);
                         statement.setString(2, t1.getText());
-                        statement.setString(3, t2.getText());
-                        statement.setString(4, "enrolled");
-                        int rowsInsreted = statement.executeUpdate();
-                        if (rowsInsreted == 0) {
-                            JOptionPane.showMessageDialog(null, "Error: Couldn't register in database.", "Error", JOptionPane.ERROR_MESSAGE);
-                            System.out.println("Error: Couldn't register in database.");
+                        int rowsDeleted = statement.executeUpdate();
+                        if (rowsDeleted == 0) {
+                            JOptionPane.showMessageDialog(null, "Error: Couldn't Drop in database.", "Error", JOptionPane.ERROR_MESSAGE);
+                            System.out.println("Error: Couldn't Drop in database.");
                         } else {
-                            JOptionPane.showMessageDialog(null, "Registered successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
-                            System.out.println("Registered Successfully.");
+                            JOptionPane.showMessageDialog(null, "Course dropped successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                            System.out.println("Course droped successfully.");
                         }
                     }
                 } catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(null, "Error registering: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Error Droping: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
                     ex.printStackTrace();
                 }
                 new studentDashboard(username, role, in_pass, roll_no);

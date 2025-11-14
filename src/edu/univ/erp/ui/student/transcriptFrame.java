@@ -38,6 +38,7 @@ public class transcriptFrame {
                             arrCourseCode.add(new String[]{courseCode, section});
                         } 
                         if (empty) {
+                            JOptionPane.showMessageDialog(null, "Error no courses enrolled", "Error", JOptionPane.ERROR_MESSAGE); 
                             System.out.println("\t (no courses enrolled)");
                         }
                     }
@@ -62,6 +63,7 @@ public class transcriptFrame {
                                 arrGrade.add(grade);
                             } 
                             if (empty) {
+                                JOptionPane.showMessageDialog(null, "Error no grades for courses enrolled", "Error", JOptionPane.ERROR_MESSAGE); 
                                 System.out.println("\t (no grades for courses enrolled)");
                             }
                         }

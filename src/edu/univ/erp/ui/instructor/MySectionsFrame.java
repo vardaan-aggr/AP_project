@@ -24,9 +24,7 @@ public class MySectionsFrame {
         String columName[] = {" course Code "};
         JTable t = new JTable(data, columName);
         JScrollPane sp = new JScrollPane(t);
-        
         f.add(sp);
-        
  
         JButton backButton = new JButton("Back to Dashboard");
         backButton.setBounds(200, 300, 200, 30);
@@ -41,7 +39,6 @@ public class MySectionsFrame {
 
     }
 
-    
     private String[][] dataPull(String roll_no) {
         ArrayList<String[]> arrList = new ArrayList<>();
         try (Connection connection = DatabaseConnector.getErpConnection()) {
@@ -71,7 +68,4 @@ public class MySectionsFrame {
         arrList.toArray(strArr);
         return strArr;
     }
-
-
-
 }

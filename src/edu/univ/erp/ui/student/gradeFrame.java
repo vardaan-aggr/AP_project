@@ -19,13 +19,11 @@ import edu.univ.erp.data.DatabaseConnector;
 public class gradeFrame {
     public gradeFrame(String username, String role, String in_pass, String roll_no) {
         JFrame f = new JFrame();
-        // Updated frame size
         f.setSize(800, 600);
         f.setLayout(null);
         f.getContentPane().setBackground(Color.decode("#d8d0c1"));
 
         JLabel l0 = new JLabel("GRADES");
-        // Updated banner size
         l0.setBounds(0, 0, 800, 60);
         l0.setBackground(Color.decode("#051072"));
         l0.setForeground(Color.decode("#d8d0c4"));
@@ -45,12 +43,10 @@ public class gradeFrame {
         t.setRowHeight(25);
 
         JScrollPane sp = new JScrollPane(t);
-        // Updated scroll pane bounds for new frame size
         sp.setBounds(20, 80, 760, 440);
         f.add(sp);
 
         JButton b1 = new JButton("Back");
-        // Updated button bounds for new frame size
         b1.setBounds(660, 540, 120, 40);
         b1.setBackground(Color.decode("#2f77b1"));
         b1.setForeground(Color.WHITE);
@@ -87,6 +83,7 @@ public class gradeFrame {
                         data.add(new String[]{courseCode, grade});
                     }
                     if (empty) {
+                        JOptionPane.showMessageDialog(null, "Error: no courses in grade table", "Error", JOptionPane.ERROR_MESSAGE);
                         System.out.println("\t (no courses in grade table)");
                     }
                 }

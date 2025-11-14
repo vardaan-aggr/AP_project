@@ -18,13 +18,11 @@ import edu.univ.erp.data.DatabaseConnector;
 public class timetableFrame {
     public timetableFrame(String username, String role, String in_pass, String roll_no) {
         JFrame f = new JFrame();
-        // Updated frame size
         f.setSize(800, 600);
         f.setLayout(null);
         f.getContentPane().setBackground(Color.decode("#d8d0c1"));
 
         JLabel l0 = new JLabel("TIMETABLE");
-        // Updated banner size
         l0.setBounds(0, 0, 800, 60);
         l0.setBackground(Color.decode("#051072"));
         l0.setForeground(Color.decode("#d8d0c4"));
@@ -44,12 +42,10 @@ public class timetableFrame {
         t.setRowHeight(25);
 
         JScrollPane sp = new JScrollPane(t);
-        // Updated scroll pane bounds for new frame size
         sp.setBounds(20, 80, 760, 440);
         f.add(sp);
 
         JButton b1 = new JButton("Back");
-        // Updated button bounds for new frame size
         b1.setBounds(660, 540, 120, 40);
         b1.setBackground(Color.decode("#2f77b1"));
         b1.setForeground(Color.WHITE);
@@ -90,6 +86,7 @@ public class timetableFrame {
                         arrList1.add(new String[]{courseCode, section});
                     }
                     if (empty) {
+                        JOptionPane.showMessageDialog(null, "Error no enrollments", "Error", JOptionPane.ERROR_MESSAGE); 
                         System.out.println("\t (no enrollments)");
                     }
                 }
@@ -103,10 +100,10 @@ public class timetableFrame {
             String v2 = arrList1.get(i)[1];
             try (Connection connection = DatabaseConnector.getErpConnection()) {
                 try (PreparedStatement statement = connection.prepareStatement("""
-                            Select day_time, room, semester, year FROM sections WHERE course_code = ? AND section = ?;
+                            Select day_time, room FROM sections WHERE course_code = ? AND section = ?;
                         """)) {
-                    statement.setString(1, String.valueOf(v1));
-                    statement.setString(2, String.valueOf(v2));
+                    statement.setString(1, v1);
+                    statement.setString(2, v2);
                     try (ResultSet resultSet = statement.executeQuery()) {
                         boolean empty = true;
                         while (resultSet.next()) {
@@ -116,6 +113,7 @@ public class timetableFrame {
                             arrList2.add(new String[]{v1, day_time, room});
                         }
                         if (empty) {
+                            JOptionPane.showMessageDialog(null, "Error no section with given inputs exists", "Error", JOptionPane.ERROR_MESSAGE); 
                             System.out.println("\t (no section with given inputs exists)");
                         }
                     }
