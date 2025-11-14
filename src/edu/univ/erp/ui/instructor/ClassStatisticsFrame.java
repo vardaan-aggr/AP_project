@@ -20,30 +20,35 @@ public class ClassStatisticsFrame {
 
         JFrame f ;
         f = new JFrame("Class Statistics");
-        f.setSize(600, 400);
+        f.setSize(500, 400);
         f.setLayout(null);
         f.setLocationRelativeTo(null);
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.setVisible(true);
 
         JLabel course_code = new JLabel("course code : ");
-        course_code.setBounds(50, 400, 100, 30);
+        course_code.setBounds(50, 50, 100, 30);
         f.add(course_code);
         JTextField code = new JTextField();
-        code.setBounds(150, 400, 250, 30);
+        code.setBounds(170, 50, 250, 30);
         f.add(code);
 
         JLabel sectionLabel = new JLabel( " Section  : ");
-        sectionLabel.setBounds(50, 350, 100, 30);
+        sectionLabel.setBounds(50, 100, 100, 30);
         f.add(sectionLabel);
         JTextField sectionField = new JTextField();
-        sectionField.setBounds(150, 350, 250, 30);
+        sectionField.setBounds(170, 100, 250, 30);
         f.add(sectionField);
 
 
         JButton seeStats = new JButton("See Statistics");
-        seeStats.setBounds(150, 150, 100, 30);
+        seeStats.setBounds(50, 200, 150, 30);
         f.add(seeStats);
+
+        
+        JButton backButton = new JButton("<-- Back to Dashboard");
+        backButton.setBounds(215, 200, 150, 30);
+        f.add(backButton);
 
         seeStats.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -53,7 +58,14 @@ public class ClassStatisticsFrame {
                 double stats =computeStats(courseCode_input, section_input);
 
                 
-                JOptionPane.showMessageDialog(f, " Average grades = " + stats) ;
+                JOptionPane.showMessageDialog(f, " Average CGPA  = " + stats) ;
+                new InstructorDashboard(roll_no);
+                f.dispose();
+            }
+        });
+
+        backButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
                 new InstructorDashboard(roll_no);
                 f.dispose();
             }
@@ -94,17 +106,15 @@ public class ClassStatisticsFrame {
         for (String grade : grades) {
             switch (grade) {
                 case "A":
-                    totalPoints += 4;
-                    break;
-                case "B":
                     totalPoints += 3;
                     break;
-                case "C":
+                case "B":
                     totalPoints += 2;
                     break;
-                case "D":
+                case "C":
                     totalPoints += 1;
                     break;
+
                 case "F":
                     totalPoints += 0;
                     break;

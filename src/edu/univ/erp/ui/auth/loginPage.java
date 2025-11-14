@@ -44,7 +44,11 @@ public class loginPage {
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.setLocationRelativeTo(null);
         f.setVisible(true);
-    
+        
+        // For testing purposes only: remove in production
+        t1.setText("instructor1");
+        t2.setText("instructor1");
+
         b1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String username_input = t1.getText();

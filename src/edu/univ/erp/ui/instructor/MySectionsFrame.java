@@ -20,10 +20,12 @@ public class MySectionsFrame {
         f.setLayout(null);
         f.setLocationRelativeTo(null); 
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        f.setVisible(true);
         String data[][] = dataPull(roll_no);
         String columName[] = {" course Code "};
         JTable t = new JTable(data, columName);
         JScrollPane sp = new JScrollPane(t);
+        sp.setBounds(50, 50, 500, 200);
         
         f.add(sp);
         
