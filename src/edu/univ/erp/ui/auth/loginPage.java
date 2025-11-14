@@ -78,21 +78,21 @@ public class loginPage {
                                 String roll_no = resultSet.getString("roll_no");
                                 // System.out.println("Billi kre meow meow 🙀: "+ hash_pass_db);
                                 if (BCrypt.checkpw(password_input, hash_pass_db)) {
-                                    System.out.println("\nCorrect Password\n");
+                                    System.out.println("\nCorrect Password");
                                     if (role_db.equals("student")) {
-                                        f.dispose();
-                                        System.out.println("\tOpening Student Dashboard..");
                                         new studentDashboard(username_input, role_db, password_input, roll_no);
+                                        System.out.println("\tOpening Student Dashboard..");
+                                        f.dispose();
                                     }
                                     else if (role_db.equals("instructor")) {
-                                        f.dispose();
-                                        System.out.println("--- Opening Instructor Dashboard");
                                         new InstructorDashboard(roll_no);
+                                        System.out.println("\tOpening Instructor Dashboard");
+                                        f.dispose();
                                     }
                                     else if (role_db.equals("admin")) {
-                                        f.dispose();
-                                        System.out.println("--- Opening Admin Dashboard");
                                         new adminDashboard();
+                                        System.out.println("\tOpening Admin Dashboard");
+                                        f.dispose();
                                     }
                                 } else {
                                     System.out.println("WrongPassword");

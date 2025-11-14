@@ -1,32 +1,82 @@
 package edu.univ.erp.ui.admin;
 
 import javax.swing.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.event.ActionListener; 
+import java.awt.event.ActionEvent; 
 
 public class adminDashboard {
+    public static void main(String[] args) {
+        JFrame f = new JFrame();
+        f.setSize(800, 600); 
+        f.setLayout(null);
+        f.getContentPane().setBackground(Color.decode("#d8d0c1"));
 
-    public static void main(String[] args)
-    {
-        JFrame frame = new JFrame();
+        JLabel l0 = new JLabel("ADMIN DASHBOARD");
+        l0.setBounds(0, 0, 800, 60); 
+        l0.setBackground(Color.decode("#051072"));
+        l0.setForeground(Color.decode("#d8d0c4"));
+        l0.setFont(new Font("Arial", Font.BOLD, 28));
+        l0.setOpaque(true);
+        l0.setHorizontalAlignment(SwingConstants.CENTER);
+        f.add(l0);
 
-        JButton userManagement = new JButton("User Management");
-        userManagement.setBounds(0, 100, 220, 50);
-        frame.add(userManagement);
+        JButton b1 = new JButton("Add users");
+        b1.setBackground(Color.decode("#2f77b1"));
+        b1.setForeground(Color.WHITE);
+        b1.setFont(new Font("Arial", Font.BOLD, 14));
+        b1.setBounds(100, 100, 600, 50); 
+        f.add(b1);
 
-        JButton courseManagement = new JButton("Course Management");
-        courseManagement.setBounds(300, 100, 220, 50);
-        frame.add(courseManagement);
-    
-        JButton instructorAssignment = new JButton("Instructor Assignment");
-        instructorAssignment.setBounds(0, 500, 220, 50);
-        frame.add(instructorAssignment);
+        JButton b2 = new JButton("Create/edit courses and sections");
+        b2.setBackground(Color.decode("#2f77b1"));
+        b2.setForeground(Color.WHITE);
+        b2.setFont(new Font("Arial", Font.BOLD, 14));
+        b2.setBounds(100, 190, 600, 50); 
+        f.add(b2);
 
-        JButton maintenanceMode = new JButton("Maintenance Mode");
-        maintenanceMode.setBounds(300, 500, 220, 50);
-        frame.add(maintenanceMode);
+        JButton b3 = new JButton("Assign instructor");
+        b3.setBackground(Color.decode("#2f77b1"));
+        b3.setForeground(Color.WHITE);
+        b3.setFont(new Font("Arial", Font.BOLD, 14));
+        b3.setBounds(100, 280, 600, 50); 
+        f.add(b3);
 
-        frame.setSize(500, 600);
-        frame.setLayout(null);
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
+        JButton b4 = new JButton("Toggle Maintenance Mode");
+        b4.setBackground(Color.decode("#2f77b1"));
+        b4.setForeground(Color.WHITE);
+        b4.setFont(new Font("Arial", Font.BOLD, 14));
+        b4.setBounds(100, 370, 600, 50); 
+        f.add(b4);
+
+        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        f.setLocationRelativeTo(null);
+        f.setVisible(true);
+
+        // ---- Action Listeners ----
+        b1.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        }) ;
+
+        b2.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
+        b3.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
+        b4.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                
+            }
+        });
     }
 }

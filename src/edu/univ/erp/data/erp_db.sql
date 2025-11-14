@@ -14,13 +14,15 @@ Create table IF NOT EXISTS courses (
     course_code varchar(50),
     title varchar (50),
     section varchar(50),
-    credits int 
+    credits int,
+    PRIMARY KEY (course_code, section)
 );
 Create table IF NOT EXISTS enrollments (
     roll_no int,
     course_code varchar(50),
     section varchar(50),
-    status varchar(50)
+    status varchar(50),
+    PRIMARY KEY(roll_no, course_code, section)
 );
 Create table IF NOT EXISTS sections (
     course_code varchar(50),
@@ -31,18 +33,12 @@ Create table IF NOT EXISTS sections (
     capacity INT  ,
     semester varchar(50),
     year INT 
+    -- PRIMARY KEY(course_code, section)
 );
 Create table IF NOT EXISTS grades (
     roll_no INT ,
     course_code varchar(50),
     section varchar(50),
-    grade varchar(50)
+    grade varchar(50),
+    -- PRIMARY KEY (course_code, section)
 );
-
-
- 
--- Create table IF NOT EXISTS settings (
---     students varchar(50),
---     instructor role (50),
---     courses varchar(50)
--- );
