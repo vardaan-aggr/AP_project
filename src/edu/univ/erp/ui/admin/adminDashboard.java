@@ -7,7 +7,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent; 
 
 public class adminDashboard {
-    public static void main(String[] args) {
+    public adminDashboard(int rollNo) {
         JFrame f = new JFrame();
         f.setSize(800, 600); 
         f.setLayout(null);
@@ -50,6 +50,13 @@ public class adminDashboard {
         b4.setBounds(100, 370, 600, 50); 
         f.add(b4);
 
+        JButton b5 = new JButton("Search Database");
+        b5.setBackground(Color.decode("#2f77b1"));
+        b5.setForeground(Color.WHITE);
+        b5.setFont(new Font("Arial", Font.BOLD, 14));
+        b5.setBounds(100, 460, 600, 50); 
+        f.add(b5);
+
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.setLocationRelativeTo(null);
         f.setVisible(true);
@@ -57,7 +64,8 @@ public class adminDashboard {
         // ---- Action Listeners ----
         b1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-
+                new AddUsers(rollNo);
+                f.dispose();
             }
         }) ;
 
@@ -69,13 +77,21 @@ public class adminDashboard {
 
         b3.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-
+                new assignIns(rollNo);
+                f.dispose();
             }
         });
 
         b4.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 
+            }
+        });
+
+        b5.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                new searchDb(rollNo);
+                f.dispose();
             }
         });
     }

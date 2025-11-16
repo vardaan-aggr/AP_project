@@ -1,7 +1,0 @@
-package edu.univ.erp.ui.admin;
-
-public class AssignIns {
-    public AssignIns() {
-        
-    }
-}
