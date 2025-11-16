@@ -61,8 +61,8 @@ public class loginPage {
         f.setVisible(true);
         
         // For testing purposes only: remove in production
-        t1.setText("instructor1");
-        t2.setText("instructor1");
+        t1.setText("admin1");
+        t2.setText("admin1");
 
         b1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -94,7 +94,7 @@ public class loginPage {
                                         f.dispose();
                                     }
                                     else if (role_db.equals("admin")) {
-                                        new adminDashboard();
+                                        new adminDashboard(Integer.parseInt(roll_no));
                                         System.out.println("\tOpening Admin Dashboard");
                                         f.dispose();
                                     }
