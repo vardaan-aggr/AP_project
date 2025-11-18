@@ -3,6 +3,55 @@
     "configurations": [
         {
             "type": "java",
+            "name": "deleteSectionACourse",
+            "request": "launch",
+            "mainClass": "edu.univ.erp.ui.admin.deleteSectionACourse",
+            "projectName": "AP_project_25a853fc"
+        },
+        {
+            "type": "java",
+            "name": "editCourse",
+            "request": "launch",
+            "mainClass": "edu.univ.erp.ui.admin.editCourse",
+            "projectName": "AP_project_25a853fc"
+        },
+        {
+            "type": "java",
+            "name": "editSection",
+            "request": "launch",
+            "mainClass": "edu.univ.erp.ui.admin.editSection",
+            "projectName": "AP_project_25a853fc"
+        },
+        {
+            "type": "java",
+            "name": "createSection",
+            "request": "launch",
+            "mainClass": "edu.univ.erp.ui.admin.createSection",
+            "projectName": "AP_project_25a853fc"
+        },
+        {
+            "type": "java",
+            "name": "createCourse",
+            "request": "launch",
+            "mainClass": "edu.univ.erp.ui.admin.createCourse",
+            "projectName": "AP_project_25a853fc"
+        },
+        {
+            "type": "java",
+            "name": "CreateEdit",
+            "request": "launch",
+            "mainClass": "edu.univ.erp.ui.admin.CreateEdit",
+            "projectName": "AP_project_25a853fc"
+        },
+        {
+            "type": "java",
+            "name": "adminDashboard",
+            "request": "launch",
+            "mainClass": "edu.univ.erp.ui.admin.adminDashboard",
+            "projectName": "AP_project_25a853fc"
+        },
+        {
+            "type": "java",
             "name": "LoginPage",
             "request": "launch",
             "mainClass": "edu.univ.erp.ui.auth.LoginPage",
