@@ -6,70 +6,95 @@ import java.sql.SQLException;
 
 import javax.swing.*;
 
-import edu.univ.erp.data.DatabaseConnector;
+import com.formdev.flatlaf.FlatLightLaf;
 
+import edu.univ.erp.data.DatabaseConnector;
+import edu.univ.erp.util.BREATHEFONT;
+
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class dropCourseFrame {
     public dropCourseFrame(String username, String role, String in_pass, String roll_no) {
+        Font breatheFont = BREATHEFONT.fontGen();
+        Font gFont = BREATHEFONT.gFontGen();
+        
+        try {
+            UIManager.setLookAndFeel(new FlatLightLaf());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         JFrame f = new JFrame();
         f.setSize(800, 600);
-        f.setLayout(null);
-        f.getContentPane().setBackground(Color.decode("#d8d0c1"));
+        f.setLayout(new BorderLayout());
 
-        JLabel l0 = new JLabel("Drop Course");
-        l0.setBounds(0, 0, 800, 60);
-        l0.setBackground(Color.decode("#051072"));
+        // ---- TOP ----
+        JPanel p1 = new JPanel();
+        p1.setBackground(Color.decode("#051072")); 
+        
+        JLabel l0 = new JLabel("DROP COURSE");
         l0.setForeground(Color.decode("#dbd3c5"));
-        l0.setFont(new Font("Arial", Font.BOLD, 28));
-        l0.setOpaque(true);
-        l0.setHorizontalAlignment(SwingConstants.CENTER);
-        f.add(l0);
+        l0.setFont(breatheFont.deriveFont(Font.BOLD, 80f));
+        l0.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0));
+        p1.add(l0);
+        f.add(p1, BorderLayout.NORTH);
+
+        // ---- MIDDLE ----
+        JPanel p2 = new JPanel(new GridBagLayout());
+        p2.setBackground(Color.decode("#dbd3c5")); 
+        p2.setBorder(BorderFactory.createEmptyBorder(50, 100, 50, 100));
+        
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10); 
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
         JLabel l1 = new JLabel("Course code: ");
-        l1.setBounds(145, 150, 100, 30);
-        f.add(l1);
+        l1.setFont(gFont.deriveFont(Font.BOLD, 24));
+        l1.setForeground(Color.decode("#020A48"));
+        gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
+        p2.add(l1, gbc);
 
-        JTextField t1 = new JTextField(50);
-        t1.setBounds(255, 150, 400, 30);
-        f.add(t1);
+        JTextField t1 = new JTextField(20);
+        t1.setFont(new Font("Gabarito", Font.PLAIN, 21));
+        gbc.gridx = 1; gbc.gridy = 0; gbc.weightx = 1;
+        p2.add(t1, gbc);
 
-        // JLabel l2 = new JLabel("Section: ");
-        // l2.setBounds(145, 220, 100, 30);
-        // f.add(l2);
+        f.add(p2, BorderLayout.CENTER);
 
-        // JTextField t2 = new JTextField();
-        // t2.setBounds(255, 220, 400, 30);
-        // f.add(t2);
-
-        // JLabel l3 = new JLabel("Roll num: ");
-        // l3.setBounds(145, 290, 100, 30);
-        // f.add(l3);
-
-        // JTextField t3 = new JTextField();
-        // t3.setBounds(255, 290, 400, 30);
-        // f.add(t3);
-
+        // ---- LOWS ----
+        JPanel p3 = new JPanel();
+        p3.setBackground(Color.decode("#dbd3c5"));
+        p3.setBorder(BorderFactory.createEmptyBorder(0, 0, 50, 0));
+  
         JButton b1 = new JButton("Drop");
-        b1.setBounds(270, 400, 120, 40); 
-        b1.setBackground(Color.decode("#2f77b1"));
-        b1.setForeground(Color.WHITE);
-        b1.setFont(new Font("Arial", Font.BOLD, 14));
-        f.add(b1);
+        b1.setBackground(Color.decode("#2f77b1")); 
+        b1.setForeground(Color.WHITE); 
+        b1.setFont(breatheFont.deriveFont(Font.PLAIN, 35));
+        b1.setMargin(new Insets(10, 30, 5, 30));
+        p3.add(b1);
+
+        p3.add(Box.createHorizontalStrut(20));
 
         JButton b2 = new JButton("Back");
-        b2.setBounds(410, 400, 120, 40); 
-        b2.setBackground(Color.decode("#2f77b1"));
-        b2.setForeground(Color.WHITE);
-        b2.setFont(new Font("Arial", Font.BOLD, 14));
-        f.add(b2);
+        b2.setBackground(Color.decode("#2f77b1")); 
+        b2.setForeground(Color.WHITE); 
+        b2.setFont(breatheFont.deriveFont(Font.PLAIN, 35));
+        b2.setMargin(new Insets(10, 30, 5, 30));
+        p3.add(b2);
+
+        f.add(p3, BorderLayout.SOUTH);
 
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.setLocationRelativeTo(null);
         f.setVisible(true);
+
 
         // --- Action Listeners ---
         b1.addActionListener(new ActionListener() {

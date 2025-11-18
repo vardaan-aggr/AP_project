@@ -1,117 +1,163 @@
 package edu.univ.erp.ui.instructor;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;   
-import java.awt.event.ActionListener;  
-import edu.univ.erp.ui.common.AllCourses;
-import java.awt.Color;
-import java.awt.Font;
+import com.formdev.flatlaf.FlatLightLaf;
 
+import java.awt.event.ActionEvent;   
+import java.awt.event.ActionListener;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+
+import edu.univ.erp.ui.common.AllCourses;
+import edu.univ.erp.util.BREATHEFONT;
 import edu.univ.erp.util.modeOps;
 
 public class InstructorDashboard {
     
-    private JFrame dashboardFrame; 
-
     public InstructorDashboard(String roll_no) {
-        dashboardFrame = new JFrame("Instructor Dashboard");
-        dashboardFrame.setSize(800, 600); // Made height taller
-        dashboardFrame.setLayout(null);
-        dashboardFrame.getContentPane().setBackground(Color.decode("#d8d0c1"));
-        dashboardFrame.setLocationRelativeTo(null);
-        dashboardFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
-        dashboardFrame.setVisible(true);
+        
+        Font breatheFont = BREATHEFONT.fontGen();
+        Font gFont = BREATHEFONT.gFontGen();
 
+        try {
+            UIManager.setLookAndFeel(new FlatLightLaf());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        JFrame f = new JFrame("Instructor Dashboard");
+        f.setSize(800, 600);
+        f.setLayout(new BorderLayout());
+
+        // ---- TOP ----
+        JPanel p1 = new JPanel();
+        p1.setOpaque(true); 
+        p1.setBackground(Color.decode("#051072")); 
+        
         JLabel l0 = new JLabel("INSTRUCTOR DASHBOARD");
-        l0.setBounds(0, 0, 800, 60);
-        l0.setBackground(Color.decode("#051072"));
         l0.setForeground(Color.decode("#dbd3c5"));
-        l0.setFont(new Font("Arial", Font.BOLD, 28));
-        l0.setOpaque(true);
-        l0.setHorizontalAlignment(SwingConstants.CENTER);
-        dashboardFrame.add(l0);
+        l0.setFont(breatheFont.deriveFont(Font.BOLD, 80f)); 
+        l0.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0));
+        p1.add(l0);
+        f.add(p1, BorderLayout.NORTH);
 
-        // --- BUTTONS ---
-        JButton mySections = new JButton("My Sections");
-        mySections.setBounds(100, 110, 600, 50); 
-        mySections.setBackground(Color.decode("#2f77b1"));
-        mySections.setForeground(Color.WHITE);
-        mySections.setFont(new Font("Arial", Font.BOLD, 14));
-        dashboardFrame.add(mySections);
+        // ---- MIDDLE ----
+        JPanel p2 = new JPanel(new GridBagLayout());
+        p2.setBackground(Color.decode("#dbd3c5")); 
+        p2.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
 
-        JButton computefinal = new JButton("Compute Final Grades");
-        computefinal.setBounds(100, 180, 600, 50); 
-        computefinal.setBackground(Color.decode("#2f77b1"));
-        computefinal.setForeground(Color.WHITE);
-        computefinal.setFont(new Font("Arial", Font.BOLD, 14));
-        dashboardFrame.add(computefinal);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10); 
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.weightx = 1.0;
+        gbc.gridx = 0;
+
+        Color btnBg = Color.decode("#2f77b1");
+        Color btnFg = Color.WHITE;
+        Font btnFont = gFont.deriveFont(Font.BOLD, 20f); 
+        Dimension btnSize = new Dimension(440, 60); 
+
+        gbc.gridy = 0;
+        JButton b1 = new JButton("My Sections");
+        styleButton(b1, btnBg, btnFg, btnFont, btnSize);
+        p2.add(b1, gbc);
+
+        gbc.gridy = 1;
+        JButton b2 = new JButton("Compute Final Grades");
+        styleButton(b2, btnBg, btnFg, btnFont, btnSize);
+        p2.add(b2, gbc);
     
-        JButton classStats = new JButton(" Class Statistics");
-        classStats.setBounds(100, 250, 600, 50); 
-        classStats.setBackground(Color.decode("#2f77b1"));
-        classStats.setForeground(Color.WHITE);
-        classStats.setFont(new Font("Arial", Font.BOLD, 14));
-        dashboardFrame.add(classStats);
+        gbc.gridy = 2;
+        JButton b3 = new JButton("Class Statistics");
+        styleButton(b3, btnBg, btnFg, btnFont, btnSize);
+        p2.add(b3, gbc);
         
-        // --- NEW BUTTON ADDED ---
-        JButton viewcourses = new JButton("Courses/Sections");
-        viewcourses.setBounds(100, 320, 600, 50);
-        viewcourses.setBackground(Color.decode("#2f77b1"));
-        viewcourses.setForeground(Color.WHITE);
-        viewcourses.setFont(new Font("Arial", Font.BOLD, 14));
-        dashboardFrame.add(viewcourses);
-        
+        gbc.gridy = 3;
+        JButton b4 = new JButton("Courses/Sections");
+        styleButton(b4, btnBg, btnFg, btnFont, btnSize);
+        p2.add(b4, gbc);
+
+        f.add(p2, BorderLayout.CENTER);
+
+        // ---- LOWS ----
+        JPanel p3 = new JPanel();
+        p3.setBackground(Color.decode("#dbd3c5"));
+        p3.setBorder(BorderFactory.createEmptyBorder(0, 0, 30, 0));
+
         JButton logoutBtn = new JButton("Logout");
-        logoutBtn.setBounds(325, 420, 150, 45); 
         logoutBtn.setBackground(Color.decode("#2f77b1"));
         logoutBtn.setForeground(Color.WHITE);
-        logoutBtn.setFont(new Font("Arial", Font.BOLD, 14));
-        dashboardFrame.add(logoutBtn);
+        logoutBtn.setFont(breatheFont.deriveFont(Font.PLAIN, 35f)); 
+        logoutBtn.setMargin(new Insets(10, 30, 5, 30));
+        
+        p3.add(logoutBtn);
+        f.add(p3, BorderLayout.SOUTH);
 
+        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+        f.setLocationRelativeTo(null);
+        f.setVisible(true);
 
         // --- ACTION LISTENERS ---
-        mySections.addActionListener(new ActionListener() {
+        b1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                dashboardFrame.dispose(); 
+                System.out.println("Opening My Sections...");
                 new MySectionsFrame(roll_no);
+                f.dispose(); 
             }
         });
         
-        computefinal.addActionListener(new ActionListener() {
+        b2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (modeOps.getMaintainMode().equals("true")) {
-                    JOptionPane.showMessageDialog(null, "Cannot change, Maintainance mode is on.", "FYI", JOptionPane.INFORMATION_MESSAGE);
-                    System.out.println("\tCouldn't open bcz maintainance mode is on.");
+                    JOptionPane.showMessageDialog(null, "Cannot change, Maintenance mode is on.", "FYI", JOptionPane.INFORMATION_MESSAGE);
+                    System.out.println("\tCouldn't open bcz maintenance mode is on.");
                 } else if (modeOps.getMaintainMode().equals("failure")) {
                     ;
                 } else {
-                dashboardFrame.dispose();
-                new ComputeFinalFrame(roll_no);
+                    System.out.println("Opening Compute Final Grades...");
+                    new ComputeFinalFrame(roll_no);
+                    f.dispose();
                 }
             }
         });
         
-        classStats.addActionListener(new ActionListener() {
+        b3.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                dashboardFrame.dispose();
+                System.out.println("Opening Class Statistics...");
                 new ClassStatisticsFrame(roll_no);
+                f.dispose();
             }
         });
 
-        // --- NEW ACTION LISTENER ---
-        viewcourses.addActionListener(new ActionListener() {
+        b4.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                dashboardFrame.dispose();
+                System.out.println("Opening Course Catalog...");
                 new AllCourses(roll_no, "instructor");
+                f.dispose();
             }
         });
 
         logoutBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(dashboardFrame, "Logged out.");
-
-                dashboardFrame.dispose();
+                JOptionPane.showMessageDialog(f, "Logged out.");
+                System.out.println("Logged out.");
+                f.dispose();
             }
         });
+    }
+
+    void styleButton(JButton button, Color bg, Color fg, Font font, Dimension size) {
+        button.setBackground(bg);
+        button.setForeground(fg);
+        button.setFont(font);
+        button.setPreferredSize(size);
+        button.setMinimumSize(size);
+        button.setMaximumSize(size);
     }
 }
