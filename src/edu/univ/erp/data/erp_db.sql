@@ -32,13 +32,13 @@ Create table IF NOT EXISTS sections (
     room varchar (50),
     capacity INT  ,
     semester varchar(50),
-    year INT 
-    PRIMARY KEY(course_code, section)
+    year INT,
+    PRIMARY KEY(course_code, section, semester)
 );
 Create table IF NOT EXISTS grades (
     roll_no INT ,
     course_code varchar(50),
     section varchar(50),
     grade varchar(50),
-    -- PRIMARY KEY (course_code, section)
+    PRIMARY KEY (roll_no, course_code, section)
 );

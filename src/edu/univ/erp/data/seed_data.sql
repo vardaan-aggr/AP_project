@@ -34,6 +34,5 @@ Insert into sections (course_code, section, roll_no, day_time, room, capacity, s
     ('MTH203', 'B', '2', 'Tue 4:30-6:00, Thu 4:30-6:00', 'B-003', '200', 'Monsoon', '2025');
 Insert into students(roll_no ,program ,year ) values
     ('3', 'B.Tech ECE', '2');
-
-
-select * from grades;
+use erp_db;
+select * from instructors;
