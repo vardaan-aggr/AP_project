@@ -1,70 +1,104 @@
 package edu.univ.erp.ui.admin;
 
 import java.awt.event.ActionListener;
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.SwingConstants;
+import javax.swing.JPanel;
+import javax.swing.UIManager;
+
+import com.formdev.flatlaf.FlatLightLaf;
 
 import edu.univ.erp.ui.admin.searchDB.searchAdm;
 import edu.univ.erp.ui.admin.searchDB.searchIns;
 import edu.univ.erp.ui.admin.searchDB.searchStd;
-import edu.univ.erp.ui.student.studentDashboard;
+import edu.univ.erp.util.BREATHEFONT;
 
 public class searchDb {
     public searchDb(int rollNo) {
+
+        Font breatheFont = BREATHEFONT.fontGen();
+        Font gFont = BREATHEFONT.gFontGen();
+
+        try {
+            UIManager.setLookAndFeel(new FlatLightLaf());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         JFrame f = new JFrame();
         f.setSize(800, 600);
-        f.setLayout(null);
-        f.getContentPane().setBackground(Color.decode("#d8d0c1"));
+        f.setLayout(new BorderLayout());
+
+        // ---- TOP ----
+        JPanel p1 = new JPanel();
+        p1.setOpaque(true); 
+        p1.setBackground(Color.decode("#051072")); 
         
-        JLabel l0 = new JLabel("Search DataBase");
-        l0.setBounds(0, 0, 800, 60); 
-        l0.setBackground(Color.decode("#051072"));
+        JLabel l0 = new JLabel("SEARCH DATABASE");
         l0.setForeground(Color.decode("#dbd3c5"));
-        l0.setFont(new Font("Arial", Font.BOLD, 28));
-        l0.setOpaque(true);
-        l0.setHorizontalAlignment(SwingConstants.CENTER);
-        f.add(l0);
+        l0.setFont(breatheFont.deriveFont(Font.BOLD, 80f)); 
+        l0.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0));
+        p1.add(l0);
+        f.add(p1, BorderLayout.NORTH);
 
-        JLabel l1 = new JLabel("Where to look at?");
-        l1.setBounds(50, 80, 100, 30);
-        f.add(l1);
-        // JTextField t1 = new JTextField(50);
-        // t1.setBounds(150, 80, 250, 30);
-        // f.add(t1);
-        
-        JButton b1 = new JButton("Student");
-        b1.setBounds(150, 130, 100, 30);
-        b1.setBackground(Color.decode("#2f77b1")); 
-        b1.setForeground(Color.WHITE); 
-        b1.setFont(new Font("Arial", Font.BOLD, 14));
-        f.add(b1);
+        // ---- MIDDLE  ----
+        JPanel p2 = new JPanel(new GridBagLayout());
+        p2.setBackground(Color.decode("#dbd3c5")); 
+        p2.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
 
-        JButton b2 = new JButton("Instructor");
-        b2.setBounds(260, 130, 100, 30);
-        b2.setBackground(Color.decode("#2f77b1")); 
-        b2.setForeground(Color.WHITE); 
-        b2.setFont(new Font("Arial", Font.BOLD, 14));
-        f.add(b2);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10); 
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.weightx = 1.0;
+        gbc.gridx = 0;
 
-        JButton b3 = new JButton("Admin");
-        b3.setBounds(370, 130, 100, 30);
-        b3.setBackground(Color.decode("#2f77b1")); 
-        b3.setForeground(Color.WHITE); 
-        b3.setFont(new Font("Arial", Font.BOLD, 14));
-        f.add(b3);
+        Color btnBg = Color.decode("#2f77b1");
+        Color btnFg = Color.WHITE;
+        Font btnFont = gFont.deriveFont(Font.BOLD, 20f); 
+        Dimension btnSize = new Dimension(440, 60);
+
+        gbc.gridy = 0;
+        JButton b1 = new JButton("Search Student");
+        styleButton(b1, btnBg, btnFg, btnFont, btnSize);
+        p2.add(b1, gbc);
+
+        gbc.gridy = 1;
+        JButton b2 = new JButton("Search Instructor");
+        styleButton(b2, btnBg, btnFg, btnFont, btnSize);
+        p2.add(b2, gbc);
+
+        gbc.gridy = 2;
+        JButton b3 = new JButton("Search Admin");
+        styleButton(b3, btnBg, btnFg, btnFont, btnSize);
+        p2.add(b3, gbc);
+
+        f.add(p2, BorderLayout.CENTER);
+
+        // ---- LOWS ----
+        JPanel p3 = new JPanel();
+        p3.setBackground(Color.decode("#dbd3c5"));
+        p3.setBorder(BorderFactory.createEmptyBorder(0, 0, 30, 0));
 
         JButton b4 = new JButton("Back");
-        b4.setBounds(660, 540, 120, 40);
-        b4.setBackground(Color.decode("#2f77b1"));
-        b4.setForeground(Color.WHITE);
-        b4.setFont(new Font("Arial", Font.BOLD, 14));
-        f.add(b4);
+        b4.setBackground(Color.decode("#2f77b1")); 
+        b4.setForeground(Color.WHITE); 
+        b4.setFont(breatheFont.deriveFont(Font.PLAIN, 35f)); 
+        b4.setMargin(new Insets(10, 30, 5, 30));
+        
+        p3.add(b4);
+        f.add(p3, BorderLayout.SOUTH);
 
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.setLocationRelativeTo(null);
@@ -102,5 +136,13 @@ public class searchDb {
                 f.dispose();
             }
         });
+    }
+    void styleButton(JButton button, Color bg, Color fg, Font font, Dimension size) {
+        button.setBackground(bg);
+        button.setForeground(fg);
+        button.setFont(font);
+        button.setPreferredSize(size);
+        button.setMinimumSize(size);
+        button.setMaximumSize(size);
     }
 }

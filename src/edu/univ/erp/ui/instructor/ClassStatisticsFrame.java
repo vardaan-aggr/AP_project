@@ -4,85 +4,130 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
-import javax.swing.JOptionPane;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
+import javax.swing.*;
+import com.formdev.flatlaf.FlatLightLaf;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;   
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
+
 import edu.univ.erp.data.DatabaseConnector;
+import edu.univ.erp.util.BREATHEFONT;
 
 public class ClassStatisticsFrame {
     public ClassStatisticsFrame(String roll_no) {
 
+        Font breatheFont = BREATHEFONT.fontGen();
+        Font gFont = BREATHEFONT.gFontGen();
+
+        try {
+            UIManager.setLookAndFeel(new FlatLightLaf());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         JFrame f = new JFrame("Class Statistics");
         f.setSize(800, 600);
-        f.setLayout(null);
-        f.getContentPane().setBackground(Color.decode("#d8d0c1"));
+        f.setLayout(new BorderLayout());
         f.setLocationRelativeTo(null);
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        f.setVisible(true);
 
-        JLabel l0 = new JLabel("Class Statistics");
-        l0.setBounds(0, 0, 800, 60);
-        l0.setBackground(Color.decode("#051072"));
+        // ---- TOP ----
+        JPanel p1 = new JPanel();
+        p1.setOpaque(true); 
+        p1.setBackground(Color.decode("#051072")); 
+        
+        JLabel l0 = new JLabel("CLASS STATISTICS");
         l0.setForeground(Color.decode("#dbd3c5"));
-        l0.setFont(new Font("Arial", Font.BOLD, 28));
-        l0.setOpaque(true);
-        l0.setHorizontalAlignment(SwingConstants.CENTER);
-        f.add(l0);
+        l0.setFont(breatheFont.deriveFont(Font.BOLD, 80f));
+        l0.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0));
+        p1.add(l0);
+        f.add(p1, BorderLayout.NORTH);
 
-        JLabel course_code = new JLabel("Course code : ");
-        course_code.setBounds(150, 120, 150, 35);
-        f.add(course_code);
-        JTextField code = new JTextField();
-        code.setBounds(150, 120, 150, 35);
-        f.add(code);
+        // ---- CENTER ----
+        JPanel p2 = new JPanel(new GridBagLayout());
+        p2.setBackground(Color.decode("#dbd3c5"));
+        p2.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
 
-        JLabel sectionLabel = new JLabel( "Section : ");
-        sectionLabel.setBounds(150, 180, 150, 35);
-        f.add(sectionLabel);
-        JTextField sectionField = new JTextField();
-        sectionField.setBounds(300, 180, 300, 35);
-        f.add(sectionField);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(15, 10, 15, 10); 
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
+        JLabel l1 = new JLabel("Course Code: ");
+        l1.setFont(gFont.deriveFont(Font.BOLD, 24));
+        l1.setForeground(Color.decode("#020A48"));
+        gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
+        p2.add(l1, gbc);
+
+        JTextField code = new JTextField(20);
+        code.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        gbc.gridx = 1; gbc.gridy = 0; gbc.weightx = 1;
+        p2.add(code, gbc);
+
+        JLabel l2 = new JLabel("Section: ");
+        l2.setFont(gFont.deriveFont(Font.BOLD, 24));
+        l2.setForeground(Color.decode("#020A48"));
+        gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0;
+        p2.add(l2, gbc);
+
+        JTextField sectionField = new JTextField(20);
+        sectionField.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        gbc.gridx = 1; gbc.gridy = 1; gbc.weightx = 1;
+        p2.add(sectionField, gbc);
+
+        f.add(p2, BorderLayout.CENTER);
+
+        // ---- LOWS ----
+        JPanel p3 = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 20));
+        p3.setBackground(Color.decode("#dbd3c5"));
+        
+        Dimension btnSize = new Dimension(250, 50);
 
         JButton seeStats = new JButton("See Statistics");
-        seeStats.setBounds(250, 280, 160, 40);
         seeStats.setBackground(Color.decode("#2f77b1"));
         seeStats.setForeground(Color.WHITE);
-        seeStats.setFont(new Font("Arial", Font.BOLD, 14));
-        f.add(seeStats);
+        seeStats.setFont(breatheFont.deriveFont(Font.PLAIN, 35f));
+        seeStats.setPreferredSize(btnSize);
+        p3.add(seeStats);
 
-        
-        JButton backButton = new JButton("Back to Dashboard");
+        JButton backButton = new JButton("Back");
         backButton.setBackground(Color.decode("#2f77b1"));
         backButton.setForeground(Color.WHITE);
-        backButton.setFont(new Font("Arial", Font.BOLD, 14));
-        backButton.setBounds(430, 280, 180, 40);
-        f.add(backButton);
+        backButton.setFont(breatheFont.deriveFont(Font.PLAIN, 35f));
+        backButton.setPreferredSize(btnSize);
+        p3.add(backButton);
 
+        f.add(p3, BorderLayout.SOUTH);
+        f.setVisible(true);
+
+        // --- Action Listeners ---
         seeStats.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String courseCode_input = code.getText();
                 String section_input = sectionField.getText();
-                // Logic to compute statistics can be added here
-                double stats =computeStats(courseCode_input, section_input);                
-                JOptionPane.showMessageDialog(null, " Average CGPA  = " + stats) ;
-                new InstructorDashboard(roll_no);
-                f.dispose();
+                
+                if(courseCode_input.isEmpty() || section_input.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Please enter both Course Code and Section.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                double stats = computeStats(courseCode_input, section_input);                
+                JOptionPane.showMessageDialog(null, "Average CGPA for " + courseCode_input + " (" + section_input + ") = " + String.format("%.2f", stats), "Statistics", JOptionPane.INFORMATION_MESSAGE);
             }
         });
 
         backButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                System.out.println("\tGoing back to Instructor Dashboard..");
                 new InstructorDashboard(roll_no);
                 f.dispose();
             }
@@ -91,26 +136,30 @@ public class ClassStatisticsFrame {
 
     private String[] gradesArr(String courseCode, String section) {
         ArrayList<String> arrList = new ArrayList<>();
-                    try (Connection connection = DatabaseConnector.getErpConnection()) {
+        try (Connection connection = DatabaseConnector.getErpConnection()) {
             try (PreparedStatement statement = connection.prepareStatement("""
-                        Select grade FROM grades WHERE  course_code = ? AND section = ?; 
+                        Select grade FROM grades WHERE course_code = ? AND section = ?; 
                     """)) {
-                statement.setString(1, String.valueOf(courseCode));
-                statement.setString(2, String.valueOf(section));
+                statement.setString(1, courseCode);
+                statement.setString(2, section);
                 try (ResultSet resultSet = statement.executeQuery()) {
                     boolean empty = true;
                     while (resultSet.next()) {
                         empty = false;
                         String grade = resultSet.getString("grade");
-                        arrList.add(grade);
+                        if(grade != null) {
+                            arrList.add(grade);
+                        }
                     } 
                     if (empty) {
-                        System.out.println("\t (no data)");
+                        System.out.println("\t (no grades found)");
+                        JOptionPane.showMessageDialog(null, "No grades found for this course/section.", "Info", JOptionPane.INFORMATION_MESSAGE);
                     }
                 }
             } 
         } catch (SQLException ex) {
             ex.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Database Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
         String[] strArr = new String[arrList.size()];
         arrList.toArray(strArr);
@@ -121,7 +170,7 @@ public class ClassStatisticsFrame {
         String[] grades = gradesArr(courseCode, section);
         int totalPoints = 0;
         for (String grade : grades) {
-            switch (grade) {
+            switch (grade.toUpperCase()) {
                 case "A":
                     totalPoints += 3;
                     break;
@@ -134,10 +183,10 @@ public class ClassStatisticsFrame {
                 case "F":
                     totalPoints += 0;
                     break;
+                default:
+                    break;
             }
         }
         return grades.length == 0 ? 0.0 : (double) totalPoints / grades.length;
     }
-
 }
-

@@ -4,48 +4,82 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 import javax.swing.*;
-import java.awt.Color;
-import java.awt.Font;
 
+import com.formdev.flatlaf.FlatLightLaf;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+
+import edu.univ.erp.util.BREATHEFONT;
 import edu.univ.erp.util.modeOps;
 
 
 public class maintainMode {
     public maintainMode (int rollNo) {
+        
+        Font breatheFont = BREATHEFONT.fontGen();
+        Font gFont = BREATHEFONT.gFontGen();
+
+        try {
+            UIManager.setLookAndFeel(new FlatLightLaf());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         JFrame f = new JFrame();
         f.setSize(800, 600); 
-        f.setLayout(null);
-        f.getContentPane().setBackground(Color.decode("#d8d0c1"));
+        f.setLayout(new BorderLayout());
 
-        JLabel l0 = new JLabel("Maintainance Mode");
-        l0.setBounds(0, 0, 800, 60); 
-        l0.setBackground(Color.decode("#051072"));
+        // ---- TOP ----
+        JPanel p1 = new JPanel();
+        p1.setOpaque(true); 
+        p1.setBackground(Color.decode("#051072")); 
+        
+        JLabel l0 = new JLabel("MAINTENANCE MODE");
         l0.setForeground(Color.decode("#dbd3c5"));
-        l0.setFont(new Font("Arial", Font.BOLD, 28));
-        l0.setOpaque(true);
-        l0.setHorizontalAlignment(SwingConstants.CENTER);
-        f.add(l0);
+        l0.setFont(breatheFont.deriveFont(Font.BOLD, 80f)); 
+        l0.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0));
+        p1.add(l0);
+        f.add(p1, BorderLayout.NORTH);
 
+        // ---- MIDDLE ----
+        JPanel p2 = new JPanel(new GridBagLayout());
+        p2.setBackground(Color.decode("#dbd3c5")); 
+        p2.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10); 
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.weightx = 1.0;
+        gbc.gridx = 0;
+
+        Color btnBg = Color.decode("#2f77b1");
+        Color btnFg = Color.WHITE;
+        Font btnFont = gFont.deriveFont(Font.BOLD, 20f); 
+        Dimension btnSize = new Dimension(280, 60); 
+
+        gbc.gridy = 0;
         JButton b1 = new JButton("Turn On");
-        b1.setBackground(Color.decode("#2f77b1"));
-        b1.setForeground(Color.WHITE);
-        b1.setFont(new Font("Arial", Font.BOLD, 14));
-        b1.setBounds(100, 100, 600, 50);
-        f.add(b1);
+        styleButton(b1, btnBg, btnFg, btnFont, btnSize);
+        p2.add(b1, gbc);
 
+        gbc.gridy = 1;
         JButton b2 = new JButton("Turn Off");
-        b2.setBackground(Color.decode("#2f77b1"));
-        b2.setForeground(Color.WHITE);
-        b2.setFont(new Font("Arial", Font.BOLD, 14));
-        b2.setBounds(100, 170, 600, 50);
-        f.add(b2);
+        styleButton(b2, btnBg, btnFg, btnFont, btnSize);
+        p2.add(b2, gbc);
 
+        gbc.gridy = 2;
         JButton b3 = new JButton("Back");
-        b3.setBackground(Color.decode("#2f77b1"));
-        b3.setForeground(Color.WHITE);
-        b3.setFont(new Font("Arial", Font.BOLD, 14));
-        b3.setBounds(100, 240, 600, 50); 
-        f.add(b3);
+        styleButton(b3, btnBg, btnFg, btnFont, btnSize);
+        p2.add(b3, gbc);
+
+        f.add(p2, BorderLayout.CENTER);
 
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.setLocationRelativeTo(null);
@@ -81,5 +115,13 @@ public class maintainMode {
                 f.dispose();
             }
         });
+    }
+    private void styleButton(JButton button, Color bg, Color fg, Font font, Dimension size) {
+        button.setBackground(bg);
+        button.setForeground(fg);
+        button.setFont(font);
+        button.setPreferredSize(size);
+        button.setMinimumSize(size);
+        button.setMaximumSize(size);
     }
 }

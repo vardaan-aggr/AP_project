@@ -17,4 +17,15 @@ public class BREATHEFONT {
         }
         return breatheFont;
     }
+    public static Font gFontGen() {
+        Font gf;
+        try {
+            File fontFile = new File("AP_project/lib/GoogleSansFlex-VariableFont_GRAD,ROND,opsz,slnt,wdth,wght.ttf"); 
+            gf = Font.createFont(Font.TRUETYPE_FONT, fontFile);
+        } catch (IOException | FontFormatException e) {
+            e.printStackTrace();
+            gf = new Font("Arial", Font.BOLD, 32); 
+        }
+        return gf;
+    }
 }

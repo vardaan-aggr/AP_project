@@ -4,113 +4,223 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
+
+import com.formdev.flatlaf.FlatLightLaf;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;   
 import java.awt.event.ActionListener;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 import edu.univ.erp.data.DatabaseConnector;
+import edu.univ.erp.util.BREATHEFONT;
 
 public class ComputeFinalFrame {
     public ComputeFinalFrame(String roll_no) {
-        JFrame f ;
-        f = new JFrame("Compute Final Grades");
-        f.setSize(600, 600);
-        f.setLayout(null);
+
+        Font breatheFont = BREATHEFONT.fontGen();
+        Font gFont = BREATHEFONT.gFontGen();
+
+        try {
+            UIManager.setLookAndFeel(new FlatLightLaf());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        JFrame f = new JFrame("Compute Final Grades");
+        f.setSize(800, 600);
+        f.setLayout(new BorderLayout());
         f.setLocationRelativeTo(null); 
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        // ---- TOP  ----
+        JPanel p1 = new JPanel();
+        p1.setOpaque(true); 
+        p1.setBackground(Color.decode("#051072")); 
+        
+        JLabel l0 = new JLabel("COMPUTE GRADES");
+        l0.setForeground(Color.decode("#dbd3c5"));
+        l0.setFont(breatheFont.deriveFont(Font.BOLD, 80f));
+        l0.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0));
+        p1.add(l0);
+        f.add(p1, BorderLayout.NORTH);
+
+        // ---- CENTER ----
+        JPanel p2 = new JPanel(new GridBagLayout());
+        p2.setBackground(Color.decode("#dbd3c5"));
+        p2.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10); 
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        Font labelFont = gFont.deriveFont(Font.BOLD, 22f);
+        Font fieldFont = gFont.deriveFont(Font.PLAIN, 20f);
+        Color labelColor = Color.decode("#020A48");
+
+        JLabel student_no = new JLabel("Student Roll No:");
+        student_no.setFont(labelFont);
+        student_no.setForeground(labelColor);
+        gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
+        p2.add(student_no, gbc);
+
+        JTextField num = new JTextField(15);
+        num.setFont(fieldFont);
+        gbc.gridx = 1; gbc.gridy = 0; gbc.weightx = 1;
+        p2.add(num, gbc);
+
+        JLabel course_code = new JLabel("Course Code:");
+        course_code.setFont(labelFont);
+        course_code.setForeground(labelColor);
+        gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0;
+        p2.add(course_code, gbc);
+
+        JTextField code = new JTextField(15);
+        code.setFont(fieldFont);
+        gbc.gridx = 1; gbc.gridy = 1; gbc.weightx = 1;
+        p2.add(code, gbc);
+
+        JLabel sectionLabel = new JLabel("Section:");
+        sectionLabel.setFont(labelFont);
+        sectionLabel.setForeground(labelColor);
+        gbc.gridx = 0; gbc.gridy = 2; gbc.weightx = 0;
+        p2.add(sectionLabel, gbc);
+
+        JTextField sectionField = new JTextField(15);
+        sectionField.setFont(fieldFont);
+        gbc.gridx = 1; gbc.gridy = 2; gbc.weightx = 1;
+        p2.add(sectionField, gbc);
+
+        JLabel quizLabel = new JLabel("Quiz Total:");
+        quizLabel.setFont(labelFont);
+        quizLabel.setForeground(labelColor);
+        gbc.gridx = 0; gbc.gridy = 3; gbc.weightx = 0;
+        p2.add(quizLabel, gbc);
+
+        JTextField quizMarks = new JTextField(15);
+        quizMarks.setFont(fieldFont);
+        gbc.gridx = 1; gbc.gridy = 3; gbc.weightx = 1;
+        p2.add(quizMarks, gbc);
+        
+        JLabel suffixQuiz = new JLabel("/ 10");
+        suffixQuiz.setFont(labelFont);
+        suffixQuiz.setForeground(labelColor);
+        gbc.gridx = 2; gbc.gridy = 3; gbc.weightx = 0;
+        p2.add(suffixQuiz, gbc);
+
+        JLabel midsemLabel = new JLabel("Midsem Marks:");
+        midsemLabel.setFont(labelFont);
+        midsemLabel.setForeground(labelColor);
+        gbc.gridx = 0; gbc.gridy = 4; gbc.weightx = 0;
+        p2.add(midsemLabel, gbc);
+
+        JTextField midsemField = new JTextField(15);
+        midsemField.setFont(fieldFont);
+        gbc.gridx = 1; gbc.gridy = 4; gbc.weightx = 1;
+        p2.add(midsemField, gbc);
+
+        JLabel suffixMidsem = new JLabel("/ 10");
+        suffixMidsem.setFont(labelFont);
+        suffixMidsem.setForeground(labelColor);
+        gbc.gridx = 2; gbc.gridy = 4; gbc.weightx = 0;
+        p2.add(suffixMidsem, gbc);
+        
+        JLabel endsemLabel = new JLabel("Endsem Marks:");
+        endsemLabel.setFont(labelFont);
+        endsemLabel.setForeground(labelColor);
+        gbc.gridx = 0; gbc.gridy = 5; gbc.weightx = 0;
+        p2.add(endsemLabel, gbc);
+
+        JTextField endsemField = new JTextField(15);
+        endsemField.setFont(fieldFont);
+        gbc.gridx = 1; gbc.gridy = 5; gbc.weightx = 1;
+        p2.add(endsemField, gbc);
+
+        JLabel suffixEndsem = new JLabel("/ 10");
+        suffixEndsem.setFont(labelFont);
+        suffixEndsem.setForeground(labelColor);
+        gbc.gridx = 2; gbc.gridy = 5; gbc.weightx = 0;
+        p2.add(suffixEndsem, gbc);
+
+        f.add(p2, BorderLayout.CENTER);
+
+        // ---- BOTTOM ----
+        JPanel p3 = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 20));
+        p3.setBackground(Color.decode("#dbd3c5"));
+        
+        Dimension btnSize = new Dimension(250, 50);
+
+        JButton backButton = new JButton("Back");
+        backButton.setBackground(Color.decode("#2f77b1"));
+        backButton.setForeground(Color.WHITE);
+        backButton.setFont(breatheFont.deriveFont(Font.PLAIN, 35f));
+        backButton.setPreferredSize(btnSize);
+        p3.add(backButton);
+
+        JButton add = new JButton("Add Grade");
+        add.setBackground(Color.decode("#2f77b1"));
+        add.setForeground(Color.WHITE);
+        add.setFont(breatheFont.deriveFont(Font.PLAIN, 35f));
+        add.setPreferredSize(btnSize);
+        p3.add(add);
+
+        f.add(p3, BorderLayout.SOUTH);
         f.setVisible(true);
-
-        JLabel student_no = new JLabel("Roll number : ");
-        student_no.setBounds(50, 50, 100, 30);
-        f.add(student_no);
-        JTextField num = new JTextField(50);
-        num.setBounds(150, 50, 250, 30);
-        f.add(num);
         
-        JLabel course_code = new JLabel("course code : ");
-        course_code.setBounds(50, 100, 100, 30);
-        f.add(course_code);
-        JTextField code = new JTextField();
-        code.setBounds(150, 100, 250, 30);
-        f.add(code);
-        
-        JLabel sectionLabel = new JLabel( " Section  : ");
-        sectionLabel.setBounds(50, 150, 100, 30);
-        f.add(sectionLabel);
-        JTextField sectionField = new JTextField();
-        sectionField.setBounds(150, 150, 250, 30);
-        f.add(sectionField);
-        
-        JLabel quizLabel = new JLabel("quiz total ");
-        quizLabel.setBounds(50, 200, 100, 30);
-        f.add(quizLabel);
-        JTextField quizMarks = new JTextField();
-        quizMarks.setBounds(150, 200, 250, 30);
-        f.add(quizMarks);
-        JLabel suffixQuiz = new JLabel("/ 10 ");
-        suffixQuiz.setBounds(400, 200, 50, 30);
-        f.add(suffixQuiz);
-        
-        JLabel midsemLabel = new JLabel(" Midsem Marks : ");
-        midsemLabel.setBounds(50, 250, 100, 30);
-        f.add(midsemLabel);
-        JTextField midsemField = new JTextField();
-        midsemField.setBounds(150, 250, 250, 30);
-        f.add(midsemField);
-        JLabel suffixMidsem = new JLabel("/ 10 ");
-        suffixMidsem.setBounds(400, 250, 50, 30);
-        f.add(suffixMidsem);
-        
-        JLabel endsemLabel = new JLabel("Endsem Marks: ");
-        endsemLabel.setBounds(50, 300, 100, 30);
-        f.add(endsemLabel);
-        JTextField endsemField = new JTextField();
-        endsemField.setBounds(150, 300, 250, 30);
-        f.add(endsemField);
-        JLabel suffixEndsem = new JLabel("/ 10 ");
-        suffixEndsem.setBounds(400, 300, 50, 30);
-        f.add(suffixEndsem);
-
-
-        JButton backButton = new JButton("<-- Back to Dashboard");
-        backButton.setBounds(210, 400, 200, 30);
-        f.add(backButton);
-
-        JButton add = new JButton("Add +");
-        add.setBounds(100, 400, 100, 30);
-        f.add(add);
-        
+        // ---- Action Listeners ----
         add.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // 1. Get text from the fields
+                if (num.getText().isEmpty() || code.getText().isEmpty() || sectionField.getText().isEmpty() || 
+                    quizMarks.getText().isEmpty() || midsemField.getText().isEmpty() || endsemField.getText().isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Please fill all fields.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
                 String userRollno_input = num.getText();
                 String courseCode_input = code.getText();
                 String section_input = sectionField.getText();
-                String quizMarks_input = quizMarks.getText();
-                String midsemMarks_input = midsemField.getText();
-                String endsemMarks_input = endsemField.getText();
-                char finalGrade=computeGrade( quizMarks_input, midsemMarks_input, endsemMarks_input);
-                try (Connection connection = DatabaseConnector.getErpConnection()) {
-                    try (PreparedStatement statement = connection.prepareStatement("""
-                    INSERT INTO grades (roll_no, course_code, section, grade) VALUES
-                        (?,?,?,?);     """)) {
-                        statement.setString(1, userRollno_input);
-                        statement.setString(2, courseCode_input);
-                        statement.setString(3,section_input );
-                        statement.setString(4, finalGrade+"");
-                        statement.executeQuery();
-                    }
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
                 
-                JOptionPane.showMessageDialog(null, " grades updated successfully.");
-                new InstructorDashboard(roll_no);
-                f.dispose();
+                try {
+                    char finalGrade = computeGrade(quizMarks.getText(), midsemField.getText(), endsemField.getText());
+                    
+                    try (Connection connection = DatabaseConnector.getErpConnection()) {
+                        try (PreparedStatement statement = connection.prepareStatement("""
+                        INSERT INTO grades (roll_no, course_code, section, grade) VALUES
+                            (?,?,?,?);     """)) {
+                            statement.setString(1, userRollno_input);
+                            statement.setString(2, courseCode_input);
+                            statement.setString(3, section_input);
+                            statement.setString(4, String.valueOf(finalGrade));
+                            int rows = statement.executeUpdate(); 
+                            if (rows > 0) {
+                                JOptionPane.showMessageDialog(null, "Grade computed and updated successfully!\nFinal Grade: " + finalGrade, "Success", JOptionPane.INFORMATION_MESSAGE);
+                                new InstructorDashboard(roll_no);
+                                f.dispose();
+                            } else {
+                                JOptionPane.showMessageDialog(null, "Failed to update grade.", "Error", JOptionPane.ERROR_MESSAGE);
+                            }
+                        }
+                    } catch (SQLException ex) {
+                        JOptionPane.showMessageDialog(null, "Database Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                        ex.printStackTrace();
+                    }
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(null, "Marks must be numbers only.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
         
@@ -121,31 +231,26 @@ public class ComputeFinalFrame {
             }
         });
     }
-    
 
-    
-
-    private char computeGrade(String quizMarks, String midsemMarks, String endsemMarks) {
-    
-
+    private char computeGrade(String quizMarks, String midsemMarks, String endsemMarks) throws NumberFormatException {
         int quiz = Integer.parseInt(quizMarks);
         int midsem = Integer.parseInt(midsemMarks); 
         int endsem = Integer.parseInt(endsemMarks);
 
+        if (quiz > 10 || midsem > 10 || endsem > 10) {
+            throw new NumberFormatException("Marks cannot exceed 10");
+        }
+
         int finalGrade = (int)(0.2 * quiz + 0.3 * midsem + 0.5 * endsem); 
-        // all mid sem ,end sem, quiz are of 10 marks each
-        if (finalGrade <= 10 && finalGrade >= 8) {
+        
+        if (finalGrade >= 8) {
             return 'A';
-        } else if (finalGrade < 8 && finalGrade >= 6) {
+        } else if (finalGrade >= 6) {
             return 'B';
-        } else if (finalGrade < 6 && finalGrade >= 4) {
+        } else if (finalGrade >= 4) {
             return 'C';
         } else {
             return 'F';
         }
-
-        
-
     }
-
 }
