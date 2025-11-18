@@ -7,8 +7,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent; 
 
 public class adminDashboard {
-    public static void main(String[] args) {
-        JFrame f = new JFrame();
+    public adminDashboard() {
+    // public static void main(String[] args) {
+        JFrame f = new JFrame("Admin Dashboard");;
         f.setSize(800, 600); 
         f.setLayout(null);
         f.getContentPane().setBackground(Color.decode("#d8d0c1"));
