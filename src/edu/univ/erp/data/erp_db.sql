@@ -42,3 +42,7 @@ Create table IF NOT EXISTS grades (
     grade varchar(50),
     PRIMARY KEY (roll_no, course_code, section)
 );
+Create table if not exists settings (
+    settings_key varchar(50) PRIMARY KEY,
+    settings_value varchar(50)
+);

@@ -7,6 +7,8 @@ import java.awt.Color;
 import java.awt.Font;
 import java.io.IOException;
 
+import edu.univ.erp.util.modeOps;
+
 public class studentDashboard {
     public studentDashboard(String username, String role, String in_pass, String roll_no) {
         JFrame f = new JFrame();
@@ -17,7 +19,7 @@ public class studentDashboard {
         JLabel l0 = new JLabel("STUDENT DASHBOARD");
         l0.setBounds(0, 0, 800, 60);  
         l0.setBackground(Color.decode("#051072"));
-        l0.setForeground(Color.decode("#d8d0c4"));
+        l0.setForeground(Color.decode("#dbd3c5"));
         l0.setFont(new Font("Arial", Font.BOLD, 28));
         l0.setOpaque(true);
         l0.setHorizontalAlignment(SwingConstants.CENTER);
@@ -59,7 +61,7 @@ public class studentDashboard {
         f.add(b6);
 
         JButton b5 = new JButton("Logout");
-        b5.setBounds(600, 500, 100, 30); 
+        b5.setBounds(600, 500, 120, 40); 
         b5.setBackground(Color.decode("#2f77b1")); 
         b5.setForeground(Color.WHITE); 
         b5.setFont(new Font("Arial", Font.BOLD, 14));
@@ -79,9 +81,16 @@ public class studentDashboard {
         // --- Action Listeners ---
         b1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                System.out.println("\tOpening Registration Portal..");
-                new registerFrame(username, role, in_pass, roll_no);
-                f.dispose();
+                if (modeOps.getMaintainMode().equals("true")) {
+                    JOptionPane.showMessageDialog(null, "Cannot change, Maintainance mode is on.", "FYI", JOptionPane.INFORMATION_MESSAGE);
+                    System.out.println("\tCouldn't open bcz maintainance mode is on.");
+                } else if (modeOps.getMaintainMode().equals("failure")) {
+                    ;
+                } else {
+                    System.out.println("\tOpening Registration Portal..");
+                    new registerFrame(username, role, in_pass, roll_no);
+                    f.dispose();
+                }
             }
         });
 
@@ -116,7 +125,7 @@ public class studentDashboard {
 
         b5.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(f, "Logging out..");
+                JOptionPane.showMessageDialog(null, "Logging out..");
                 System.out.println("\nLogged out successfully...");
                 f.dispose();
             }
@@ -132,9 +141,16 @@ public class studentDashboard {
 
         b7.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                if (modeOps.getMaintainMode().equals("true")) {
+                    JOptionPane.showMessageDialog(null, "Cannot change, Maintainance mode is on.", "FYI", JOptionPane.INFORMATION_MESSAGE);
+                    System.out.println("\tCouldn't open bcz maintainance mode is on.");
+                } else if (modeOps.getMaintainMode().equals("failure")) {
+                    ;
+                } else {
                 System.out.println("\tOpening Drop Course Portal..");
                 new dropCourseFrame(username, role, in_pass, roll_no);
                 f.dispose();
+                }
             }   
         });
     }

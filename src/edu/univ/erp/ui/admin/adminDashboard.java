@@ -16,7 +16,7 @@ public class adminDashboard {
         JLabel l0 = new JLabel("ADMIN DASHBOARD");
         l0.setBounds(0, 0, 800, 60); 
         l0.setBackground(Color.decode("#051072"));
-        l0.setForeground(Color.decode("#d8d0c4"));
+        l0.setForeground(Color.decode("#dbd3c5"));
         l0.setFont(new Font("Arial", Font.BOLD, 28));
         l0.setOpaque(true);
         l0.setHorizontalAlignment(SwingConstants.CENTER);
@@ -57,6 +57,13 @@ public class adminDashboard {
         b5.setBounds(100, 460, 600, 50); 
         f.add(b5);
 
+        JButton b6 = new JButton("Logout");
+        b6.setBounds(600, 525, 100, 30); 
+        b6.setBackground(Color.decode("#2f77b1")); 
+        b6.setForeground(Color.WHITE); 
+        b6.setFont(new Font("Arial", Font.BOLD, 14));
+        f.add(b6);
+
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.setLocationRelativeTo(null);
         f.setVisible(true);
@@ -64,6 +71,7 @@ public class adminDashboard {
         // ---- Action Listeners ----
         b1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                System.out.println("Opening users adding interface..");
                 new AddUsers(rollNo);
                 f.dispose();
             }
@@ -71,12 +79,15 @@ public class adminDashboard {
 
         b2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-
+                System.out.println("Opening courses/sections adding/editing interface..");
+                new CreateEdit(rollNo);
+                f.dispose();
             }
         });
 
         b3.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                System.out.println("Opening assign instructor interface..");
                 new assignIns(rollNo);
                 f.dispose();
             }
@@ -84,13 +95,24 @@ public class adminDashboard {
 
         b4.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                
+                System.out.println("Opening toggle maintainence interface..");
+                new maintainMode(rollNo);
+                f.dispose();
             }
         });
 
         b5.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                System.out.println("Opening Search Database interface..");
                 new searchDb(rollNo);
+                f.dispose();
+            }
+        });
+
+        b6.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(null, "Logging out..");
+                System.out.println("\nLogged out successfully...");
                 f.dispose();
             }
         });

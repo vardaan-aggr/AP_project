@@ -83,7 +83,7 @@ public class transcriptFrame {
             e.printStackTrace();
         }
         JOptionPane.showMessageDialog(null, "Downloaded successfully.", "Print transcript", JOptionPane.INFORMATION_MESSAGE);
-        System.out.println("Going back to Student Dashboard..");
+        System.out.println("\tGoing back to Student Dashboard..");
         new studentDashboard(username, role, in_pass, rollNo);
     }
 }

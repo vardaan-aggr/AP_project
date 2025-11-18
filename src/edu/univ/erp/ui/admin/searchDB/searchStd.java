@@ -28,7 +28,7 @@ public class searchStd {
         JLabel l0 = new JLabel("Student Info");
         l0.setBounds(0, 0, 800, 60);
         l0.setBackground(Color.decode("#051072"));
-        l0.setForeground(Color.decode("#d8d0c4"));
+        l0.setForeground(Color.decode("#dbd3c5"));
         l0.setFont(new Font("Arial", Font.BOLD, 28));
         l0.setOpaque(true);
         l0.setHorizontalAlignment(SwingConstants.CENTER);
@@ -39,7 +39,7 @@ public class searchStd {
         JTable t = new JTable(data, columName);
 
         t.getTableHeader().setBackground(Color.decode("#051072"));
-        t.getTableHeader().setForeground(Color.decode("#d8d0c4"));
+        t.getTableHeader().setForeground(Color.decode("#dbd3c5"));
         t.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
         t.setFont(new Font("Arial", Font.PLAIN, 12));
         t.setRowHeight(25);
@@ -62,7 +62,7 @@ public class searchStd {
         // --- Action Listeners ---
         b1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Going back to Student Dashboard..");
+                System.out.println("\tGoing back to admin dashboard..");
                 new adminDashboard(roll_no_inp);
                 f.dispose();
             }
@@ -71,10 +71,14 @@ public class searchStd {
 
     private String[][] dataPull() {
         ArrayList<String[]> data = new ArrayList<>();
+        String bedebop = """
+                        Select auth_db.auth_table.roll_no, auth_db.auth_table.username, erp_db.students.program, erp_db.students.year 
+                        From auth_db.auth_table
+                        Join erp_db.students ON auth_db.auth_table.roll_no = erp_db.students.roll_no
+                        Where auth_db.auth_table.role = ?;
+                    """;
         try (Connection connection = DatabaseConnector.getAuthConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement("""
-                        Select roll_no, username FROM auth_table WHERE role = ?;
-                    """)) {
+            try (PreparedStatement statement = connection.prepareStatement(bedebop)) {
                 statement.setString(1, "student");
                 try (ResultSet resultSet = statement.executeQuery()) {
                     boolean empty = true;
@@ -82,48 +86,24 @@ public class searchStd {
                         empty = false;
                         String rollNo = resultSet.getString("roll_no");
                         String username = resultSet.getString("username");
-                        try (Connection connection2 = DatabaseConnector.getErpConnection()) {
-                            try (PreparedStatement statement1 = connection2.prepareStatement("""
-                                        Select program, year FROM students where roll_no = ?;
-                                    """)) {
-                                statement1.setString(1, String.valueOf(rollNo));
-                                try (ResultSet resultSet2 = statement1.executeQuery()) {
-                                    boolean empty1 = true;
-                                    while (resultSet2.next()) {
-                                        empty1 = false;
-                                        String program = resultSet2.getString("program");
-                                        String year = resultSet2.getString("year");
-                                        data.add(new String[]{username, rollNo, program, year});
-                                    }
-                                    if (empty1) {
-                                        JOptionPane.showMessageDialog(null, "Error: no student in erp database", "Error", JOptionPane.ERROR_MESSAGE);
-                                        System.out.println("\t (no student in erp database)");
-                                    }
-                                }
-                            }
-                        } catch (SQLException ex) {
-                            JOptionPane.showMessageDialog(null, "Error opening students from erp: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
-                            ex.printStackTrace();
-                        }
+                        String program = resultSet.getString("program");
+                        String year = resultSet.getString("year");
+                        data.add(new String[]{username, rollNo, program, year});
                     }
                     if (empty) {
-                        JOptionPane.showMessageDialog(null, "Error: no student in auth database", "Error", JOptionPane.ERROR_MESSAGE);
-                        System.out.println("\t (no student in auth database)");
+                        JOptionPane.showMessageDialog(null, "Error: No student in both database together", "Error", JOptionPane.ERROR_MESSAGE);
+                        System.out.println("\t (Error: No student in both database together)");
                     }
                 }
             }
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "Error opening student from auth: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Error opening student info from database.", "Error", JOptionPane.ERROR_MESSAGE);
+            System.out.println("Error opening student info from database: " + ex);
             ex.printStackTrace();
         }
 
         String[][] strArr = new String[data.size()][4];
-        for (int i = 0; i < data.size(); i++) {
-            strArr[i][0] = data.get(i)[0];
-            strArr[i][1] = data.get(i)[1];
-            strArr[i][2] = data.get(i)[2];
-            strArr[i][3] = data.get(i)[3];
-        }
+        data.toArray(strArr);
         return strArr;
     }
 }

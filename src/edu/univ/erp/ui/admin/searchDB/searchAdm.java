@@ -13,10 +13,8 @@ import java.awt.event.ActionListener;
 import java.awt.Color;
 import java.awt.Font;
 
-
 import edu.univ.erp.data.DatabaseConnector;
 import edu.univ.erp.ui.admin.adminDashboard;
-
 
 public class searchAdm {
     public searchAdm(int roll_no_inp) {
@@ -28,7 +26,7 @@ public class searchAdm {
         JLabel l0 = new JLabel("Admin Info");
         l0.setBounds(0, 0, 800, 60);
         l0.setBackground(Color.decode("#051072"));
-        l0.setForeground(Color.decode("#d8d0c4"));
+        l0.setForeground(Color.decode("#dbd3c5"));
         l0.setFont(new Font("Arial", Font.BOLD, 28));
         l0.setOpaque(true);
         l0.setHorizontalAlignment(SwingConstants.CENTER);
@@ -39,7 +37,7 @@ public class searchAdm {
         JTable t = new JTable(data, columName);
 
         t.getTableHeader().setBackground(Color.decode("#051072"));
-        t.getTableHeader().setForeground(Color.decode("#d8d0c4"));
+        t.getTableHeader().setForeground(Color.decode("#dbd3c5"));
         t.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
         t.setFont(new Font("Arial", Font.PLAIN, 12));
         t.setRowHeight(25);
@@ -62,7 +60,7 @@ public class searchAdm {
         // --- Action Listeners ---
         b1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Going back to Student Dashboard..");
+                System.out.println("\tGoing back to Admin Dashboard..");
                 new adminDashboard(roll_no_inp);
                 f.dispose();
             }
@@ -85,21 +83,19 @@ public class searchAdm {
                         data.add(new String[]{username, rollNo});
                     }
                     if (empty) {
-                        JOptionPane.showMessageDialog(null, "Error: no admin in auth database", "Error", JOptionPane.ERROR_MESSAGE);
-                        System.out.println("\t (no admin in auth database)");
+                        JOptionPane.showMessageDialog(null, "Error: No admin in database", "Error", JOptionPane.ERROR_MESSAGE);
+                        System.out.println("\t (No admin in database)");
                     }
                 }
             }
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "Error opening grades: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "A database error occurred.", "Error", JOptionPane.ERROR_MESSAGE);
+            System.out.println("Error fetching admin data from databases: " + ex);
             ex.printStackTrace();
         }
 
         String[][] strArr = new String[data.size()][2];
-        for (int i = 0; i < data.size(); i++) {
-            strArr[i][0] = data.get(i)[0];
-            strArr[i][1] = data.get(i)[1];
-        }
+        data.toArray(strArr);
         return strArr;
     }
 }

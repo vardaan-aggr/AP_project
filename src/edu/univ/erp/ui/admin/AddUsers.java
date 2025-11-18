@@ -16,7 +16,7 @@ public class AddUsers {
         JLabel l0 = new JLabel("ADD USER");
         l0.setBounds(0, 0, 800, 50);
         l0.setBackground(Color.decode("#051072"));
-        l0.setForeground(Color.decode("#d8d0c4"));
+        l0.setForeground(Color.decode("#dbd3c5"));
         l0.setFont(new Font("Arial", Font.BOLD, 28));
         l0.setOpaque(true);
         l0.setHorizontalAlignment(SwingConstants.CENTER);
@@ -50,7 +50,7 @@ public class AddUsers {
         // ---- ActionListeners ----
         b1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Going back to Admin Dashboard..");
+                System.out.println("\t to Admin Dashboard..");
                 new adminDashboard(rollNo);
                 f.dispose();
             }
@@ -61,24 +61,20 @@ public class AddUsers {
                 String role = t1.getText().toLowerCase();
                 if (role.equals("student")) {
                     new addStd(rollNo);
-                    System.out.println("Going back to add student user..");
+                    System.out.println(" to add student user..");
                     f.dispose();
                 } else if (role.equals("instructor")) {
-                    System.out.println("Going back to add instructor user..");
+                    System.out.println(" to add instructor user..");
                     new addIns(rollNo);
                     f.dispose();
                 } else if (role.equals("admin")) {
-                    System.out.println("Going back to add admin user..");
+                    System.out.println(" to add admin user..");
                     new addAdm(rollNo);
                     f.dispose();
                 } else {
                     JOptionPane.showMessageDialog(null, "ENTER ONLY Student, Instructor, Admin", "Error", JOptionPane.ERROR_MESSAGE);
                     System.out.println("Rerunning add users..");
-                    new AddUsers(rollNo);
-                    f.dispose();
                 }
-                System.out.println("Going back to Admin Dashboard..");
-
             }
         });
     }

@@ -27,7 +27,7 @@ public class assignIns {
         JLabel l0 = new JLabel("Add instructor");
         l0.setBounds(0, 0, 800, 50);
         l0.setBackground(Color.decode("#051072"));
-        l0.setForeground(Color.decode("#d8d0c4"));
+        l0.setForeground(Color.decode("#dbd3c5"));
         l0.setFont(new Font("Arial", Font.BOLD, 28));
         l0.setOpaque(true);
         l0.setHorizontalAlignment(SwingConstants.CENTER);
@@ -81,9 +81,9 @@ public class assignIns {
                         if (rowsAffected > 0) {
                             System.out.println("Added instructor successfully in Auth..");
                         } else {
-                            JOptionPane.showMessageDialog(f, "Failed to add instructor!", "Error", JOptionPane.ERROR_MESSAGE);
+                            JOptionPane.showMessageDialog(null, "Failed to add instructor!", "Error", JOptionPane.ERROR_MESSAGE);
                             System.out.println("Failed to add instructor in Auth");
-                            System.out.println("Going back to Admin Dashboard..");
+                            System.out.println(" to Admin Dashboard..");
                             new adminDashboard(rollNo);
                             f.dispose();
                         }
@@ -92,7 +92,7 @@ public class assignIns {
                     ex.printStackTrace();
                 }
 
-                System.out.println("Going back to Admin Dashboard..");
+                System.out.println("\tGoing back to Admin Dashboard..");
                 new adminDashboard(rollNo);
                 f.dispose();
             }
@@ -100,7 +100,7 @@ public class assignIns {
 
         b2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Going back to Admin Dashboard..");
+                System.out.println("\tGoing back to Admin Dashboard..");
                 new adminDashboard(rollNo);
                 f.dispose();
             }

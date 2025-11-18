@@ -14,6 +14,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class addStd {
     public addStd(int rollNo) {
@@ -25,7 +26,7 @@ public class addStd {
         JLabel l0 = new JLabel("Add student");
         l0.setBounds(0, 0, 800, 50);
         l0.setBackground(Color.decode("#051072"));
-        l0.setForeground(Color.decode("#d8d0c4"));
+        l0.setForeground(Color.decode("#dbd3c5"));
         l0.setFont(new Font("Arial", Font.BOLD, 28));
         l0.setOpaque(true);
         l0.setHorizontalAlignment(SwingConstants.CENTER);
@@ -80,13 +81,13 @@ public class addStd {
         // ---- Action Listeners ----
         b1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                int rollNo = -1;
+                int rollNoTemp = -1;
                 String hash_pass = HashGenerator.makeHash(t4.getText());
                 try (Connection connection = DatabaseConnector.getAuthConnection()) {
                     try (PreparedStatement statement = connection.prepareStatement("""
                                 INSERT INTO auth_table (username, role, hash_password) VALUES
                                     (?, ?, ?)
-                            """)) {
+                            """, Statement.RETURN_GENERATED_KEYS)) {
                         statement.setString(1, t1.getText());
                         statement.setString(2, "student");
                         statement.setString(3, hash_pass);
@@ -94,43 +95,57 @@ public class addStd {
                         if (rowsAffected > 0) {
                              try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
                                 if (generatedKeys.next()) {
-                                    rollNo = generatedKeys.getInt(1);
-                                    System.out.println("Student added successfully in Auth with roll no: " + rollNo);
+                                    rollNoTemp = generatedKeys.getInt(1);
+                                    JOptionPane.showMessageDialog(null, "Sucessfully added ", "Sucess", JOptionPane.INFORMATION_MESSAGE);
+                                    System.out.println("Student added successfully in Auth with roll no: " + rollNoTemp);
+                                } else {
+                                    // the insert worked, but we couldn't get the new ID.
+                                    JOptionPane.showMessageDialog(null, "Failed to retrieve new student's ID", "Error", JOptionPane.ERROR_MESSAGE);
+                                    System.out.println("Failed to get generated key for new student.");
+                                    return; 
                                 }
                             }
                         } else {
-                            JOptionPane.showMessageDialog(f, "Failed to add student!", "Error", JOptionPane.ERROR_MESSAGE);
-                            System.out.println("Failed to add student in Auth");
+                            JOptionPane.showMessageDialog(null, "Failed to add student info in database.", "Error", JOptionPane.ERROR_MESSAGE);
+                            System.out.println("Failed to add student info in database.");
                             return;
                         }
                     } 
                 } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(null, "Database Error (Auth): " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                     ex.printStackTrace();
+                    return;
                 }
 
-                if (rollNo != -1) {
+                if (rollNoTemp != -1) {
                     try (Connection connection = DatabaseConnector.getErpConnection()) {
                         try (PreparedStatement statement = connection.prepareStatement("""
                                     INSERT INTO students (roll_no, program, year) VALUES
                                         (?, ?, ?)
                                 """)) {
-                            statement.setString(1, String.valueOf(rollNo));
+                            statement.setString(1, String.valueOf(rollNoTemp));
                             statement.setString(2, t2.getText());
-                            statement.setString(3, l3.getText());
+                            statement.setString(3, t3.getText());
                             int rowsAffected = statement.executeUpdate();
                             if (rowsAffected > 0) {
+                                JOptionPane.showMessageDialog(null, "Added successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
                                 System.out.println("Student added successfully in Erp db");
                             } else {
+                                JOptionPane.showMessageDialog(null, "Failed to add student to ERP database", "Error", JOptionPane.ERROR_MESSAGE);
                                 System.out.println("Failed to add student in Erp");
+                                return;
                             }
                         } 
                     } catch (SQLException ex) {
+                        JOptionPane.showMessageDialog(null, "Database Error (ERP): " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                         ex.printStackTrace();
+                        return;
                     }
                 } else {
-                    ;
+                    System.out.println("Skipping ERP insert because auth insert failed.");
+                    return;
                 }
-                System.out.println("Going back to Admin Dashboard..");
+                System.out.println(" to Admin Dashboard..");
                 new adminDashboard(rollNo);
                 f.dispose();
             }
@@ -138,7 +153,7 @@ public class addStd {
 
         b2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Going back to Admin Dashboard..");
+                System.out.println(" to Admin Dashboard..");
                 new adminDashboard(rollNo);
                 f.dispose();
             }
