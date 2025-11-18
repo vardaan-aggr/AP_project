@@ -75,7 +75,7 @@ public class AllCourses {
                     t.setRowSelectionInterval(rowNumber - 1, rowNumber-1 );
                     t.scrollRectToVisible(t.getCellRect(rowNumber - 1, 0, true));
                 } else {
-                    JOptionPane.showMessageDialog(f, "Course not found: " + course_code_input);
+                    JOptionPane.showMessageDialog(null, "Course not found: " + course_code_input);
                 }
             }
         });

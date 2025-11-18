@@ -28,7 +28,7 @@ public class addAdm {
         JLabel l0 = new JLabel("Add Admin");
         l0.setBounds(0, 0, 800, 50);
         l0.setBackground(Color.decode("#051072"));
-        l0.setForeground(Color.decode("#d8d0c4"));
+        l0.setForeground(Color.decode("#dbd3c5"));
         l0.setFont(new Font("Arial", Font.BOLD, 28));
         l0.setOpaque(true);
         l0.setHorizontalAlignment(SwingConstants.CENTER);
@@ -69,7 +69,6 @@ public class addAdm {
         // ---- Action Listeners ----
         b1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                int rollNo = -1;
                 String hash_pass = HashGenerator.makeHash(t2.getText());
                 try (Connection connection = DatabaseConnector.getAuthConnection()) {
                     try (PreparedStatement statement = connection.prepareStatement("""
@@ -77,20 +76,25 @@ public class addAdm {
                                     (?, ?, ?)
                             """)) {
                         statement.setString(1, t1.getText());
-                        statement.setString(2, "Admin");
+                        statement.setString(2, "admin");
                         statement.setString(3, hash_pass);
                         int rowsAffected = statement.executeUpdate();
                         if (rowsAffected > 0) {
-                            System.out.println("Admin added successfully in Erp db");
+                            JOptionPane.showMessageDialog(null, "Admin added successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+                            System.out.println("Admin added successfully..");
                         } else {
-                            JOptionPane.showMessageDialog(f, "Failed to add instructor!", "Error", JOptionPane.ERROR_MESSAGE);
-                            System.out.println("Failed to add instructor in Auth");
+                            JOptionPane.showMessageDialog(null, "Error: Failed to add info into auth db!", "Error", JOptionPane.ERROR_MESSAGE);
+                            System.out.println("Error: Failed to add info into auth db");
+                            return;
                         }
                     } 
                 } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(null, "Error: Failed to add info into auth db!", "Error", JOptionPane.ERROR_MESSAGE);
+                    System.out.println("Error: Failed to add info into auth db");
                     ex.printStackTrace();
+                    return;
                 }
-                System.out.println("Going back to Admin Dashboard..");
+                System.out.println("\tGoing back to Admin Dashboard..");
                 new adminDashboard(rollNo);
                 f.dispose();
             }
@@ -98,7 +102,7 @@ public class addAdm {
 
         b2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Going back to Admin Dashboard..");
+                System.out.println("\tGoing back to Admin Dashboard..");
                 new adminDashboard(rollNo);
                 f.dispose();
             }

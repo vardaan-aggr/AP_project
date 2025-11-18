@@ -23,7 +23,7 @@ public class registerFrame {
         JLabel l0 = new JLabel("REGISTER");
         l0.setBounds(0, 0, 800, 60);
         l0.setBackground(Color.decode("#051072"));
-        l0.setForeground(Color.decode("#d8d0c4"));
+        l0.setForeground(Color.decode("#dbd3c5"));
         l0.setFont(new Font("Arial", Font.BOLD, 28));
         l0.setOpaque(true);
         l0.setHorizontalAlignment(SwingConstants.CENTER);
@@ -102,7 +102,7 @@ public class registerFrame {
 
         b2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Going back to Student Dashboard..");
+                System.out.println("\tGoing back to Student Dashboard..");
                 new studentDashboard(username, role, in_pass, roll_no);
                 f.dispose();
             }

@@ -34,5 +34,12 @@ Insert into sections (course_code, section, roll_no, day_time, room, capacity, s
     ('MTH203', 'B', '2', 'Tue 4:30-6:00, Thu 4:30-6:00', 'B-003', '200', 'Monsoon', '2025');
 Insert into students(roll_no ,program ,year ) values
     ('3', 'B.Tech ECE', '2');
+use auth_db;
+delete from auth_table where hash_password = '$2a$10$WkcvFpvnHToeetekXlJokuJuZFadEleVQ7OyTZ3HvA0C0ykqmbLH2';
+select * from auth_table;
+update instructors set department = 'ECE' where roll_no = 2;
 use erp_db;
-select * from instructors;
+insert into settings (settings_key, settings_value) value 
+    ('maintain_mode', 'false');
+select * from enrollments;
+drop table settings;

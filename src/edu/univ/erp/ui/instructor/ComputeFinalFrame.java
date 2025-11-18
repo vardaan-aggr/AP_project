@@ -108,7 +108,7 @@ public class ComputeFinalFrame {
                     ex.printStackTrace();
                 }
                 
-                JOptionPane.showMessageDialog(f, " grades updated successfully.");
+                JOptionPane.showMessageDialog(null, " grades updated successfully.");
                 new InstructorDashboard(roll_no);
                 f.dispose();
             }
