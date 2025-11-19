@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap; 
+import java.util.Map;     
 
 import javax.swing.*;
 import org.mindrot.jbcrypt.BCrypt;
@@ -26,6 +28,28 @@ import java.awt.Insets;
 import edu.univ.erp.util.BREATHEFONT;
 
 public class loginPage {
+    
+    private static class LoginAttemptInfo {
+        int failedAttemptCount = 0;
+        long lastFailedAttemptTimestamp = 0; // in milliseconds
+        int lifeUsed = 0;
+
+        public void increment() {
+            lifeUsed++;
+            failedAttemptCount++;
+            lastFailedAttemptTimestamp = System.currentTimeMillis();
+        }
+
+        public void reset() {
+            failedAttemptCount = 0;
+            lastFailedAttemptTimestamp = 0;
+        }
+    }
+
+    private static final Map<String, LoginAttemptInfo> loginAttempts = new HashMap<>();
+    private static final int MAX_ATTEMPTS = 5;
+    private static final long LOCKOUT_TIME_MS = 30000; // 30 seconds (30000 ms)
+
     private static String roll_no = "";
 
     public loginPage() {
@@ -129,52 +153,86 @@ public class loginPage {
             public void actionPerformed(ActionEvent e) {
                 String username_input = t1.getText().trim();
                 String password_input = new String(t2.getPassword());
+
+                // 1. Get or create login attempt info
+                LoginAttemptInfo attemptInfo = loginAttempts.computeIfAbsent(username_input, k -> new LoginAttemptInfo());
+
+                // 2. Check for lockout
+                if (attemptInfo.failedAttemptCount >= MAX_ATTEMPTS || attemptInfo.lifeUsed >= MAX_ATTEMPTS) {
+                    long elapsed = System.currentTimeMillis() - attemptInfo.lastFailedAttemptTimestamp;
+                    long remainingSeconds = (LOCKOUT_TIME_MS - elapsed) / 1000;
+
+                    if (elapsed < LOCKOUT_TIME_MS) {
+                        JOptionPane.showMessageDialog(f, 
+                            "Too many failed attempts. Please wait " + (remainingSeconds + 1) + " seconds.", 
+                            "Login Locked", 
+                            JOptionPane.WARNING_MESSAGE);
+                        System.out.println("\tLogin attempt blocked for " + username_input + ". Remaining time: " + (remainingSeconds + 1) + "s");
+                        return; // Block the login attempt
+                    } else {
+                        // Lockout time has expired, clear the old state (reset count/timestamp)
+                        attemptInfo.reset();
+                    }
+                }
+                
+                boolean loginSuccessful = false;
+                String role_db = null;
+                String retrieved_roll_no = null;
+
                 try (Connection connection = DatabaseConnector.getAuthConnection()) {
                     try (PreparedStatement statement = connection.prepareStatement("""
                                 Select hash_password, role, roll_no FROM auth_table WHERE username = ?; 
                             """)) {
                         statement.setString(1, username_input);
                         try (ResultSet resultSet = statement.executeQuery()) {
-                            boolean empty = true;
-                            while (resultSet.next()) {
-                                empty = false;
+                            if (resultSet.next()) {
                                 String hash_pass_db = resultSet.getString("hash_password");
-                                String role_db = resultSet.getString("role");
-                                roll_no = resultSet.getString("roll_no");
-                                // System.out.println("Billi kre meow meow 🙀: "+ hash_pass_db);
+                                role_db = resultSet.getString("role");
+                                retrieved_roll_no = resultSet.getString("roll_no");
+                                
                                 if (BCrypt.checkpw(password_input, hash_pass_db)) {
-                                    System.out.println("\nCorrect Password");
-                                    if (role_db.equals("student")) {
-                                        new studentDashboard(username_input, role_db, password_input, roll_no);
-                                        System.out.println("\tOpening Student Dashboard..");
-                                        f.dispose();
-                                        return;
-                                    }
-                                    else if (role_db.equals("instructor")) {
-                                        new InstructorDashboard(roll_no);
-                                        System.out.println("\tOpening Instructor Dashboard");
-                                        f.dispose();
-                                        return;
-                                    }
-                                    else if (role_db.equals("admin")) {
-                                        new adminDashboard(roll_no);
-                                        System.out.println("\tOpening Admin Dashboard");
-                                        f.dispose();
-                                        return;
-                                    }
-                                } else {
-                                    JOptionPane.showMessageDialog(null, "Wrong Password sorry", "Error", JOptionPane.ERROR_MESSAGE);
-                                    System.out.println("WrongPassword");
+                                    loginSuccessful = true;
                                 }
-                            } 
-                            if (empty) {
-                                System.out.println("\t (no data)");
-                                JOptionPane.showMessageDialog(null, "Username not found.", "Error", JOptionPane.ERROR_MESSAGE);
                             }
                         }
                     } 
                 } catch (SQLException ex) {
                     ex.printStackTrace();
+                    JOptionPane.showMessageDialog(f, "Database error during login.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return; 
+                }
+
+                // 3. Handle login outcome
+                if (loginSuccessful) {
+                    System.out.println("\nCorrect Password");
+                    // Reset failed attempts on success
+                    loginAttempts.remove(username_input);
+                    roll_no = retrieved_roll_no; // Update static roll_no member
+
+                    if (role_db.equals("student")) {
+                        new studentDashboard(username_input, role_db, password_input, roll_no);
+                        System.out.println("\tOpening Student Dashboard..");
+                    }
+                    else if (role_db.equals("instructor")) {
+                        new InstructorDashboard(roll_no);
+                        System.out.println("\tOpening Instructor Dashboard");
+                    }
+                    else if (role_db.equals("admin")) {
+                        new adminDashboard(roll_no);
+                        System.out.println("\tOpening Admin Dashboard");
+                    }
+                    f.dispose();
+                } else {
+                    // Update failed attempts on wrong password or user not found
+                    attemptInfo.increment();
+                    
+                    String message = "Invalid username or password.";
+                    if (attemptInfo.failedAttemptCount >= MAX_ATTEMPTS) {
+                         message += "\nToo many failed attempts. Account locked for 30 seconds.";
+                    }
+
+                    JOptionPane.showMessageDialog(f, message, "Login Failed", JOptionPane.ERROR_MESSAGE);
+                    System.out.println("WrongPassword. Failed attempts for " + username_input + ": " + attemptInfo.failedAttemptCount);
                 }
             }
         });
