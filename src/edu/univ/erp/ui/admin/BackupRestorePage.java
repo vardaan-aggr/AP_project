@@ -1,12 +1,12 @@
 package edu.univ.erp.ui.admin;
 
 import javax.swing.*;
+import com.formdev.flatlaf.FlatLightLaf;
 import edu.univ.erp.util.BREATHEFONT;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -18,110 +18,166 @@ public class BackupRestorePage {
     private String dbPass;
 
     public BackupRestorePage(String rollNo) {
-        // 1. LOAD CONFIGURATION FIRST
         if (!loadConfig()) {
-            JOptionPane.showMessageDialog(null, "Error: Could not load config from resources/BackupConfig.properties");
-            // If config fails, we stop here to prevent errors later
+            JOptionPane.showMessageDialog(null, "Error: Could not load database config.");
+            new adminDashboard(rollNo); 
             return;
         }
 
         Font breatheFont = BREATHEFONT.fontGen();
-        
-        JFrame f = new JFrame("Backup & Restore");
-        f.setSize(600, 400);
-        f.setLayout(new GridBagLayout());
-        f.setLocationRelativeTo(null);
+        Font gFont = BREATHEFONT.gFontGen();
 
-        JPanel panel = new JPanel(new GridLayout(3, 1, 10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
-
-        JButton btnBackup = new JButton("Backup Database");
-        JButton btnRestore = new JButton("Restore Database");
-        JButton btnBack = new JButton("Back to Dashboard");
-
-        // Style
-        Font btnFont = breatheFont.deriveFont(Font.BOLD, 20f);
-        Color btnBg = Color.decode("#2f77b1");
-        
-        for (JButton b : new JButton[]{btnBackup, btnRestore, btnBack}) {
-            b.setFont(btnFont);
-            b.setBackground(btnBg);
-            b.setForeground(Color.WHITE);
+        try {
+            UIManager.setLookAndFeel(new FlatLightLaf());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        // --- BACKUP ACTION ---
+        JFrame f = new JFrame("Backup & Restore");
+        f.setSize(800, 600); 
+        f.setLayout(new BorderLayout());
+
+        // ---- TOP ----
+        JPanel p1 = new JPanel();
+        p1.setBackground(Color.decode("#051072")); 
+        p1.setOpaque(true); 
+        
+        JLabel l0 = new JLabel("BACKUP & RESTORE"); 
+        l0.setForeground(Color.decode("#dbd3c5"));
+        l0.setFont(breatheFont.deriveFont(Font.BOLD, 60f)); 
+        l0.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0));
+        p1.add(l0);
+        f.add(p1, BorderLayout.NORTH);
+
+        // ---- MIDDLE ----
+        JPanel p2 = new JPanel(new GridBagLayout());
+        p2.setBackground(Color.decode("#dbd3c5")); 
+        
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(15, 15, 15, 15); 
+        gbc.fill = GridBagConstraints.HORIZONTAL; 
+        gbc.gridx = 0;
+        gbc.weightx = 1;
+
+        // Style Definitions
+        Font btnFont = gFont.deriveFont(Font.PLAIN, 25f);
+        Color btnBg = Color.decode("#2f77b1");
+        Color txtColor = Color.WHITE;
+
+        // Button 1: Backup
+        JButton btnBackup = new JButton("Backup Database");
+        btnBackup.setBackground(btnBg); 
+        btnBackup.setForeground(txtColor);
+        btnBackup.setFont(btnFont);
+        btnBackup.setMargin(new Insets(15, 40, 15, 40)); 
+        gbc.gridy = 0;
+        p2.add(btnBackup, gbc);
+
+        // Button 2: Restore
+        JButton btnRestore = new JButton("Restore Database");
+        btnRestore.setBackground(btnBg); 
+        btnRestore.setForeground(txtColor);
+        btnRestore.setFont(btnFont);
+        btnRestore.setMargin(new Insets(15, 40, 15, 40));
+        gbc.gridy = 1;
+        p2.add(btnRestore, gbc);
+
+        // Button 3: Back
+        JButton btnBack = new JButton("Back to Dashboard");
+        btnBack.setBackground(Color.decode("#2f77b1")); 
+        btnBack.setForeground(txtColor);
+        btnBack.setFont(btnFont);
+        btnBack.setMargin(new Insets(15, 40, 15, 40));
+        gbc.gridy = 2;
+        p2.add(btnBack, gbc);
+
+        // Container to center p2
+        JPanel container = new JPanel(new GridBagLayout());
+        container.setBackground(Color.decode("#dbd3c5"));
+        container.add(p2);
+
+        f.add(container, BorderLayout.CENTER);
+
+
+        // --- ACTIONS  ---
+
+        String fixedPath = "AP_project/src/edu/univ/erp/BackupRestore/erp_backup.sql"; 
+
         btnBackup.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                JFileChooser fileChooser = new JFileChooser();
-                fileChooser.setDialogTitle("Save Backup As");
-                if (fileChooser.showSaveDialog(f) == JFileChooser.APPROVE_OPTION) {
-                    File file = fileChooser.getSelectedFile();
-                    String path = file.getAbsolutePath();
-                    if (!path.endsWith(".sql")) path += ".sql";
-                    
-                    if (performBackup(path)) {
-                        JOptionPane.showMessageDialog(f, "Backup Success!\nSaved to: " + path);
-                    } else {
-                        JOptionPane.showMessageDialog(f, "Backup Failed. Check console for errors.");
-                    }
+                if (performBackup(fixedPath)) {
+                    JOptionPane.showMessageDialog(f, "Backup Success!\nSaved to: " + fixedPath);
+                } else {
+                    JOptionPane.showMessageDialog(f, "Backup Failed.\nCheck console for errors.");
                 }
             }
         });
-        
-        // --- RESTORE ACTION ---
+
         btnRestore.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                JFileChooser fileChooser = new JFileChooser();
-                fileChooser.setDialogTitle("Select Backup File");
-                if (fileChooser.showOpenDialog(f) == JFileChooser.APPROVE_OPTION) {
-                    File file = fileChooser.getSelectedFile();
-                    
-                    int confirm = JOptionPane.showConfirmDialog(f, 
-                        "WARNING: This will DELETE current data and replace it.\nAre you sure?", 
-                        "Confirm Restore", JOptionPane.YES_NO_OPTION);
-                    
-                    if (confirm == JOptionPane.YES_OPTION) {
-                        if (performRestore(file.getAbsolutePath())) {
-                            JOptionPane.showMessageDialog(f, "Restore Success!\nPlease restart the app.");
-                        } else {
-                            JOptionPane.showMessageDialog(f, "Restore Failed. Check console for errors.");
-                        }
+                int confirm = JOptionPane.showConfirmDialog(f, 
+                    "WARNING: This will DELETE current data and replace it from:\n" + fixedPath + "\nAre you sure?", 
+                    "Confirm Restore", JOptionPane.YES_NO_OPTION);
+                
+                if (confirm == JOptionPane.YES_OPTION) {
+                    File backupFile = new File(fixedPath);
+                    if (!backupFile.exists()) {
+                        JOptionPane.showMessageDialog(f, "Error: Backup file not found at " + fixedPath);
+                        return;
+                    }
+
+                    if (performRestore(fixedPath)) {
+                        JOptionPane.showMessageDialog(f, "Restore Success!\nPlease restart the app.");
+                    } else {
+                        JOptionPane.showMessageDialog(f, "Restore Failed.\nCheck console for errors.");
                     }
                 }
             }
         });
        
-        // --- BACK ACTION ---
         btnBack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new adminDashboard(rollNo);
+                // Converting String rollNo to int for Dashboard compatibility
+                try {
+                    new adminDashboard(rollNo);
+                } catch (NumberFormatException ex) {
+                    // Fallback if rollNo isn't a number
+                    System.err.println("Invalid admin ID"); 
+                }
                 f.dispose();
             }
         });
-        
-        panel.add(btnBackup);
-        panel.add(btnRestore);
-        panel.add(btnBack);
-        f.add(panel);
+
+        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        f.setLocationRelativeTo(null);
         f.setVisible(true);
     }
 
     // --- CONFIG LOADER ---
     private boolean loadConfig() {
         Properties prop = new Properties();
-        String filePath = "resources/BackupConfig.properties"; 
         
-        try (FileInputStream input = new FileInputStream(filePath)) {
+        String hardcodedPath = "AP_project/src/resources/Erpdatabase.properties"; 
+
+        try (java.io.FileInputStream input = new java.io.FileInputStream(hardcodedPath)) {
             prop.load(input);
             
-            this.dbName = prop.getProperty("db.name");
-            this.dbUser = prop.getProperty("db.user");
-            this.dbPass = prop.getProperty("db.password");
+            this.dbUser = prop.getProperty("username");
+            this.dbPass = prop.getProperty("password");
+            String url = prop.getProperty("jdbcUrl");
             
-            System.out.println("Backup Config Loaded: User=" + dbUser + ", DB=" + dbName);
+            if (url != null) {
+                this.dbName = url.substring(url.lastIndexOf("/") + 1);
+                if (this.dbName.contains("?")) {
+                    this.dbName = this.dbName.substring(0, this.dbName.indexOf("?"));
+                }
+            } else {
+                System.out.println("Error: jdbcUrl missing in properties.");
+                return false;
+            }
             return true;
         } catch (Exception e) {
-            System.out.println("Failed to load backup config file.");
+            System.out.println("Error loading config from: " + hardcodedPath);
             e.printStackTrace();
             return false;
         }
@@ -129,7 +185,7 @@ public class BackupRestorePage {
 
     // --- BACKUP LOGIC ---
     private boolean performBackup(String savePath) {
-        // For Arch Linux: using mariadb-dump
+        // Ensure "mariadb-dump" is in your Windows/Mac PATH environment variable
         List<String> command = Arrays.asList(
             "mariadb-dump", 
             "-u" + dbUser, 
@@ -143,7 +199,8 @@ public class BackupRestorePage {
 
         try {
             Process p = pb.start();
-            return p.waitFor() == 0;
+            int exitCode = p.waitFor();
+            return exitCode == 0;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -152,7 +209,6 @@ public class BackupRestorePage {
 
     // --- RESTORE LOGIC ---
     private boolean performRestore(String filePath) {
-        // For Arch Linux: using mariadb client
         List<String> command = Arrays.asList(
             "mariadb", 
             "-u" + dbUser, 
@@ -165,7 +221,8 @@ public class BackupRestorePage {
 
         try {
             Process p = pb.start();
-            return p.waitFor() == 0;
+            int exitCode = p.waitFor();
+            return exitCode == 0;
         } catch (Exception e) {
             e.printStackTrace();
             return false;

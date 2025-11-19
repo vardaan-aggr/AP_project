@@ -44,5 +44,7 @@ insert into settings (settings_key, settings_value) value
 select * from enrollments;
 drop table settings;
 use auth_db;
-select * from auth_table;
+select * from courses;
 
+Insert into courses(course_code, title, section, credits) VALUES 
+    ('IP12', 'Intro to Plumbing', 'N', '6')
