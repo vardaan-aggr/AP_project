@@ -17,7 +17,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class AddUsers {
-    public AddUsers(int rollNo) {
+    public AddUsers(String rollNo) {
 
         Font breatheFont = BREATHEFONT.fontGen();
         Font gFont = BREATHEFONT.gFontGen(); 
@@ -53,7 +53,7 @@ public class AddUsers {
         gbc.insets = new Insets(10, 10, 10, 10); 
         gbc.fill = GridBagConstraints.HORIZONTAL;
         
-        JLabel l1 = new JLabel("Role: ");
+        JLabel l1 = new JLabel("Role:");
         l1.setFont(gFont.deriveFont(Font.BOLD, 24)); 
         l1.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
@@ -108,7 +108,7 @@ public class AddUsers {
 
         b2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String role = t1.getText().toLowerCase();
+                String role = t1.getText().trim().toLowerCase();
                 if (role.equals("student")) {
                     new addStd(rollNo);
                     System.out.println(" to add student user..");

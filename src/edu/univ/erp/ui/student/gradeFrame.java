@@ -63,11 +63,9 @@ public class gradeFrame {
         header.setBackground(Color.decode("#051072"));
         header.setForeground(Color.decode("#dbd3c5"));
         header.setFont(gFont.deriveFont(Font.BOLD, 18));
-        // header.setFont(new Font("Gabarito Black", Font.BOLD, 18));
         header.setOpaque(true);
 
         t.setFont(gFont.deriveFont(Font.PLAIN, 16));
-        // t.setFont(new Font("Gabarito", Font.PLAIN, 16));
         t.setRowHeight(30);
         t.setSelectionBackground(Color.decode("#2f77b1"));
         t.setSelectionForeground(Color.WHITE);

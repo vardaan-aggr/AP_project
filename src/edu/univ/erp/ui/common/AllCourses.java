@@ -48,8 +48,8 @@ public class AllCourses {
         
         JLabel l0 = new JLabel("COURSE CATALOG");
         l0.setForeground(Color.decode("#dbd3c5"));
-        l0.setFont(breatheFont.deriveFont(Font.BOLD, 60f)); 
-        l0.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        l0.setFont(breatheFont.deriveFont(Font.BOLD, 80f)); 
+        l0.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0));
         p1.add(l0);
         f.add(p1, BorderLayout.NORTH);
 
@@ -58,12 +58,11 @@ public class AllCourses {
         centerPanel.setBackground(Color.decode("#dbd3c5"));
         centerPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
 
-        // 1. Search Bar Panel
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         searchPanel.setBackground(Color.decode("#dbd3c5"));
         
-        JLabel searchLabel = new JLabel("Search Code: ");
-        searchLabel.setFont(gFont.deriveFont(Font.BOLD, 18f));
+        JLabel searchLabel = new JLabel("Search Code:");
+        searchLabel.setFont(gFont.deriveFont(Font.BOLD, 18f));  
         searchLabel.setForeground(Color.decode("#051072"));
         
         JTextField t1 = new JTextField(20);
@@ -89,15 +88,16 @@ public class AllCourses {
         JTableHeader header = t.getTableHeader();
         header.setBackground(Color.decode("#051072"));
         header.setForeground(Color.decode("#dbd3c5"));
-        header.setFont(gFont.deriveFont(Font.BOLD, 16));
+        header.setFont(gFont.deriveFont(Font.BOLD, 18));
         header.setOpaque(true);
         
-        t.setFont(gFont.deriveFont(Font.PLAIN, 14));
+        t.setFont(gFont.deriveFont(Font.PLAIN, 16));
         t.setRowHeight(25);
         t.setSelectionBackground(Color.decode("#2f77b1"));
         t.setSelectionForeground(Color.WHITE);
-        t.setGridColor(Color.LIGHT_GRAY);
-
+        t.setShowGrid(true);
+        t.setGridColor(Color.decode("#051072"));
+        
         JScrollPane sp = new JScrollPane(t);
         sp.getViewport().setBackground(Color.WHITE);
         centerPanel.add(sp, BorderLayout.CENTER);
@@ -111,8 +111,8 @@ public class AllCourses {
         JButton backButton = new JButton("Back");
         backButton.setBackground(Color.decode("#2f77b1"));
         backButton.setForeground(Color.WHITE);
-        backButton.setFont(breatheFont.deriveFont(Font.PLAIN, 24f));
-        backButton.setMargin(new Insets(5, 20, 5, 20));
+        backButton.setFont(breatheFont.deriveFont(Font.PLAIN, 35f));
+        backButton.setMargin(new Insets(10, 30, 5, 30));
         
         p3.add(backButton);
         f.add(p3, BorderLayout.SOUTH);
@@ -123,7 +123,7 @@ public class AllCourses {
         // --- Action Listeners ---
         searchButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String input = t1.getText().trim();
+                String input = t1.getText().trim().trim();
                 if(input.isEmpty()) return;
 
                 boolean found = false;

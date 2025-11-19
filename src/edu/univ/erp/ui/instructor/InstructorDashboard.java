@@ -115,7 +115,7 @@ public class InstructorDashboard {
         b2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (modeOps.getMaintainMode().equals("true")) {
-                    JOptionPane.showMessageDialog(null, "Cannot change, Maintenance mode is on.", "FYI", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Cannot change, Maintenance mode is on.", "Info", JOptionPane.INFORMATION_MESSAGE);
                     System.out.println("\tCouldn't open bcz maintenance mode is on.");
                 } else if (modeOps.getMaintainMode().equals("failure")) {
                     ;

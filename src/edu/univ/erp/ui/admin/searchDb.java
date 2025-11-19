@@ -25,7 +25,7 @@ import edu.univ.erp.ui.admin.searchDB.searchStd;
 import edu.univ.erp.util.BREATHEFONT;
 
 public class searchDb {
-    public searchDb(int rollNo) {
+    public searchDb(String rollNo) {
 
         Font breatheFont = BREATHEFONT.fontGen();
         Font gFont = BREATHEFONT.gFontGen();

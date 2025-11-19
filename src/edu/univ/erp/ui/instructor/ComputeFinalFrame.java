@@ -15,7 +15,6 @@ import com.formdev.flatlaf.FlatLightLaf;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -68,7 +67,7 @@ public class ComputeFinalFrame {
         gbc.insets = new Insets(10, 10, 10, 10); 
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        Font labelFont = gFont.deriveFont(Font.BOLD, 22f);
+        Font labelFont = gFont.deriveFont(Font.PLAIN, 22f);
         Font fieldFont = gFont.deriveFont(Font.PLAIN, 20f);
         Color labelColor = Color.decode("#020A48");
 
@@ -162,20 +161,18 @@ public class ComputeFinalFrame {
         JPanel p3 = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 20));
         p3.setBackground(Color.decode("#dbd3c5"));
         
-        Dimension btnSize = new Dimension(250, 50);
-
         JButton backButton = new JButton("Back");
         backButton.setBackground(Color.decode("#2f77b1"));
         backButton.setForeground(Color.WHITE);
         backButton.setFont(breatheFont.deriveFont(Font.PLAIN, 35f));
-        backButton.setPreferredSize(btnSize);
+        backButton.setMargin(new Insets(10, 30, 5, 30));
         p3.add(backButton);
 
         JButton add = new JButton("Add Grade");
         add.setBackground(Color.decode("#2f77b1"));
         add.setForeground(Color.WHITE);
         add.setFont(breatheFont.deriveFont(Font.PLAIN, 35f));
-        add.setPreferredSize(btnSize);
+        add.setMargin(new Insets(10, 30, 5, 30));
         p3.add(add);
 
         f.add(p3, BorderLayout.SOUTH);
@@ -184,18 +181,18 @@ public class ComputeFinalFrame {
         // ---- Action Listeners ----
         add.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (num.getText().isEmpty() || code.getText().isEmpty() || sectionField.getText().isEmpty() || 
-                    quizMarks.getText().isEmpty() || midsemField.getText().isEmpty() || endsemField.getText().isEmpty()) {
+                if (num.getText().trim().isEmpty() || code.getText().trim().isEmpty() || sectionField.getText().trim().isEmpty() || 
+                    quizMarks.getText().trim().isEmpty() || midsemField.getText().trim().isEmpty() || endsemField.getText().trim().isEmpty()) {
                     JOptionPane.showMessageDialog(null, "Please fill all fields.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
-                String userRollno_input = num.getText();
-                String courseCode_input = code.getText();
-                String section_input = sectionField.getText();
+                String userRollno_input = num.getText().trim();
+                String courseCode_input = code.getText().trim();
+                String section_input = sectionField.getText().trim();
                 
                 try {
-                    char finalGrade = computeGrade(quizMarks.getText(), midsemField.getText(), endsemField.getText());
+                    char finalGrade = computeGrade(quizMarks.getText().trim(), midsemField.getText().trim(), endsemField.getText().trim());
                     
                     try (Connection connection = DatabaseConnector.getErpConnection()) {
                         try (PreparedStatement statement = connection.prepareStatement("""

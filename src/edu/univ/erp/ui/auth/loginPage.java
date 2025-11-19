@@ -26,7 +26,9 @@ import java.awt.Insets;
 import edu.univ.erp.util.BREATHEFONT;
 
 public class loginPage {
-    public static void main(String[] args) {
+    private static String roll_no = "";
+
+    public loginPage() {
         Font breatheFont = BREATHEFONT.fontGen();
         Font gFont = BREATHEFONT.gFontGen();
 
@@ -59,11 +61,9 @@ public class loginPage {
         p2.setBorder(BorderFactory.createEmptyBorder(100, 100, 100, 100));
         GridBagConstraints gbc = new GridBagConstraints();
 
-        // Add 5px of padding around all components
         gbc.insets = new Insets(10, 10, 10, 10);
 
-        JLabel l1 = new JLabel("Username: ");
-        // l1.setFont(new Font("Gabarito Black", Font.PLAIN, 24));
+        JLabel l1 = new JLabel("Username:");
         l1.setFont(gFont.deriveFont(Font.BOLD, 24));
         l1.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 0;
@@ -72,15 +72,13 @@ public class loginPage {
 
         JTextField t1 = new JTextField(50);
         t1.setFont(gFont.deriveFont(Font.PLAIN, 21));
-        // t1.setFont(new Font("Gabarito", Font.PLAIN, 21));
         gbc.gridx = 1; gbc.weightx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.CENTER;
         p2.add(t1, gbc);
         
-        JLabel l2 = new JLabel("Password: ");
+        JLabel l2 = new JLabel("Password:");
         l2.setFont(gFont.deriveFont(Font.BOLD, 24));
-        // l2.setFont(new Font("Gabarito Black", Font.PLAIN, 24));
         l2.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0;
         gbc.fill= GridBagConstraints.NONE;
@@ -88,7 +86,6 @@ public class loginPage {
         p2.add(l2, gbc);
         JPasswordField t2 = new JPasswordField(50);
         t2.setFont(gFont.deriveFont(Font.PLAIN, 22));
-        // t2.setFont(new Font("Gabarito", Font.PLAIN, 22));
         gbc.gridx = 1;
         gbc.gridy = 1;
         gbc.weightx = 1;
@@ -99,14 +96,25 @@ public class loginPage {
         
         // ---- Low ----
         JPanel p3 = new JPanel();
-        JButton b1 = new JButton("LOGIN");
         p3.setBackground(Color.decode("#dbd3c5"));
         p3.setBorder(BorderFactory.createEmptyBorder(0, 0, 50, 0));
+        
+        JButton b1 = new JButton("LOGIN");
         b1.setBackground(Color.decode("#2f77b1")); 
         b1.setForeground(Color.WHITE); 
         b1.setFont(breatheFont.deriveFont(Font.PLAIN, 35f));
         b1.setMargin(new Insets(10, 30, 5, 30));
+
+        JButton b2 = new JButton("Change Password");
+        b2.setBackground(Color.decode("#87c3fa")); 
+        b2.setForeground(Color.WHITE); 
+        b2.setFont(breatheFont.deriveFont(Font.PLAIN, 30f));
+        b2.setMargin(new Insets(10, 30, 5, 30));
+
         p3.add(b1);
+        p3.add(Box.createHorizontalStrut(20)); 
+        p3.add(b2);
+        
         f.add(p3, BorderLayout.SOUTH);
 
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -114,12 +122,12 @@ public class loginPage {
         f.setVisible(true);
         
         // For testing purposes only: remove in production
-        t1.setText("instructor1");
-        t2.setText("instructor1");
+        t1.setText("admin1");
+        t2.setText("admin1");
 
         b1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String username_input = t1.getText();
+                String username_input = t1.getText().trim();
                 String password_input = new String(t2.getPassword());
                 try (Connection connection = DatabaseConnector.getAuthConnection()) {
                     try (PreparedStatement statement = connection.prepareStatement("""
@@ -132,7 +140,7 @@ public class loginPage {
                                 empty = false;
                                 String hash_pass_db = resultSet.getString("hash_password");
                                 String role_db = resultSet.getString("role");
-                                String roll_no = resultSet.getString("roll_no");
+                                roll_no = resultSet.getString("roll_no");
                                 // System.out.println("Billi kre meow meow 🙀: "+ hash_pass_db);
                                 if (BCrypt.checkpw(password_input, hash_pass_db)) {
                                     System.out.println("\nCorrect Password");
@@ -149,7 +157,7 @@ public class loginPage {
                                         return;
                                     }
                                     else if (role_db.equals("admin")) {
-                                        new adminDashboard(Integer.parseInt(roll_no));
+                                        new adminDashboard(roll_no);
                                         System.out.println("\tOpening Admin Dashboard");
                                         f.dispose();
                                         return;
@@ -170,5 +178,17 @@ public class loginPage {
                 }
             }
         });
+
+        b2.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                new changePassword(roll_no);
+                System.out.println("Change Password clicked");
+                f.dispose();
+            }
+        });
+    }
+
+    public static void main(String[] args) {
+        new loginPage();
     }
 }

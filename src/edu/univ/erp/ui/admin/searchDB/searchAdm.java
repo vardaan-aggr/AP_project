@@ -25,7 +25,7 @@ import edu.univ.erp.ui.admin.adminDashboard;
 import edu.univ.erp.util.BREATHEFONT;
 
 public class searchAdm {
-    public searchAdm(int roll_no_inp) {
+    public searchAdm(String roll_no_inp) {
 
         Font breatheFont = BREATHEFONT.fontGen();
         Font gFont = BREATHEFONT.gFontGen();

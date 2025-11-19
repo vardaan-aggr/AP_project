@@ -1,17 +1,26 @@
 package edu.univ.erp.ui.admin;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+
+import com.formdev.flatlaf.FlatLightLaf;
 
 import edu.univ.erp.data.DatabaseConnector;
-import edu.univ.erp.ui.admin.adminDashboard;
+import edu.univ.erp.util.BREATHEFONT;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -22,95 +31,101 @@ import java.awt.event.ActionEvent;
 public class createSection {
 
     public createSection(String roll_no) {
-    // public static void main(String[] args) {
 
+        Font breatheFont = BREATHEFONT.fontGen();
+        Font gFont = BREATHEFONT.gFontGen(); 
 
-        JFrame f = new JFrame("Create Course");;
-        f.setSize(800, 600); 
-        f.setLayout(null);
-        f.getContentPane().setBackground(Color.decode("#d8d0c1"));
+        try {
+            UIManager.setLookAndFeel(new FlatLightLaf());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        JFrame f = new JFrame("Create Section");
+        f.setSize(800, 650); 
+        f.setLayout(new BorderLayout());
+
+        // ---- TOP ----
+        JPanel p1 = new JPanel();
+        p1.setBackground(Color.decode("#051072")); 
+        p1.setOpaque(true); 
         
-        JLabel l0 = new JLabel("CREATE SECTION");
-        l0.setBounds(0, 0, 800, 60); 
-        l0.setBackground(Color.decode("#051072"));
-        l0.setForeground(Color.decode("#d8d0c4"));
-        l0.setFont(new Font("Arial", Font.BOLD, 28));
-        l0.setOpaque(true);
-        l0.setHorizontalAlignment(SwingConstants.CENTER);
-        f.add(l0);
-        // course_code ,section ,roll_no ,day_time ,room ,capacity,semester,year 
-        JLabel l1 = new JLabel("Course code: ");
-        l1.setBounds(145, 100, 100, 30);
-        f.add(l1);
-        JTextField t1 = new JTextField(50);
-        t1.setBounds(275, 100, 350, 30);
-        f.add(t1);
+        JLabel l0 = new JLabel("CREATE SECTION"); 
+        l0.setForeground(Color.decode("#dbd3c5"));
+        l0.setFont(breatheFont.deriveFont(Font.BOLD, 60f)); 
+        l0.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0));
+        p1.add(l0);
+        f.add(p1, BorderLayout.NORTH);
+
+        // ---- MIDDLE ----
+        JPanel p2 = new JPanel(new GridBagLayout());
+        p2.setBackground(Color.decode("#dbd3c5")); 
+        p2.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 10, 5, 10); 
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        // Row 0: Course Code
+        addLabel(p2, gFont, "Course Code:", 0, gbc);
+        JTextField t1 = addField(p2, gFont, 0, gbc);
+
+        // Row 1: Section
+        addLabel(p2, gFont, "Section:", 1, gbc);
+        JTextField t2 = addField(p2, gFont, 1, gbc);
+
+        // Row 2: Instructor Roll
+        addLabel(p2, gFont, "Instructor Roll No:", 2, gbc);
+        JTextField t3 = addField(p2, gFont, 2, gbc);
+
+        // Row 3: Day & Time
+        addLabel(p2, gFont, "Day & Time:", 3, gbc);
+        JTextField t4 = addField(p2, gFont, 3, gbc);
+
+        // Row 4: Room No
+        addLabel(p2, gFont, "Room No:", 4, gbc);
+        JTextField t5 = addField(p2, gFont, 4, gbc);
+
+        // Row 5: Capacity
+        addLabel(p2, gFont, "Capacity:", 5, gbc);
+        JTextField t6 = addField(p2, gFont, 5, gbc);
+
+        // Row 6: Semester
+        addLabel(p2, gFont, "Semester:", 6, gbc);
+        JTextField t7 = addField(p2, gFont, 6, gbc);
+
+        // Row 7: Year
+        addLabel(p2, gFont, "Year:", 7, gbc);
+        JTextField t8 = addField(p2, gFont, 7, gbc);
+
+        // --- BUTTONS ---
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
+        buttonPanel.setOpaque(false);
+
+        JButton assignButton = new JButton("Create"); 
+        assignButton.setBackground(Color.decode("#2f77b1")); 
+        assignButton.setForeground(Color.WHITE); 
+        assignButton.setFont(breatheFont.deriveFont(Font.PLAIN, 35)); 
+        assignButton.setMargin(new Insets(5, 20, 5, 20));
+        buttonPanel.add(assignButton);
         
-        JLabel l2 = new JLabel("Section: ");
-        l2.setBounds(145, 150, 100, 30);
-        f.add(l2);
-        JTextField t2 = new JTextField();
-        t2.setBounds(275, 150, 350, 30);
-        f.add(t2);
+        JButton backButton = new JButton("Back"); 
+        backButton.setBackground(Color.decode("#2f77b1")); 
+        backButton.setForeground(Color.WHITE); 
+        backButton.setFont(breatheFont.deriveFont(Font.PLAIN, 35));
+        backButton.setMargin(new Insets(5, 20, 5, 20));
+        buttonPanel.add(backButton);
 
-        JLabel l3 = new JLabel("Instructor's Roll no : ");
-        l3.setBounds(145, 200, 120, 30);
-        f.add(l3);
+        // Place buttons
+        gbc.gridx = 0; gbc.gridy = 8; 
+        gbc.gridwidth = 2; 
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.insets = new Insets(20, 10, 10, 10); 
+        p2.add(buttonPanel, gbc);
 
-        JTextField t3 = new JTextField();
-        t3.setBounds(275, 200, 350, 30);
-        f.add(t3);
+        f.add(p2, BorderLayout.CENTER);
 
-        JLabel l4 = new JLabel("Day & Time : ");
-        l4.setBounds(145, 250, 100, 30);
-        f.add(l4);
-        JTextField t4 = new JTextField();
-        t4.setBounds(275, 250, 350, 30);
-        f.add(t4);
-        
-        JLabel l5 = new JLabel("Room No : ");
-        l5.setBounds(145, 300, 100, 30);
-        f.add(l5);
-        JTextField t5 = new JTextField();
-        t5.setBounds(275, 300, 350, 30);
-        f.add(t5);
-        
-        JLabel l6 = new JLabel("Capacity : ");
-        l6.setBounds(145, 350, 100, 30);
-        f.add(l6);
-        JTextField t6 = new JTextField();
-        t6.setBounds(275, 350, 350, 30);
-        f.add(t6);
-
-        JLabel l7 = new JLabel("Semester : ");
-        l7.setBounds(145, 400, 100, 30);
-        f.add(l7);
-        JTextField t7 = new JTextField();
-        t7.setBounds(275, 400, 350, 30);
-        f.add(t7);
-
-        JLabel l8 = new JLabel("Year : ");
-        l8.setBounds(145, 450, 100, 30);
-        f.add(l8);
-        JTextField t8 = new JTextField();
-        t8.setBounds(275, 450, 350, 30);
-        f.add(t8);
-
-        JButton assignButton = new JButton("Create Section");
-        assignButton.setBackground(Color.decode("#2f77b1"));
-        assignButton.setForeground(Color.WHITE);
-        assignButton.setFont(new Font("Arial", Font.BOLD, 14));
-        assignButton.setBounds(190, 500, 150, 50); 
-        f.add(assignButton);
-
-        JButton backButton = new JButton("<- BACK");
-        backButton.setBackground(Color.decode("#2f77b1"));
-        backButton.setForeground(Color.WHITE);
-        backButton.setFont(new Font("Arial", Font.BOLD, 14));
-        backButton.setBounds(440, 500, 150, 50); 
-        f.add(backButton);
-
-        
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.setLocationRelativeTo(null);
         f.setVisible(true);
@@ -122,14 +137,14 @@ public class createSection {
                     try (PreparedStatement statement = connection.prepareStatement("""
                                 INSERT INTO sections(course_code ,section ,roll_no ,day_time ,room ,capacity,semester,year ) VALUES (?,?, ?,?,?, ?, ?, ?);
                             """)) {
-                        statement.setString(1, t1.getText());
-                        statement.setString(2, t2.getText());
-                        statement.setString(3, t3.getText());
-                        statement.setString(4, t4.getText());
-                        statement.setString(5, t5.getText());
-                        statement.setString(6, t6.getText());
-                        statement.setString(7, t7.getText());
-                        statement.setString(8, t8.getText());
+                        statement.setString(1, t1.getText().trim());
+                        statement.setString(2, t2.getText().trim());
+                        statement.setString(3, t3.getText().trim());
+                        statement.setString(4, t4.getText().trim());
+                        statement.setString(5, t5.getText().trim());
+                        statement.setString(6, t6.getText().trim());
+                        statement.setString(7, t7.getText().trim());
+                        statement.setString(8, t8.getText().trim());
 
                         int rowsInsreted = statement.executeUpdate();
                         if (rowsInsreted == 0) {
@@ -156,12 +171,23 @@ public class createSection {
                 f.dispose();
             }
         });
-
-
-
-        
     }
-        
-    
-}
 
+    private static void addLabel(JPanel p, Font f, String text, int y, GridBagConstraints gbc) {
+        JLabel l = new JLabel(text);
+        l.setFont(f.deriveFont(Font.BOLD, 18)); // Slightly smaller font for dense form
+        l.setForeground(Color.decode("#020A48"));
+        gbc.gridx = 0; gbc.gridy = y; gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.EAST;
+        p.add(l, gbc);
+    }
+
+    private static JTextField addField(JPanel p, Font f, int y, GridBagConstraints gbc) {
+        JTextField t = new JTextField(20);
+        t.setFont(f.deriveFont(Font.PLAIN, 18));
+        gbc.gridx = 1; gbc.gridy = y; gbc.weightx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        p.add(t, gbc);
+        return t;
+    }
+}

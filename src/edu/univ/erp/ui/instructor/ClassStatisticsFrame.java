@@ -11,7 +11,6 @@ import com.formdev.flatlaf.FlatLightLaf;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -62,8 +61,8 @@ public class ClassStatisticsFrame {
         gbc.insets = new Insets(15, 10, 15, 10); 
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        JLabel l1 = new JLabel("Course Code: ");
-        l1.setFont(gFont.deriveFont(Font.BOLD, 24));
+        JLabel l1 = new JLabel("Course Code:");
+        l1.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l1.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
         p2.add(l1, gbc);
@@ -73,8 +72,8 @@ public class ClassStatisticsFrame {
         gbc.gridx = 1; gbc.gridy = 0; gbc.weightx = 1;
         p2.add(code, gbc);
 
-        JLabel l2 = new JLabel("Section: ");
-        l2.setFont(gFont.deriveFont(Font.BOLD, 24));
+        JLabel l2 = new JLabel("Section:");
+        l2.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l2.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0;
         p2.add(l2, gbc);
@@ -90,20 +89,18 @@ public class ClassStatisticsFrame {
         JPanel p3 = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 20));
         p3.setBackground(Color.decode("#dbd3c5"));
         
-        Dimension btnSize = new Dimension(250, 50);
-
         JButton seeStats = new JButton("See Statistics");
         seeStats.setBackground(Color.decode("#2f77b1"));
         seeStats.setForeground(Color.WHITE);
         seeStats.setFont(breatheFont.deriveFont(Font.PLAIN, 35f));
-        seeStats.setPreferredSize(btnSize);
+        seeStats.setMargin(new Insets(10, 30, 5, 30));
         p3.add(seeStats);
 
         JButton backButton = new JButton("Back");
         backButton.setBackground(Color.decode("#2f77b1"));
         backButton.setForeground(Color.WHITE);
         backButton.setFont(breatheFont.deriveFont(Font.PLAIN, 35f));
-        backButton.setPreferredSize(btnSize);
+        backButton.setMargin(new Insets(10, 30, 5, 30));
         p3.add(backButton);
 
         f.add(p3, BorderLayout.SOUTH);
@@ -112,8 +109,8 @@ public class ClassStatisticsFrame {
         // --- Action Listeners ---
         seeStats.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String courseCode_input = code.getText();
-                String section_input = sectionField.getText();
+                String courseCode_input = code.getText().trim();
+                String section_input = sectionField.getText().trim();
                 
                 if(courseCode_input.isEmpty() || section_input.isEmpty()) {
                     JOptionPane.showMessageDialog(null, "Please enter both Course Code and Section.", "Error", JOptionPane.ERROR_MESSAGE);

@@ -1,124 +1,167 @@
 package edu.univ.erp.ui.admin;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.SwingConstants;
+import javax.swing.JPanel;
+import javax.swing.UIManager;
+
+import com.formdev.flatlaf.FlatLightLaf;
+
+import edu.univ.erp.util.BREATHEFONT;
+
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 
 public class CreateEdit {
 
-    // public CreateEdit(String roll_no) {
-    public static void main(String[] args) {
+    public CreateEdit(String roll_no) {
 
-        JFrame f = new JFrame("Create Edit courses");;
-        f.setSize(800, 600); 
-        f.setLayout(null);
-        f.getContentPane().setBackground(Color.decode("#d8d0c1"));
+        Font breatheFont = BREATHEFONT.fontGen();
+        Font gFont = BREATHEFONT.gFontGen();
         
-        JLabel l0 = new JLabel("CREATE/EDIT/DELETE SECTION");
-        l0.setBounds(0, 0, 800, 60); 
-        l0.setBackground(Color.decode("#051072"));
-        l0.setForeground(Color.decode("#d8d0c4"));
-        l0.setFont(new Font("Arial", Font.BOLD, 28));
-        l0.setOpaque(true);
-        l0.setHorizontalAlignment(SwingConstants.CENTER);
-        f.add(l0);
+        try {
+            UIManager.setLookAndFeel(new FlatLightLaf());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        JButton createNewButton = new JButton("Create New Section");
-        createNewButton.setBackground(Color.decode("#2f77b1"));
-        createNewButton.setForeground(Color.WHITE);
-        createNewButton.setFont(new Font("Arial", Font.BOLD, 14));
-        createNewButton.setBounds(200, 100, 200, 50); 
-        f.add(createNewButton);
+        JFrame f = new JFrame("Manage Courses");
+        f.setSize(800, 600);
+        f.setLayout(new BorderLayout());
 
-        JButton createNewCourButton = new JButton("Create New Course ");
-        createNewCourButton.setBackground(Color.decode("#2f77b1"));
-        createNewCourButton.setForeground(Color.WHITE);
-        createNewCourButton.setFont(new Font("Arial", Font.BOLD, 14));
-        createNewCourButton.setBounds(450, 100, 200, 50); 
-        f.add(createNewCourButton);
+        // ---- TOP ----
+        JPanel p1 = new JPanel();
+        p1.setBackground(Color.decode("#051072")); 
+        
+        JLabel l0 = new JLabel("MANAGE COURSES"); 
+        l0.setForeground(Color.decode("#dbd3c5"));
+        l0.setFont(breatheFont.deriveFont(Font.BOLD, 60f)); 
+        l0.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0));
+        p1.add(l0);
+        f.add(p1, BorderLayout.NORTH);
 
-        JButton editButton = new JButton("Edit Section");
-        editButton.setBackground(Color.decode("#2f77b1"));
-        editButton.setForeground(Color.WHITE);
-        editButton.setFont(new Font("Arial", Font.BOLD, 14));
-        editButton.setBounds(200, 200, 200, 50); 
-        f.add(editButton);
+        // ---- MIDDLE ----
+        JPanel p2 = new JPanel(new GridBagLayout());
+        p2.setBackground(Color.decode("#dbd3c5")); 
+        
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(15, 15, 15, 15); 
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1; 
+        gbc.weighty = 1;
 
-        JButton editCourButton = new JButton("Edit Course ");
-        editCourButton.setBackground(Color.decode("#2f77b1"));
-        editCourButton.setForeground(Color.WHITE);
-        editCourButton.setFont(new Font("Arial", Font.BOLD, 14));
-        editCourButton.setBounds(450, 200, 200, 50); 
-        f.add(editCourButton);
+        Font btnFont = gFont.deriveFont(Font.PLAIN, 21f);
+        Color btnColor = Color.decode("#2f77b1");
+        Color txtColor = Color.WHITE;
 
-        JButton deleteButton = new JButton("Delete Section and Course");
-        deleteButton.setBackground(Color.decode("#2f77b1"));
-        deleteButton.setForeground(Color.WHITE);
-        deleteButton.setFont(new Font("Arial", Font.BOLD, 14));
-        deleteButton.setBounds(250, 300, 350, 50); 
-        f.add(deleteButton);
+        // --- ROW 1 ---
+        JButton bCreateSection = new JButton("Create Section");
+        bCreateSection.setBackground(btnColor); bCreateSection.setForeground(txtColor);
+        bCreateSection.setFont(btnFont);
+        
+        gbc.gridx = 0; gbc.gridy = 0;
+        p2.add(bCreateSection, gbc);
 
-        JButton backButton = new JButton("<- BACK");
-        backButton.setBackground(Color.decode("#2f77b1"));
-        backButton.setForeground(Color.WHITE);
-        backButton.setFont(new Font("Arial", Font.BOLD, 14));
-        backButton.setBounds(320, 400, 200, 50); 
-        f.add(backButton);
+        JButton bCreateCourse = new JButton("Create Course");
+        bCreateCourse.setBackground(btnColor); bCreateCourse.setForeground(txtColor);
+        bCreateCourse.setFont(btnFont);
+        
+        gbc.gridx = 1; gbc.gridy = 0;
+        p2.add(bCreateCourse, gbc);
+
+        // --- ROW 2 ---
+        JButton bEditSection = new JButton("Edit Section");
+        bEditSection.setBackground(btnColor); bEditSection.setForeground(txtColor);
+        bEditSection.setFont(btnFont);
+        
+        gbc.gridx = 0; gbc.gridy = 1;
+        p2.add(bEditSection, gbc);
+
+        JButton bEditCourse = new JButton("Edit Course");
+        bEditCourse.setBackground(btnColor); bEditCourse.setForeground(txtColor);
+        bEditCourse.setFont(btnFont);
+        
+        gbc.gridx = 1; gbc.gridy = 1;
+        p2.add(bEditCourse, gbc);
+
+        // --- ROW 3 ---
+        JButton bDelete = new JButton("Delete Section / Course");
+        bDelete.setBackground(Color.decode("#2f77b1")); 
+        bDelete.setForeground(txtColor);
+        bDelete.setFont(btnFont);
+
+        gbc.gridx = 0; gbc.gridy = 2;
+        gbc.gridwidth = 2; 
+        p2.add(bDelete, gbc);
+
+        // --- ROW 4 (Back) ---
+        JButton bBack = new JButton("Back");
+        bBack.setBackground(btnColor); bBack.setForeground(txtColor);
+        bBack.setFont(btnFont);
+
+        gbc.gridx = 0; gbc.gridy = 3;
+        gbc.gridwidth = 2;
+        p2.add(bBack, gbc);
+
+        // Add padding panel to center
+        JPanel container = new JPanel(new BorderLayout());
+        container.add(p2, BorderLayout.CENTER);
+        // Add margins to prevent buttons from touching edges
+        p2.setBorder(BorderFactory.createEmptyBorder(50, 100, 50, 100)); 
+
+        f.add(container, BorderLayout.CENTER);
 
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.setLocationRelativeTo(null);
         f.setVisible(true);
 
-        createNewButton.addActionListener( new ActionListener() {
+        bCreateSection.addActionListener( new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-
-                // new createSection(roll_no);
+                new createSection(roll_no);
                 f.dispose();
             }
         }); 
 
-        createNewCourButton.addActionListener( new ActionListener() {
+        bCreateCourse.addActionListener( new ActionListener() {
             public void actionPerformed(ActionEvent e){
-                new createCourse();
+                new createCourse(roll_no);
                 f.dispose();;
             }
-            
         });
 
-        editButton.addActionListener( new ActionListener() {
+        bEditSection.addActionListener( new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-
-                new editSection();
+                new editSection(roll_no);
                 f.dispose();
             }
         });
 
-        editCourButton.addActionListener( new ActionListener() {
+        bEditCourse.addActionListener( new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-
-                new editCourse();
-                f.dispose();
-            }
-        });
-        deleteButton.addActionListener( new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-
-                new deleteSectionACourse();
+                new editCourse(roll_no);
                 f.dispose();
             }
         });
 
-
-        backButton.addActionListener( new ActionListener() {
+        bDelete.addActionListener( new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                new deleteSectionACourse(roll_no);
+                f.dispose();
+            }
+        });
 
-                // new adminDashboard(roll_no);
+        bBack.addActionListener( new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                new adminDashboard(roll_no);
                 f.dispose();
             }
         });

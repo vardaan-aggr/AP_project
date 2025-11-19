@@ -17,9 +17,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent; 
 
 public class adminDashboard {
-    public adminDashboard(int rollNo) {
+    public adminDashboard(String rollNo) {
 
-        Font breatheFont = BREATHEFONT.fontGen();
+        Font breatheFont = BREATHEFONT.fontGen(); 
         Font gFont = BREATHEFONT.gFontGen();
 
         try {
@@ -34,77 +34,79 @@ public class adminDashboard {
 
         // ---- TOP ----
         JPanel p1 = new JPanel();
-        p1.setOpaque(true); 
-        p1.setBackground(Color.decode("#051072")); 
-        
+        p1.setOpaque(true);
+        p1.setBackground(Color.decode("#051072"));
+
         JLabel l0 = new JLabel("ADMIN DASHBOARD");
         l0.setForeground(Color.decode("#dbd3c5"));
-        l0.setFont(breatheFont.deriveFont(Font.BOLD, 80f)); 
+        l0.setFont(breatheFont.deriveFont(Font.BOLD, 80f));
         l0.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0));
         p1.add(l0);
         f.add(p1, BorderLayout.NORTH);
 
         // ---- MIDDLE ----
         JPanel p2 = new JPanel(new GridBagLayout());
-        p2.setBackground(Color.decode("#dbd3c5")); 
+        p2.setBackground(Color.decode("#dbd3c5"));
         p2.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 10, 5, 10); 
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.fill = GridBagConstraints.NONE; 
-        gbc.anchor = GridBagConstraints.CENTER;
-        gbc.weightx = 1.0;
-        gbc.gridx = 0;
-
+        gbc.insets = new Insets(10, 10, 10, 10); 
+        gbc.fill = GridBagConstraints.BOTH;      
+        
+        Dimension buttonSize = new Dimension(280, 80);
         Color btnBg = Color.decode("#2f77b1");
         Color btnFg = Color.WHITE;
-        Font btnFont = gFont.deriveFont(Font.BOLD, 20f); 
-        Dimension btnSize = new Dimension(440, 60);
+        Font btnFont = gFont.deriveFont(Font.BOLD, 21f);
+        Insets btnMargin = new Insets(10, 30, 5, 30);
 
-        gbc.gridy = 0;
+        gbc.gridx = 0; gbc.gridy = 0;
         JButton b1 = new JButton("Add Users");
-        styleButton(b1, btnBg, btnFg, btnFont, btnSize);
+        styleButton(b1, btnBg, btnFg, btnFont, buttonSize, btnMargin);
         p2.add(b1, gbc);
 
-        gbc.gridy = 1;
-        JButton b2 = new JButton("Create/Edit Courses & Sections");
-        styleButton(b2, btnBg, btnFg, btnFont, btnSize);
+        gbc.gridx = 1; gbc.gridy = 0;
+        JButton b2 = new JButton("Manage Courses");
+        styleButton(b2, btnBg, btnFg, btnFont, buttonSize, btnMargin);
         p2.add(b2, gbc);
 
-        gbc.gridy = 2;
+        gbc.gridx = 0; gbc.gridy = 1;
         JButton b3 = new JButton("Assign Instructor");
-        styleButton(b3, btnBg, btnFg, btnFont, btnSize);
+        styleButton(b3, btnBg, btnFg, btnFont, buttonSize, btnMargin);
         p2.add(b3, gbc);
 
-        gbc.gridy = 3;
-        JButton b4 = new JButton("Toggle Maintenance Mode");
-        styleButton(b4, btnBg, btnFg, btnFont, btnSize);
+        gbc.gridx = 1; gbc.gridy = 1;
+        JButton b4 = new JButton("Maintenance Mode");
+        styleButton(b4, btnBg, btnFg, btnFont, buttonSize, btnMargin);
         p2.add(b4, gbc);
 
-        gbc.gridy = 4;
+        gbc.gridx = 0; gbc.gridy = 2;
         JButton b5 = new JButton("Search Database");
-        styleButton(b5, btnBg, btnFg, btnFont, btnSize);
+        styleButton(b5, btnBg, btnFg, btnFont, buttonSize, btnMargin);
         p2.add(b5, gbc);
+
+        gbc.gridx = 1; gbc.gridy = 2;
+        JButton b6 = new JButton("Backup / Restore");
+        styleButton(b6, btnBg, btnFg, btnFont, buttonSize, btnMargin);
+        p2.add(b6, gbc);
 
         f.add(p2, BorderLayout.CENTER);
 
-        // ---- LOWS ----
+        // ---- LOWS ---- 
         JPanel p3 = new JPanel();
         p3.setBackground(Color.decode("#dbd3c5"));
         p3.setBorder(BorderFactory.createEmptyBorder(0, 0, 30, 0));
 
-        JButton b6 = new JButton("Logout");
-        b6.setBackground(Color.decode("#2f77b1")); 
-        b6.setForeground(Color.WHITE); 
-        b6.setFont(breatheFont.deriveFont(Font.PLAIN, 35f)); 
-        b6.setMargin(new Insets(10, 30, 5, 30));
-        
-        p3.add(b6);
+        JButton bLogout = new JButton("Logout");
+        bLogout.setBackground(Color.decode("#2f77b1"));
+        bLogout.setForeground(Color.WHITE);
+        bLogout.setFont(breatheFont.deriveFont(Font.PLAIN, 35f));
+        bLogout.setMargin(new Insets(10, 30, 5, 30));
+
+        p3.add(bLogout);
         f.add(p3, BorderLayout.SOUTH);
 
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
-        f.setLocationRelativeTo(null); 
+        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        f.setLocationRelativeTo(null);
         f.setVisible(true);
 
 
@@ -151,6 +153,14 @@ public class adminDashboard {
 
         b6.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                System.out.println("Opening Backup/Restore interface..");
+                new BackupRestorePage(rollNo); 
+                f.dispose();
+            }
+        });
+
+        bLogout.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
                 JOptionPane.showMessageDialog(null, "Logging out..");
                 System.out.println("\nLogged out successfully...");
                 f.dispose();
@@ -158,12 +168,11 @@ public class adminDashboard {
         });
     }
 
-    void styleButton(JButton button, Color bg, Color fg, Font font, Dimension size) {
-        button.setBackground(bg);
-        button.setForeground(fg);
-        button.setFont(font);
-        button.setPreferredSize(size);
-        button.setMinimumSize(size);
-        button.setMaximumSize(size);
+    private static void styleButton(JButton btn, Color bg, Color fg, Font font, Dimension dim, Insets margin) {
+        btn.setPreferredSize(dim);
+        btn.setBackground(bg);
+        btn.setForeground(fg);
+        btn.setFont(font);
+        btn.setMargin(margin);
     }
 }

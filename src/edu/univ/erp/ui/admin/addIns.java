@@ -31,7 +31,7 @@ import edu.univ.erp.util.BREATHEFONT;
 import edu.univ.erp.util.HashGenerator;
 
 public class addIns {
-    public addIns(int rollNo) {
+    public addIns(String rollNo) {
 
         Font breatheFont = BREATHEFONT.fontGen();
         Font gFont = BREATHEFONT.gFontGen(); 
@@ -67,7 +67,7 @@ public class addIns {
         gbc.insets = new Insets(10, 10, 10, 10); 
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        JLabel l1 = new JLabel("Username: ");
+        JLabel l1 = new JLabel("Username:");
         l1.setFont(gFont.deriveFont(Font.BOLD, 24));
         l1.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
@@ -80,7 +80,7 @@ public class addIns {
         gbc.anchor = GridBagConstraints.WEST;
         p2.add(t1, gbc);
 
-        JLabel l2 = new JLabel("Password: ");
+        JLabel l2 = new JLabel("Password:");
         l2.setFont(gFont.deriveFont(Font.BOLD, 24));
         l2.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0;
@@ -93,7 +93,7 @@ public class addIns {
         gbc.anchor = GridBagConstraints.WEST;
         p2.add(t2, gbc);
 
-        JLabel l3 = new JLabel("Department: ");
+        JLabel l3 = new JLabel("Department:");
         l3.setFont(gFont.deriveFont(Font.BOLD, 24));
         l3.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 2; gbc.weightx = 0;
@@ -145,19 +145,19 @@ public class addIns {
         // ---- Action Listeners ----
         b2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (t1.getText().isEmpty() || t2.getText().isEmpty() || t3.getText().isEmpty()) {
+                if (t1.getText().trim().isEmpty() || t2.getText().trim().isEmpty() || t3.getText().trim().isEmpty()) {
                     JOptionPane.showMessageDialog(null, "All fields must be filled out.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 int rollNoTemp = -1;
-                String hash_pass = HashGenerator.makeHash(t2.getText());
+                String hash_pass = HashGenerator.makeHash(t2.getText().trim());
                 
                 try (Connection connection = DatabaseConnector.getAuthConnection()) {
                     try (PreparedStatement statement = connection.prepareStatement("""
                                 INSERT INTO auth_table (username, role, hash_password) VALUES
                                     (?, ?, ?)
                             """, Statement.RETURN_GENERATED_KEYS)) {
-                        statement.setString(1, t1.getText());
+                        statement.setString(1, t1.getText().trim());
                         statement.setString(2, "instructor");
                         statement.setString(3, hash_pass);
                         int rowsAffected = statement.executeUpdate();
@@ -194,7 +194,7 @@ public class addIns {
                                         (?, ?)
                                 """)) {
                             statement.setString(1, String.valueOf(rollNoTemp));
-                            statement.setString(2, t2.getText());
+                            statement.setString(2, t2.getText().trim());
                             int rowsAffected = statement.executeUpdate();
                             if (rowsAffected > 0) {
                                 JOptionPane.showMessageDialog(null, "Added successfully", "Success", JOptionPane.INFORMATION_MESSAGE);

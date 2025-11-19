@@ -26,7 +26,7 @@ import edu.univ.erp.util.BREATHEFONT;
 
 
 public class searchStd {
-    public searchStd(int roll_no_inp) {
+    public searchStd(String roll_no_inp) {
         Font breatheFont = BREATHEFONT.fontGen();
         Font gFont = BREATHEFONT.gFontGen();
 

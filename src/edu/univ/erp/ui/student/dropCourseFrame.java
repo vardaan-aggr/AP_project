@@ -22,6 +22,7 @@ import java.awt.event.ActionListener;
 
 public class dropCourseFrame {
     public dropCourseFrame(String username, String role, String in_pass, String roll_no) {
+
         Font breatheFont = BREATHEFONT.fontGen();
         Font gFont = BREATHEFONT.gFontGen();
         
@@ -55,14 +56,14 @@ public class dropCourseFrame {
         gbc.insets = new Insets(10, 10, 10, 10); 
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        JLabel l1 = new JLabel("Course code: ");
-        l1.setFont(gFont.deriveFont(Font.BOLD, 24));
+        JLabel l1 = new JLabel("Course code:");
+        l1.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l1.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
         p2.add(l1, gbc);
 
         JTextField t1 = new JTextField(20);
-        t1.setFont(new Font("Gabarito", Font.PLAIN, 21));
+        t1.setFont(gFont.deriveFont(Font.PLAIN, 21));
         gbc.gridx = 1; gbc.gridy = 0; gbc.weightx = 1;
         p2.add(t1, gbc);
 
@@ -104,7 +105,7 @@ public class dropCourseFrame {
                                 delete from enrollments where roll_no = ? and course_code = ?;
                             """)) {
                         statement.setString(1, roll_no);
-                        statement.setString(2, t1.getText());
+                        statement.setString(2, t1.getText().trim());
                         int rowsDeleted = statement.executeUpdate();
                         if (rowsDeleted == 0) {
                             JOptionPane.showMessageDialog(null, "Error: Couldn't Drop in database.", "Error", JOptionPane.ERROR_MESSAGE);

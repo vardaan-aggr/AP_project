@@ -28,7 +28,7 @@ import edu.univ.erp.data.DatabaseConnector;
 import edu.univ.erp.util.BREATHEFONT;
 
 public class assignIns {
-    public assignIns(int adminRollNo) {
+    public assignIns(String adminRollNo) {
 
         Font breatheFont = BREATHEFONT.fontGen();
         Font gFont = BREATHEFONT.gFontGen(); 
@@ -64,7 +64,7 @@ public class assignIns {
         gbc.insets = new Insets(10, 10, 10, 10); 
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        JLabel l1 = new JLabel("Course Code: ");
+        JLabel l1 = new JLabel("Course Code:");
         l1.setFont(gFont.deriveFont(Font.BOLD, 24));
         l1.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
@@ -77,7 +77,7 @@ public class assignIns {
         gbc.anchor = GridBagConstraints.WEST;
         p2.add(t1, gbc);
 
-        JLabel l2 = new JLabel("Section: ");
+        JLabel l2 = new JLabel("Section:");
         l2.setFont(gFont.deriveFont(Font.BOLD, 24));
         l2.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0;
@@ -90,7 +90,7 @@ public class assignIns {
         gbc.anchor = GridBagConstraints.WEST;
         p2.add(t2, gbc);
 
-        JLabel l3 = new JLabel("Instructor ID: ");
+        JLabel l3 = new JLabel("Instructor ID:");
         l3.setFont(gFont.deriveFont(Font.BOLD, 24));
         l3.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 2; gbc.weightx = 0;
@@ -139,7 +139,7 @@ public class assignIns {
         // ---- Action Listeners ----
         b1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (t1.getText().isEmpty() || t2.getText().isEmpty() || t3.getText().isEmpty()) {
+                if (t1.getText().trim().isEmpty() || t2.getText().trim().isEmpty() || t3.getText().trim().isEmpty()) {
                     JOptionPane.showMessageDialog(null, "All fields must be filled out.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
@@ -148,9 +148,9 @@ public class assignIns {
                                 INSERT INTO sections (course_code, section, roll_no) VALUES
                                     (?, ?, ?)
                             """)) {
-                        statement.setString(1, t1.getText());
-                        statement.setString(2, t2.getText());
-                        statement.setString(3, t3.getText());
+                        statement.setString(1, t1.getText().trim());
+                        statement.setString(2, t2.getText().trim());
+                        statement.setString(3, t3.getText().trim());
                         int rowsAffected = statement.executeUpdate();
                         if (rowsAffected > 0) {
                             System.out.println("Added instructor successfully in Auth..");

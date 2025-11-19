@@ -20,7 +20,7 @@ import edu.univ.erp.util.modeOps;
 
 
 public class maintainMode {
-    public maintainMode (int rollNo) {
+    public maintainMode (String rollNo) {
         
         Font breatheFont = BREATHEFONT.fontGen();
         Font gFont = BREATHEFONT.gFontGen();

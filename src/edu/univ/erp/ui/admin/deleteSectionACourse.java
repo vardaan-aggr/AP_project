@@ -1,16 +1,26 @@
 package edu.univ.erp.ui.admin;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+
+import com.formdev.flatlaf.FlatLightLaf;
 
 import edu.univ.erp.data.DatabaseConnector;
+import edu.univ.erp.util.BREATHEFONT;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -20,49 +30,95 @@ import java.awt.event.ActionEvent;
 public class deleteSectionACourse {
     public deleteSectionACourse(String roll_no) { 
 
-    // public static void main(String[] args) {
+         Font breatheFont = BREATHEFONT.fontGen();
+        Font gFont = BREATHEFONT.gFontGen(); 
+
+        try {
+            UIManager.setLookAndFeel(new FlatLightLaf());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         JFrame f = new JFrame("Delete Section and Course");
         f.setSize(800, 600); 
-        f.setLayout(null);
-        f.getContentPane().setBackground(Color.decode("#d8d0c1"));
-        
-        JLabel l0 = new JLabel("DELETE SECTION & COURSE");
-        l0.setBounds(0, 0, 800, 60); 
-        l0.setBackground(Color.decode("#051072"));
-        l0.setForeground(Color.decode("#d8d0c4"));
-        l0.setFont(new Font("Arial", Font.BOLD, 28));
-        l0.setOpaque(true);
-        l0.setHorizontalAlignment(SwingConstants.CENTER);
-        f.add(l0);
-        
-        JLabel l1 = new JLabel("Course code: ");
-        l1.setBounds(145, 200, 100, 30);
-        f.add(l1);
-        JTextField t1 = new JTextField(50);
-        t1.setBounds(275, 200, 350, 30);
-        f.add(t1);
-        
-        JLabel l2 = new JLabel("Section: ");
-        l2.setBounds(145, 280, 100, 30);
-        f.add(l2);
-        JTextField t2 = new JTextField();
-        t2.setBounds(275, 280, 350, 30);
-        f.add(t2);
+        f.setLayout(new BorderLayout());
 
-        JButton deleteButton = new JButton("Delete Both");
-        deleteButton.setBackground(Color.decode("#ec1414"));
+        // ---- TOP ----
+        JPanel p1 = new JPanel();
+        p1.setBackground(Color.decode("#051072")); 
+        p1.setOpaque(true); 
+        
+        JLabel l0 = new JLabel("DELETE COURSE"); 
+        l0.setForeground(Color.decode("#dbd3c5"));
+        l0.setFont(breatheFont.deriveFont(Font.BOLD, 60f)); 
+        l0.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0));
+        p1.add(l0);
+        f.add(p1, BorderLayout.NORTH);
+
+        // ---- MIDDLE ----
+        JPanel p2 = new JPanel(new GridBagLayout());
+        p2.setBackground(Color.decode("#dbd3c5")); 
+        p2.setBorder(BorderFactory.createEmptyBorder(50, 100, 50, 100));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(15, 15, 15, 15); 
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        // Row 0: Course Code
+        JLabel l1 = new JLabel("Course Code:");
+        l1.setFont(gFont.deriveFont(Font.BOLD, 24));
+        l1.setForeground(Color.decode("#020A48"));
+        gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.EAST;
+        p2.add(l1, gbc);
+
+        JTextField t1 = new JTextField(20);
+        t1.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        gbc.gridx = 1; gbc.gridy = 0; gbc.weightx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        p2.add(t1, gbc);
+
+        // Row 1: Section
+        JLabel l2 = new JLabel("Section:");
+        l2.setFont(gFont.deriveFont(Font.BOLD, 24));
+        l2.setForeground(Color.decode("#020A48"));
+        gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.EAST;
+        p2.add(l2, gbc);
+
+        JTextField t2 = new JTextField(20);
+        t2.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        gbc.gridx = 1; gbc.gridy = 1; gbc.weightx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        p2.add(t2, gbc);
+
+        // --- BUTTONS ---
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
+        buttonPanel.setOpaque(false);
+
+        JButton deleteButton = new JButton("Delete");
+        deleteButton.setBackground(Color.decode("#051072")); 
         deleteButton.setForeground(Color.WHITE);
-        deleteButton.setFont(new Font("Arial", Font.BOLD, 14));
-        deleteButton.setBounds(190, 350, 150, 50); 
-        f.add(deleteButton);
+        deleteButton.setFont(breatheFont.deriveFont(Font.PLAIN, 35));
+        deleteButton.setMargin(new Insets(10, 30, 5, 30));
+        buttonPanel.add(deleteButton);
 
-        JButton backButton = new JButton("<- BACK");
+        JButton backButton = new JButton("Back");
         backButton.setBackground(Color.decode("#2f77b1"));
         backButton.setForeground(Color.WHITE);
-        backButton.setFont(new Font("Arial", Font.BOLD, 14));
-        backButton.setBounds(440, 350, 150, 50); 
-        f.add(backButton);
+        backButton.setFont(breatheFont.deriveFont(Font.PLAIN, 35));
+        backButton.setMargin(new Insets(10, 30, 5, 30));
+        buttonPanel.add(backButton);
+
+        // Place buttons
+        gbc.gridx = 0; gbc.gridy = 2; 
+        gbc.gridwidth = 2; 
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.insets = new Insets(50, 10, 10, 10); 
+        p2.add(buttonPanel, gbc);
+
+        f.add(p2, BorderLayout.CENTER);
 
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.setLocationRelativeTo(null);
@@ -71,8 +127,8 @@ public class deleteSectionACourse {
         // --- Action Listeners ---
         deleteButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String courseCode = t1.getText();
-                String section = t2.getText();
+                String courseCode = t1.getText().trim();
+                String section = t2.getText().trim();
 
                 if (courseCode.isEmpty() || section.isEmpty()) {
                     JOptionPane.showMessageDialog(null, "Please enter both Course Code and Section.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -111,7 +167,7 @@ public class deleteSectionACourse {
                         JOptionPane.showMessageDialog(null, "Error deleting: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                         ex.printStackTrace();
                     }
-                    new adminDashboard(roll_no)
+                    new adminDashboard(roll_no);
                     f.dispose();
                 }
             }

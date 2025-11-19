@@ -20,7 +20,10 @@ import edu.univ.erp.util.BREATHEFONT;
 
 public class studentDashboard {
     public studentDashboard(String username, String role, String in_pass, String roll_no) {
+
         Font breatheFont = BREATHEFONT.fontGen();
+        Font gFont = BREATHEFONT.gFontGen();
+
         try {
             UIManager.setLookAndFeel(new FlatLightLaf());
         } catch (Exception e) {
@@ -56,7 +59,7 @@ public class studentDashboard {
         b1.setMargin(new Insets(10, 30, 5, 30));
         b1.setBackground(Color.decode("#2f77b1")); 
         b1.setForeground(Color.WHITE); 
-        b1.setFont(new Font("Gabarito BLACK", Font.PLAIN, 21));
+        b1.setFont(gFont.deriveFont(Font.BOLD, 21f));
         p2.add(b1, gbc);
 
         gbc.gridx = 1; gbc.gridy = 0;
@@ -65,7 +68,7 @@ public class studentDashboard {
         b2.setMargin(new Insets(10, 30, 5, 30));
         b2.setBackground(Color.decode("#2f77b1")); 
         b2.setForeground(Color.WHITE); 
-        b2.setFont(new Font("Gabarito Black", Font.PLAIN, 21));
+        b2.setFont(gFont.deriveFont(Font.BOLD, 21f));
         p2.add(b2, gbc);
 
         gbc.gridx = 0; gbc.gridy = 1;
@@ -74,7 +77,7 @@ public class studentDashboard {
         b3.setMargin(new Insets(10, 30, 5, 30));
         b3.setBackground(Color.decode("#2f77b1")); 
         b3.setForeground(Color.WHITE); 
-        b3.setFont(new Font("Gabarito Black", Font.PLAIN, 21));
+        b3.setFont(gFont.deriveFont(Font.BOLD, 21f));
         p2.add(b3, gbc);
 
         gbc.gridx = 1; gbc.gridy = 1;
@@ -83,7 +86,7 @@ public class studentDashboard {
         b4.setMargin(new Insets(10, 30, 5, 30));
         b4.setBackground(Color.decode("#2f77b1")); 
         b4.setForeground(Color.WHITE); 
-        b4.setFont(new Font("Gabarito Black", Font.PLAIN, 21));
+        b4.setFont(gFont.deriveFont(Font.BOLD, 21f));
         p2.add(b4, gbc);
 
         gbc.gridx = 0; gbc.gridy = 2;
@@ -92,7 +95,7 @@ public class studentDashboard {
         b6.setMargin(new Insets(10, 30, 5, 30));
         b6.setBackground(Color.decode("#2f77b1")); 
         b6.setForeground(Color.WHITE); 
-        b6.setFont(new Font("Gabarito Black", Font.PLAIN, 21));
+        b6.setFont(gFont.deriveFont(Font.BOLD, 21f));
         p2.add(b6, gbc);
 
         gbc.gridx = 1; gbc.gridy = 2;
@@ -101,7 +104,7 @@ public class studentDashboard {
         b7.setMargin(new Insets(10, 30, 5, 30));
         b7.setBackground(Color.decode("#2f77b1")); 
         b7.setForeground(Color.WHITE); 
-        b7.setFont(new Font("Gabarito Black", Font.PLAIN, 21));
+        b7.setFont(gFont.deriveFont(Font.BOLD, 21f));
         p2.add(b7, gbc);
         f.add(p2, BorderLayout.CENTER);
 
@@ -111,7 +114,7 @@ public class studentDashboard {
         JButton b5 = new JButton("Logout");
         b5.setBackground(Color.decode("#2f77b1")); 
         b5.setForeground(Color.WHITE); 
-        b5.setFont(breatheFont.deriveFont(Font.PLAIN, 35f));
+        b5.setFont(breatheFont.deriveFont(Font.BOLD, 35f));
         b5.setMargin(new Insets(10, 30, 5, 30));
         p3.add(b5);
         f.add(p3, BorderLayout.SOUTH);

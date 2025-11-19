@@ -1,18 +1,26 @@
 package edu.univ.erp.ui.admin;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+
+import com.formdev.flatlaf.FlatLightLaf;
 
 import edu.univ.erp.data.DatabaseConnector;
-import edu.univ.erp.ui.admin.adminDashboard;
-import edu.univ.erp.ui.admin.editSectionPage2;
+import edu.univ.erp.util.BREATHEFONT;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -24,54 +32,99 @@ import java.awt.event.ActionEvent;
 public class editCourse {
 
     public editCourse(String roll_no) {
-    // public static void main(String[] args) {
-        JFrame f0 = new JFrame("EDIT COURSE");
+Font breatheFont = BREATHEFONT.fontGen();
+        Font gFont = BREATHEFONT.gFontGen(); 
+
+        try {
+            UIManager.setLookAndFeel(new FlatLightLaf());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        JFrame f0 = new JFrame("Edit Course");
         f0.setSize(800, 600); 
-        f0.setLayout(null);
-        f0.getContentPane().setBackground(Color.decode("#d8d0c1"));
+        f0.setLayout(new BorderLayout());
 
-        JLabel l0 = new JLabel("EDIT COURSE");
-        l0.setBounds(0, 0, 800, 60); 
-        l0.setBackground(Color.decode("#051072"));
-        l0.setForeground(Color.decode("#d8d0c4"));
-        l0.setFont(new Font("Arial", Font.BOLD, 28));
-        l0.setOpaque(true);
-        l0.setHorizontalAlignment(SwingConstants.CENTER);
-        f0.add(l0);
-
-        JLabel l1 = new JLabel("Course code: ");
-        l1.setBounds(145, 200, 100, 30);
-        f0.add(l1);
-        JTextField t1 = new JTextField(50);
-        t1.setBounds(275, 200, 350, 30);
-        f0.add(t1);
-
+        // ---- TOP ----
+        JPanel p1 = new JPanel();
+        p1.setBackground(Color.decode("#051072")); 
+        p1.setOpaque(true); 
         
-        JLabel l2 = new JLabel("Section: ");
-        l2.setBounds(145, 270, 100, 30);
-        f0.add(l2);
-        JTextField t2 = new JTextField();
-        t2.setBounds(275, 270, 350, 30);
-        f0.add(t2);
+        JLabel l0 = new JLabel("EDIT COURSE"); 
+        l0.setForeground(Color.decode("#dbd3c5"));
+        l0.setFont(breatheFont.deriveFont(Font.BOLD, 60f)); 
+        l0.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0));
+        p1.add(l0);
+        f0.add(p1, BorderLayout.NORTH);
+
+        // ---- MIDDLE ----
+        JPanel p2 = new JPanel(new GridBagLayout());
+        p2.setBackground(Color.decode("#dbd3c5")); 
+        p2.setBorder(BorderFactory.createEmptyBorder(50, 100, 50, 100));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(15, 15, 15, 15); 
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        // Row 0: Course Code
+        JLabel l1 = new JLabel("Course Code:");
+        l1.setFont(gFont.deriveFont(Font.BOLD, 24));
+        l1.setForeground(Color.decode("#020A48"));
+        gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.EAST;
+        p2.add(l1, gbc);
+
+        JTextField t1 = new JTextField(20);
+        t1.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        gbc.gridx = 1; gbc.gridy = 0; gbc.weightx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        p2.add(t1, gbc);
+
+        // Row 1: Section
+        JLabel l2 = new JLabel("Section:");
+        l2.setFont(gFont.deriveFont(Font.BOLD, 24));
+        l2.setForeground(Color.decode("#020A48"));
+        gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.EAST;
+        p2.add(l2, gbc);
+
+        JTextField t2 = new JTextField(20);
+        t2.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        gbc.gridx = 1; gbc.gridy = 1; gbc.weightx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        p2.add(t2, gbc);
+
+        // --- BUTTONS ---
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
+        buttonPanel.setOpaque(false);
 
         JButton continueButton = new JButton("Continue");
-        continueButton.setBackground(Color.decode("#2f77b1"));
-        continueButton.setForeground(Color.WHITE);
-        continueButton.setFont(new Font("Arial", Font.BOLD, 14));
-        continueButton.setBounds(190, 350, 150, 50); 
-        f0.add(continueButton);
+        continueButton.setBackground(Color.decode("#2f77b1")); 
+        continueButton.setForeground(Color.WHITE); 
+        continueButton.setFont(breatheFont.deriveFont(Font.PLAIN, 35));
+        continueButton.setMargin(new Insets(10, 30, 5, 30));
+        buttonPanel.add(continueButton);
 
-        JButton backButton = new JButton("<- BACK");
-        backButton.setBackground(Color.decode("#2f77b1"));
-        backButton.setForeground(Color.WHITE);
-        backButton.setFont(new Font("Arial", Font.BOLD, 14));
-        backButton.setBounds(440, 350, 150, 50); 
-        f0.add(backButton);
+        JButton backButton = new JButton("Back");
+        backButton.setBackground(Color.decode("#2f77b1")); 
+        backButton.setForeground(Color.WHITE); 
+        backButton.setFont(breatheFont.deriveFont(Font.PLAIN, 35));
+        backButton.setMargin(new Insets(10, 30, 5, 30));
+        buttonPanel.add(backButton);
+
+        gbc.gridx = 0; gbc.gridy = 2; 
+        gbc.gridwidth = 2; 
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.insets = new Insets(50, 10, 10, 10); 
+        p2.add(buttonPanel, gbc);
+
+        f0.add(p2, BorderLayout.CENTER);
 
         f0.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f0.setLocationRelativeTo(null);
         f0.setVisible(true);
-
+        
         // --- Action Listeners ---
         continueButton.addActionListener(new ActionListener() {
             String[] arr = new String[4];
@@ -80,32 +133,32 @@ public class editCourse {
                     try (PreparedStatement statement = connection.prepareStatement("""
                         Select * FROM courses WHERE course_code = ? AND section = ?; 
                     """)) {
-                    statement.setString(1, t1.getText()); 
-                    statement.setString(2, t2.getText()); 
+                    statement.setString(1, t1.getText().trim()); 
+                    statement.setString(2, t2.getText().trim()); 
 
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    if (resultSet.next()) {
-                    
-                        String course_code = resultSet.getString("course_code");
-                        String title = resultSet.getString("title");
-                        String section = resultSet.getString("section");
-                        String credits = resultSet.getString("credits");
+                    try (ResultSet resultSet = statement.executeQuery()) {
+                        if (resultSet.next()) {
+                        
+                            String course_code = resultSet.getString("course_code");
+                            String title = resultSet.getString("title");
+                            String section = resultSet.getString("section");
+                            String credits = resultSet.getString("credits");
 
-                        arr[0] = course_code;
-                        arr[1] = title;   
-                        arr[2] = section;
-                        arr[3] = credits;
+                            arr[0] = course_code;
+                            arr[1] = title;   
+                            arr[2] = section;
+                            arr[3] = credits;
 
-                        new editCoursePage2(roll_no,arr);
-                        f0.dispose();
-    
-                    }else {
-                        JOptionPane.showMessageDialog(null, "Section not found.", "Error", JOptionPane.ERROR_MESSAGE);
-                        System.out.println("Section not found.");
-                    } 
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
+                            new editCoursePage2(roll_no,arr);
+                            f0.dispose();
+        
+                        }else {
+                            JOptionPane.showMessageDialog(null, "Section not found.", "Error", JOptionPane.ERROR_MESSAGE);
+                            System.out.println("Section not found.");
+                        } 
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                    }
                 }
                 } catch (SQLException ex) {
                     JOptionPane.showMessageDialog(null, "Error fetching section: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
@@ -120,11 +173,6 @@ public class editCourse {
                 new adminDashboard(roll_no);
                 f0.dispose();
             }
-        });        
-
-        
-
-        
+        });                
     }
-        
 }
