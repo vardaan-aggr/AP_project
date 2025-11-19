@@ -29,7 +29,7 @@ import edu.univ.erp.util.BREATHEFONT;
 import edu.univ.erp.util.HashGenerator;
 
 public class addAdm {
-    public addAdm(int rollNo) {
+    public addAdm(String rollNo) {
         Font breatheFont = BREATHEFONT.fontGen();
         Font gFont = BREATHEFONT.gFontGen(); 
 
@@ -64,7 +64,7 @@ public class addAdm {
         gbc.insets = new Insets(10, 10, 10, 10); 
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        JLabel l1 = new JLabel("Username: ");
+        JLabel l1 = new JLabel("Username:");
         l1.setFont(gFont.deriveFont(Font.BOLD, 24));
         l1.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
@@ -77,7 +77,7 @@ public class addAdm {
         gbc.anchor = GridBagConstraints.WEST;
         p2.add(t1, gbc);
 
-        JLabel l2 = new JLabel("Password: ");
+        JLabel l2 = new JLabel("Password:");
         l2.setFont(gFont.deriveFont(Font.BOLD, 24));
         l2.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0;
@@ -124,17 +124,17 @@ public class addAdm {
         // ---- Action Listeners ----
         b2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (t1.getText().isEmpty() || t2.getText().isEmpty()) {
+                if (t1.getText().trim().isEmpty() || t2.getText().trim().isEmpty()) {
                     JOptionPane.showMessageDialog(null, "All fields must be filled out.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                String hash_pass = HashGenerator.makeHash(t2.getText());
+                String hash_pass = HashGenerator.makeHash(t2.getText().trim());
                 try (Connection connection = DatabaseConnector.getAuthConnection()) {
                     try (PreparedStatement statement = connection.prepareStatement("""
                                 INSERT INTO auth_table (username, role, hash_password) VALUES
                                     (?, ?, ?)
                             """)) {
-                        statement.setString(1, t1.getText());
+                        statement.setString(1, t1.getText().trim());
                         statement.setString(2, "admin");
                         statement.setString(3, hash_pass);
                         int rowsAffected = statement.executeUpdate();

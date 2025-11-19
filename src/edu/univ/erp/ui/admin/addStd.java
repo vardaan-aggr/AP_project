@@ -25,7 +25,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class addStd {
-    public addStd(int rollNo) {
+    public addStd(String rollNo) {
 
         Font breatheFont = BREATHEFONT.fontGen();
         Font gFont = BREATHEFONT.gFontGen();
@@ -61,7 +61,7 @@ public class addStd {
         gbc.insets = new Insets(10, 10, 10, 10); // Spacing between fields
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        JLabel l1 = new JLabel("Username: ");
+        JLabel l1 = new JLabel("Username:");
         l1.setFont(gFont.deriveFont(Font.BOLD, 24));
         l1.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
@@ -74,7 +74,7 @@ public class addStd {
         gbc.anchor = GridBagConstraints.WEST;
         p2.add(t1, gbc);
 
-        JLabel l2 = new JLabel("Password: ");
+        JLabel l2 = new JLabel("Password:");
         l2.setFont(gFont.deriveFont(Font.BOLD, 24));
         l2.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0;
@@ -87,7 +87,7 @@ public class addStd {
         gbc.anchor = GridBagConstraints.WEST;
         p2.add(t2, gbc);
 
-        JLabel l3 = new JLabel("Program: ");
+        JLabel l3 = new JLabel("Program:");
         l3.setFont(gFont.deriveFont(Font.BOLD, 24));
         l3.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 2; gbc.weightx = 0;
@@ -100,7 +100,7 @@ public class addStd {
         gbc.anchor = GridBagConstraints.WEST;
         p2.add(t3, gbc);
 
-        JLabel l4 = new JLabel("Year: ");
+        JLabel l4 = new JLabel("Year:");
         l4.setFont(gFont.deriveFont(Font.BOLD, 24));
         l4.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 3; gbc.weightx = 0;
@@ -147,18 +147,18 @@ public class addStd {
         // ---- Action Listeners ----
         b2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (t1.getText().isEmpty() || t2.getText().isEmpty() || t3.getText().isEmpty() || t4.getText().isEmpty()) {
+                if (t1.getText().trim().isEmpty() || t2.getText().trim().isEmpty() || t3.getText().trim().isEmpty() || t4.getText().trim().isEmpty()) {
                     JOptionPane.showMessageDialog(null, "All fields must be filled out.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 int rollNoTemp = -1;
-                String hash_pass = HashGenerator.makeHash(t4.getText());
+                String hash_pass = HashGenerator.makeHash(t4.getText().trim());
                 try (Connection connection = DatabaseConnector.getAuthConnection()) {
                     try (PreparedStatement statement = connection.prepareStatement("""
                                 INSERT INTO auth_table (username, role, hash_password) VALUES
                                     (?, ?, ?)
                             """, Statement.RETURN_GENERATED_KEYS)) {
-                        statement.setString(1, t1.getText());
+                        statement.setString(1, t1.getText().trim());
                         statement.setString(2, "student");
                         statement.setString(3, hash_pass);
                         int rowsAffected = statement.executeUpdate();
@@ -194,8 +194,8 @@ public class addStd {
                                         (?, ?, ?)
                                 """)) {
                             statement.setString(1, String.valueOf(rollNoTemp));
-                            statement.setString(2, t2.getText());
-                            statement.setString(3, t3.getText());
+                            statement.setString(2, t2.getText().trim());
+                            statement.setString(3, t3.getText().trim());
                             int rowsAffected = statement.executeUpdate();
                             if (rowsAffected > 0) {
                                 JOptionPane.showMessageDialog(null, "Added successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
