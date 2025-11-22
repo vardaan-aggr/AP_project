@@ -11,7 +11,7 @@ import javax.swing.UIManager;
 
 import com.formdev.flatlaf.FlatLightLaf;
 
-import edu.univ.erp.data.DatabaseConnector;
+import edu.univ.erp.data.ErpCommandRunner;
 import edu.univ.erp.util.BREATHEFONT;
 
 import java.awt.BorderLayout;
@@ -22,17 +22,13 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.awt.event.ActionEvent;
-
 
 public class editCourse {
 
     public editCourse(String roll_no) {
-Font breatheFont = BREATHEFONT.fontGen();
+        Font breatheFont = BREATHEFONT.fontGen();
         Font gFont = BREATHEFONT.gFontGen(); 
 
         try {
@@ -68,7 +64,7 @@ Font breatheFont = BREATHEFONT.fontGen();
 
         // Row 0: Course Code
         JLabel l1 = new JLabel("Course Code:");
-        l1.setFont(gFont.deriveFont(Font.BOLD, 24));
+        l1.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l1.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
@@ -82,7 +78,7 @@ Font breatheFont = BREATHEFONT.fontGen();
 
         // Row 1: Section
         JLabel l2 = new JLabel("Section:");
-        l2.setFont(gFont.deriveFont(Font.BOLD, 24));
+        l2.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l2.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
@@ -127,42 +123,17 @@ Font breatheFont = BREATHEFONT.fontGen();
         
         // --- Action Listeners ---
         continueButton.addActionListener(new ActionListener() {
-            String[] arr = new String[4];
             public void actionPerformed(ActionEvent e) {
-                try (Connection connection = DatabaseConnector.getErpConnection()) {
-                    try (PreparedStatement statement = connection.prepareStatement("""
-                        Select * FROM courses WHERE course_code = ? AND section = ?; 
-                    """)) {
-                    statement.setString(1, t1.getText().trim()); 
-                    statement.setString(2, t2.getText().trim()); 
-
-                    try (ResultSet resultSet = statement.executeQuery()) {
-                        if (resultSet.next()) {
-                        
-                            String course_code = resultSet.getString("course_code");
-                            String title = resultSet.getString("title");
-                            String section = resultSet.getString("section");
-                            String credits = resultSet.getString("credits");
-
-                            arr[0] = course_code;
-                            arr[1] = title;   
-                            arr[2] = section;
-                            arr[3] = credits;
-
-                            new editCoursePage2(roll_no,arr);
-                            f0.dispose();
-        
-                        }else {
-                            JOptionPane.showMessageDialog(null, "Section not found.", "Error", JOptionPane.ERROR_MESSAGE);
-                            System.out.println("Section not found.");
-                        } 
-                    } catch (SQLException ex) {
-                        ex.printStackTrace();
-                    }
-                }
+                try {
+                    String[] arr = ErpCommandRunner.courseSectionEditHelper(t1.getText().trim(), t2.getText().trim());   
+                    new editCoursePage2(roll_no,arr);
+                    f0.dispose();             
                 } catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(null, "Error fetching section: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
+                    System.err.println("Error while getting sections and courses: " + ex);
                     ex.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "Error while getting sections and courses: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
+                    new adminDashboard(roll_no);
+                    f0.dispose();
                 }
             }
         });

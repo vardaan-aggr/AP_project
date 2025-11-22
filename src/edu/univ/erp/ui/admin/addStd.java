@@ -6,8 +6,8 @@ import com.formdev.flatlaf.FlatLightLaf;
 
 import edu.univ.erp.util.BREATHEFONT;
 import edu.univ.erp.util.HashGenerator;
-
-import edu.univ.erp.data.DatabaseConnector;
+import edu.univ.erp.data.AuthCommandRunner;
+import edu.univ.erp.data.ErpCommandRunner;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -18,11 +18,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 public class addStd {
     public addStd(String rollNo) {
@@ -62,7 +58,7 @@ public class addStd {
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         JLabel l1 = new JLabel("Username:");
-        l1.setFont(gFont.deriveFont(Font.BOLD, 24));
+        l1.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l1.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
@@ -75,7 +71,7 @@ public class addStd {
         p2.add(t1, gbc);
 
         JLabel l2 = new JLabel("Password:");
-        l2.setFont(gFont.deriveFont(Font.BOLD, 24));
+        l2.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l2.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
@@ -88,7 +84,7 @@ public class addStd {
         p2.add(t2, gbc);
 
         JLabel l3 = new JLabel("Program:");
-        l3.setFont(gFont.deriveFont(Font.BOLD, 24));
+        l3.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l3.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 2; gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
@@ -101,7 +97,7 @@ public class addStd {
         p2.add(t3, gbc);
 
         JLabel l4 = new JLabel("Year:");
-        l4.setFont(gFont.deriveFont(Font.BOLD, 24));
+        l4.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l4.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 3; gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
@@ -147,77 +143,39 @@ public class addStd {
         // ---- Action Listeners ----
         b2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (t1.getText().trim().isEmpty() || t2.getText().trim().isEmpty() || t3.getText().trim().isEmpty() || t4.getText().trim().isEmpty()) {
+                if (t1.getText().trim().isEmpty() || t2.getText().trim().isEmpty() || 
+                    t3.getText().trim().isEmpty() || t4.getText().trim().isEmpty()) {
                     JOptionPane.showMessageDialog(null, "All fields must be filled out.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                int rollNoTemp = -1;
-                String hash_pass = HashGenerator.makeHash(t4.getText().trim());
-                try (Connection connection = DatabaseConnector.getAuthConnection()) {
-                    try (PreparedStatement statement = connection.prepareStatement("""
-                                INSERT INTO auth_table (username, role, hash_password) VALUES
-                                    (?, ?, ?)
-                            """, Statement.RETURN_GENERATED_KEYS)) {
-                        statement.setString(1, t1.getText().trim());
-                        statement.setString(2, "student");
-                        statement.setString(3, hash_pass);
-                        int rowsAffected = statement.executeUpdate();
-                        if (rowsAffected > 0) {
-                             try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
-                                if (generatedKeys.next()) {
-                                    rollNoTemp = generatedKeys.getInt(1);
-                                    JOptionPane.showMessageDialog(null, "Sucessfully added ", "Sucess", JOptionPane.INFORMATION_MESSAGE);
-                                    System.out.println("Student added successfully in Auth with roll no: " + rollNoTemp);
-                                } else {
-                                    // the insert worked, but we couldn't get the new ID.
-                                    JOptionPane.showMessageDialog(null, "Failed to retrieve new student's ID", "Error", JOptionPane.ERROR_MESSAGE);
-                                    System.out.println("Failed to get generated key for new student.");
-                                    return; 
-                                }
-                            }
-                        } else {
-                            JOptionPane.showMessageDialog(null, "Failed to add student info in database.", "Error", JOptionPane.ERROR_MESSAGE);
-                            System.out.println("Failed to add student info in database.");
-                            return;
-                        }
-                    } 
-                } catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(null, "Database Error (Auth): " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                    ex.printStackTrace();
-                    return;
-                }
 
-                if (rollNoTemp != -1) {
-                    try (Connection connection = DatabaseConnector.getErpConnection()) {
-                        try (PreparedStatement statement = connection.prepareStatement("""
-                                    INSERT INTO students (roll_no, program, year) VALUES
-                                        (?, ?, ?)
-                                """)) {
-                            statement.setString(1, String.valueOf(rollNoTemp));
-                            statement.setString(2, t2.getText().trim());
-                            statement.setString(3, t3.getText().trim());
-                            int rowsAffected = statement.executeUpdate();
-                            if (rowsAffected > 0) {
-                                JOptionPane.showMessageDialog(null, "Added successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
-                                System.out.println("Student added successfully in Erp db");
-                            } else {
-                                JOptionPane.showMessageDialog(null, "Failed to add student to ERP database", "Error", JOptionPane.ERROR_MESSAGE);
-                                System.out.println("Failed to add student in Erp");
-                                return;
-                            }
-                        } 
-                    } catch (SQLException ex) {
-                        JOptionPane.showMessageDialog(null, "Database Error (ERP): " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                        ex.printStackTrace();
-                        return;
+                String username = t1.getText().trim();
+                String rawPassword = t2.getText().trim(); 
+                String program = t3.getText().trim();     
+                String year = t4.getText().trim();        
+                
+                String hash_pass = HashGenerator.makeHash(rawPassword); 
+
+                try {
+                    int newRollNo = AuthCommandRunner.registerStudentAuth(username, hash_pass);
+
+                    if (newRollNo != -1) {
+                        boolean success = ErpCommandRunner.registerStudentErp(newRollNo, program, year);
+                        
+                        if (success) {
+                            JOptionPane.showMessageDialog(null, "Student Added! Roll No: " + newRollNo, "Success", JOptionPane.INFORMATION_MESSAGE);
+                            new adminDashboard(rollNo);
+                            f.dispose();
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Auth created, but failed to add details to ERP.", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Failed to create User in Auth DB.", "Error", JOptionPane.ERROR_MESSAGE);
                     }
-                } else {
-                    System.out.println("Skipping ERP insert because auth insert failed.");
-                    return;
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(null, "Database Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    ex.printStackTrace();
                 }
-                System.out.println(" to Admin Dashboard..");
-                new adminDashboard(rollNo);
-                f.dispose();
             }
         });
 

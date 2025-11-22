@@ -32,8 +32,8 @@ Insert into sections (course_code, section, roll_no, day_time, room, capacity, s
     ('ECE250', 'N', '2', 'Wed 10:30-12:00, Fri 8:30-11:00', 'C102', '600', 'Monsoon', '2025');
     ('CTD', 'N', '2', 'Wed 10:30-12:00, Fri 8:30-11:00', 'C202', '610', 'Monsoon', '2025');
     ('MTH203', 'B', '2', 'Tue 4:30-6:00, Thu 4:30-6:00', 'B-003', '200', 'Monsoon', '2025');
-Insert into students(roll_no ,program ,year ) values
-    ('3', 'B.Tech ECE', '2');
+Insert into students(roll_no, program ,year ) values
+    ('11', 'B.Tech KSAI', '4');
 use auth_db;
 delete from auth_table where username = 'asdas';
 select * from auth_table;
@@ -43,7 +43,7 @@ insert into settings (settings_key, settings_value) value
     ('maintain_mode', 'false');
 select * from enrollments;
 drop table settings;
-use auth_db;
+use erp_db;
 select * from courses;
 
 Insert into courses(course_code, title, section, credits) VALUES 

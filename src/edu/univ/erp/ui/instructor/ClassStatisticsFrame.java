@@ -1,11 +1,6 @@
 package edu.univ.erp.ui.instructor;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-
 import javax.swing.*;
 import com.formdev.flatlaf.FlatLightLaf;
 
@@ -19,11 +14,11 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;   
 import java.awt.event.ActionListener;
 
-import edu.univ.erp.data.DatabaseConnector;
+import edu.univ.erp.data.ErpCommandRunner;
 import edu.univ.erp.util.BREATHEFONT;
 
 public class ClassStatisticsFrame {
-    public ClassStatisticsFrame(String roll_no) {
+    public ClassStatisticsFrame(String username, String role, String password, String roll_no) {
 
         Font breatheFont = BREATHEFONT.fontGen();
         Font gFont = BREATHEFONT.gFontGen();
@@ -125,46 +120,27 @@ public class ClassStatisticsFrame {
         backButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("\tGoing back to Instructor Dashboard..");
-                new InstructorDashboard(roll_no);
+                new InstructorDashboard(username, role, password, roll_no);
                 f.dispose();
             }
         });
     }
 
     private String[] gradesArr(String courseCode, String section) {
-        ArrayList<String> arrList = new ArrayList<>();
-        try (Connection connection = DatabaseConnector.getErpConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement("""
-                        Select grade FROM grades WHERE course_code = ? AND section = ?; 
-                    """)) {
-                statement.setString(1, courseCode);
-                statement.setString(2, section);
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    boolean empty = true;
-                    while (resultSet.next()) {
-                        empty = false;
-                        String grade = resultSet.getString("grade");
-                        if(grade != null) {
-                            arrList.add(grade);
-                        }
-                    } 
-                    if (empty) {
-                        System.out.println("\t (no grades found)");
-                        JOptionPane.showMessageDialog(null, "No grades found for this course/section.", "Info", JOptionPane.INFORMATION_MESSAGE);
-                    }
-                }
-            } 
-        } catch (SQLException ex) {
+        String[] strArr = null;
+        try {
+            strArr = ErpCommandRunner.instructorStatsHelper(courseCode, section);
+        } catch(SQLException ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(null, "Database Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            return new String[0];
         }
-        String[] strArr = new String[arrList.size()];
-        arrList.toArray(strArr);
         return strArr;
     }
     
     private double computeStats(String courseCode, String section) {
         String[] grades = gradesArr(courseCode, section);
+        if (grades.length == 0) return 0.0;
         int totalPoints = 0;
         for (String grade : grades) {
             switch (grade.toUpperCase()) {

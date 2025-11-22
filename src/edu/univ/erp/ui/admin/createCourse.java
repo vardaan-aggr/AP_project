@@ -67,7 +67,7 @@ public class createCourse {
 
         // Row 0: Course Code
         JLabel l1 = new JLabel("Course Code:");
-        l1.setFont(gFont.deriveFont(Font.BOLD, 24));
+        l1.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l1.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
@@ -81,7 +81,7 @@ public class createCourse {
 
         // Row 1: Title
         JLabel l2 = new JLabel("Title:");
-        l2.setFont(gFont.deriveFont(Font.BOLD, 24));
+        l2.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l2.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
@@ -95,7 +95,7 @@ public class createCourse {
 
         // Row 2: Section
         JLabel l3 = new JLabel("Section:");
-        l3.setFont(gFont.deriveFont(Font.BOLD, 24));
+        l3.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l3.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 2; gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
@@ -109,7 +109,7 @@ public class createCourse {
 
         // Row 3: Credits
         JLabel l4 = new JLabel("Credits:");
-        l4.setFont(gFont.deriveFont(Font.BOLD, 24));
+        l4.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l4.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 3; gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
@@ -163,8 +163,6 @@ public class createCourse {
                         statement.setString(2, t2.getText().trim());
                         statement.setString(3, t3.getText().trim());
                         statement.setString(4, t4.getText().trim());
-           
-
                         int rowsInsreted = statement.executeUpdate();
                         if (rowsInsreted == 0) {
                             JOptionPane.showMessageDialog(null, "Error: Couldn't register in database.", "Error", JOptionPane.ERROR_MESSAGE);

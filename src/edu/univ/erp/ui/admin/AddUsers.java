@@ -54,7 +54,7 @@ public class AddUsers {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         
         JLabel l1 = new JLabel("Role:");
-        l1.setFont(gFont.deriveFont(Font.BOLD, 24)); 
+        l1.setFont(gFont.deriveFont(Font.PLAIN, 24)); 
         l1.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;

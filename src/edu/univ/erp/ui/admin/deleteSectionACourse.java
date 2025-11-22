@@ -11,7 +11,7 @@ import javax.swing.UIManager;
 
 import com.formdev.flatlaf.FlatLightLaf;
 
-import edu.univ.erp.data.DatabaseConnector;
+import edu.univ.erp.data.ErpCommandRunner;
 import edu.univ.erp.util.BREATHEFONT;
 
 import java.awt.BorderLayout;
@@ -22,9 +22,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.awt.event.ActionEvent;
 
 public class deleteSectionACourse {
@@ -66,7 +63,7 @@ public class deleteSectionACourse {
 
         // Row 0: Course Code
         JLabel l1 = new JLabel("Course Code:");
-        l1.setFont(gFont.deriveFont(Font.BOLD, 24));
+        l1.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l1.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
@@ -80,7 +77,7 @@ public class deleteSectionACourse {
 
         // Row 1: Section
         JLabel l2 = new JLabel("Section:");
-        l2.setFont(gFont.deriveFont(Font.BOLD, 24));
+        l2.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l2.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
@@ -127,6 +124,7 @@ public class deleteSectionACourse {
         // --- Action Listeners ---
         deleteButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                int rowsAffected = -1;
                 String courseCode = t1.getText().trim();
                 String section = t2.getText().trim();
 
@@ -141,31 +139,37 @@ public class deleteSectionACourse {
                     JOptionPane.YES_NO_OPTION);
 
                 if (confirm == JOptionPane.YES_OPTION) {
-                    try (Connection connection = DatabaseConnector.getErpConnection()) {
-                        // 1. Delete from Sections table
-                        try (PreparedStatement stmtSection = connection.prepareStatement(
-                                "DELETE FROM sections WHERE course_code = ? AND section = ?")) {
-                            stmtSection.setString(1, courseCode);
-                            stmtSection.setString(2, section);
-                            stmtSection.executeUpdate();
+                    rowsAffected = ErpCommandRunner.deleteSecCourseHelper(courseCode, section); 
+                    switch (rowsAffected) {
+                        case -3: {
+                            JOptionPane.showMessageDialog(null, "Error: Couldn't connect to database.", "Error", JOptionPane.WARNING_MESSAGE);
+                            System.out.println("Error: Couldn't connect to database.");
                         }
-
-                        // 2. Delete from Courses table
-                        try (PreparedStatement stmtCourse = connection.prepareStatement(
-                                "DELETE FROM courses WHERE course_code = ? AND section = ?")) {
-                            stmtCourse.setString(1, courseCode);
-                            stmtCourse.setString(2, section);
-                            int rowsAffected = stmtCourse.executeUpdate();
-
-                            if (rowsAffected > 0) {
-                                JOptionPane.showMessageDialog(null, "Course and Section deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                            } else {
-                                JOptionPane.showMessageDialog(null, "Note: Section deleted (if existed), but Course not found in 'courses' table.", "Warning", JOptionPane.WARNING_MESSAGE);
-                            }
+                        case -1: {
+                            JOptionPane.showMessageDialog(null, "Error: Couldn't delete section.", "Error", JOptionPane.WARNING_MESSAGE);
+                            System.out.println("Error: Couldn't delete section");
                         }
-                    } catch (SQLException ex) {
-                        JOptionPane.showMessageDialog(null, "Error deleting: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                        ex.printStackTrace();
+                        case -2: {
+                            JOptionPane.showMessageDialog(null, "Error: Section didn't existed, but course existed so delted.", "Error", JOptionPane.WARNING_MESSAGE);
+                            System.out.println("Error: Section didn't existed, but course existed so delted.");
+                        }
+                        case 2: {
+                            JOptionPane.showMessageDialog(null, "Error: Section deleted, but Course not found in 'courses' table.", "Error", JOptionPane.WARNING_MESSAGE);
+                            System.out.println("Error: Section deleted, but Course not found in 'courses' table.");
+                        }
+                        case 3: {
+                            JOptionPane.showMessageDialog(null, "Error: Course didn't existed, but section existed so delted.", "Error", JOptionPane.WARNING_MESSAGE);
+                            System.out.println("Error: Course deleted (if existed), but section not found in 'courses' table.");
+                        }
+                        case 4: {
+                            JOptionPane.showMessageDialog(null, "Error: None of the section and course exist.", "Error", JOptionPane.WARNING_MESSAGE);
+                            System.out.println("Error: None of the section and course exist.");
+                   
+                        }
+                        default: {
+                            JOptionPane.showMessageDialog(null, "Course and Section deleted successfully.", "Error", JOptionPane.WARNING_MESSAGE);
+                            System.out.println("Course and Section deleted successfully.");
+                        }
                     }
                     new adminDashboard(roll_no);
                     f.dispose();

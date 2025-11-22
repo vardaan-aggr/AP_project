@@ -13,9 +13,9 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.io.IOException;
 
 import edu.univ.erp.util.modeOps;
+import edu.univ.erp.ui.common.catalog;
 import edu.univ.erp.util.BREATHEFONT;
 
 public class studentDashboard {
@@ -53,61 +53,68 @@ public class studentDashboard {
         Dimension buttonSize = new Dimension(280, 80);
         gbc.fill = GridBagConstraints.BOTH;
 
+        // Register
         gbc.gridx = 0; gbc.gridy = 0;
         JButton b1 = new JButton("Register");
         b1.setPreferredSize(buttonSize);
         b1.setMargin(new Insets(10, 30, 5, 30));
         b1.setBackground(Color.decode("#2f77b1")); 
         b1.setForeground(Color.WHITE); 
-        b1.setFont(gFont.deriveFont(Font.BOLD, 21f));
+        b1.setFont(gFont.deriveFont(Font.PLAIN, 21f));
         p2.add(b1, gbc);
 
+        // My timetable
         gbc.gridx = 1; gbc.gridy = 0;
         JButton b2 = new JButton("My Time Table");
         b2.setPreferredSize(buttonSize);
         b2.setMargin(new Insets(10, 30, 5, 30));
         b2.setBackground(Color.decode("#2f77b1")); 
         b2.setForeground(Color.WHITE); 
-        b2.setFont(gFont.deriveFont(Font.BOLD, 21f));
+        b2.setFont(gFont.deriveFont(Font.PLAIN, 21f));
         p2.add(b2, gbc);
 
+        // My Grades
         gbc.gridx = 0; gbc.gridy = 1;
         JButton b3 = new JButton("My Grades");
         b3.setPreferredSize(buttonSize);
         b3.setMargin(new Insets(10, 30, 5, 30));
         b3.setBackground(Color.decode("#2f77b1")); 
         b3.setForeground(Color.WHITE); 
-        b3.setFont(gFont.deriveFont(Font.BOLD, 21f));
+        b3.setFont(gFont.deriveFont(Font.PLAIN, 21f));
         p2.add(b3, gbc);
 
+        // Download transcript
         gbc.gridx = 1; gbc.gridy = 1;
         JButton b4 = new JButton("Download Transcript");
         b4.setPreferredSize(buttonSize);
         b4.setMargin(new Insets(10, 30, 5, 30));
         b4.setBackground(Color.decode("#2f77b1")); 
         b4.setForeground(Color.WHITE); 
-        b4.setFont(gFont.deriveFont(Font.BOLD, 21f));
+        b4.setFont(gFont.deriveFont(Font.PLAIN, 21f));
         p2.add(b4, gbc);
 
+        // Catalog
         gbc.gridx = 0; gbc.gridy = 2;
-        JButton b6 = new JButton("Course Catalog");
+        JButton b6 = new JButton("Catalog");
         b6.setPreferredSize(buttonSize);
         b6.setMargin(new Insets(10, 30, 5, 30));
         b6.setBackground(Color.decode("#2f77b1")); 
         b6.setForeground(Color.WHITE); 
-        b6.setFont(gFont.deriveFont(Font.BOLD, 21f));
+        b6.setFont(gFont.deriveFont(Font.PLAIN, 21f));
         p2.add(b6, gbc);
 
+        // Drop Course
         gbc.gridx = 1; gbc.gridy = 2;
         JButton b7 = new JButton("Drop Course");
         b7.setPreferredSize(buttonSize);
         b7.setMargin(new Insets(10, 30, 5, 30));
         b7.setBackground(Color.decode("#2f77b1")); 
         b7.setForeground(Color.WHITE); 
-        b7.setFont(gFont.deriveFont(Font.BOLD, 21f));
+        b7.setFont(gFont.deriveFont(Font.PLAIN, 21f));
         p2.add(b7, gbc);
         f.add(p2, BorderLayout.CENTER);
 
+        // Logout 
         JPanel p3 = new JPanel();
         p3.setBackground(Color.decode("#dbd3c5"));
         p3.setBorder(BorderFactory.createEmptyBorder(0, 0, 50, 0));
@@ -157,14 +164,9 @@ public class studentDashboard {
 
         b4.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                try {
-                    System.out.println("\tDownloading transcript..");
-                    new transcriptFrame(username, role, in_pass, roll_no);
-                    f.dispose();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(null, "Error opening transcript: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
-                }
+                System.out.println("\tDownloading transcript..");
+                new transcriptFrame(username, role, in_pass, roll_no);
+                f.dispose();
             }
         });
 
@@ -178,8 +180,8 @@ public class studentDashboard {
 
         b6.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                System.out.println("\tOpening course catalog..");
-                new courseCatalogFrame(username, role, in_pass, roll_no);
+                System.out.println("Opening Course Catalog...");
+                new catalog(username, role, in_pass, roll_no);
                 f.dispose();
             }
         });

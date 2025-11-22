@@ -11,15 +11,12 @@ import javax.swing.UIManager;
 
 import com.formdev.flatlaf.FlatLightLaf;
 
-import edu.univ.erp.data.DatabaseConnector;
+import edu.univ.erp.data.ErpCommandRunner;
 import edu.univ.erp.util.BREATHEFONT;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.awt.event.ActionEvent;
 import java.awt.BorderLayout;
@@ -67,7 +64,7 @@ public class editSection {
 
         // Row 0: Course Code
         JLabel l1 = new JLabel("Course Code:");
-        l1.setFont(gFont.deriveFont(Font.BOLD, 24));
+        l1.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l1.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
@@ -81,7 +78,7 @@ public class editSection {
 
         // Row 1: Section
         JLabel l2 = new JLabel("Section:");
-        l2.setFont(gFont.deriveFont(Font.BOLD, 24));
+        l2.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l2.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
@@ -127,50 +124,17 @@ public class editSection {
 
         // --- Action Listeners ---
         continueButton.addActionListener(new ActionListener() {
-            String[] arr = new String[8];
             public void actionPerformed(ActionEvent e) {
-                try (Connection connection = DatabaseConnector.getErpConnection()) {
-                    try (PreparedStatement statement = connection.prepareStatement("""
-                        Select * FROM sections WHERE course_code = ? AND section = ?; 
-                    """)) {
-                    statement.setString(1, t1.getText().trim()); 
-                    statement.setString(2, t2.getText().trim()); 
-
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    if (resultSet.next()) {
-                    
-                        String course_code = resultSet.getString("course_code");
-                        String section = resultSet.getString("section");
-                        String roll_no = resultSet.getString("roll_no");
-                        String day_time = resultSet.getString("day_time");
-                        String room = resultSet.getString("room");
-                        String capacity = resultSet.getString("capacity");
-                        String semester = resultSet.getString("semester");
-                        String year = resultSet.getString("year");
-
-                        arr[0] = course_code;
-                        arr[1] = section;   
-                        arr[2] = roll_no;
-                        arr[3] = day_time;
-                        arr[4] = room;
-                        arr[5] = capacity;
-                        arr[6] = semester;
-                        arr[7] = year;
-
-                        new editSectionPage2(roll_no,arr);
-                        f0.dispose();
-    
-                    }else {
-                        JOptionPane.showMessageDialog(null, "Section not found.", "Error", JOptionPane.ERROR_MESSAGE);
-                        System.out.println("Section not found.");
-                    } 
+                try {
+                    String[] arr = ErpCommandRunner.SectionInfoGetter(t1.getText().trim(), t2.getText().trim());   
+                    new editSectionPage2(roll_no,arr);
+                    f0.dispose();             
                 } catch (SQLException ex) {
+                    System.err.println("Error while getting section: " + ex);
                     ex.printStackTrace();
-                }
-                }
-                } catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(null, "Error fetching section: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
-                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "Error while getting section: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
+                    new adminDashboard(roll_no);
+                    f0.dispose();
                 }
             }
         });

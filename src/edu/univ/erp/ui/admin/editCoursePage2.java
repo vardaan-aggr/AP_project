@@ -11,14 +11,12 @@ import javax.swing.UIManager;
 
 import com.formdev.flatlaf.FlatLightLaf;
 
-import edu.univ.erp.data.DatabaseConnector;
+import edu.univ.erp.data.ErpCommandRunner;
 import edu.univ.erp.util.BREATHEFONT;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.awt.event.ActionEvent;
 
@@ -68,7 +66,7 @@ public class editCoursePage2 {
 
         // Row 0: Course Code (Non-Editable)
         JLabel l1 = new JLabel("Course Code:");
-        l1.setFont(gFont.deriveFont(Font.BOLD, 24));
+        l1.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l1.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
@@ -84,7 +82,7 @@ public class editCoursePage2 {
 
         // Row 1: Section (Non-Editable)
         JLabel l2 = new JLabel("Section:");
-        l2.setFont(gFont.deriveFont(Font.BOLD, 24));
+        l2.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l2.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
@@ -100,7 +98,7 @@ public class editCoursePage2 {
 
         // Row 2: Title (Editable)
         JLabel l3 = new JLabel("Title:");
-        l3.setFont(gFont.deriveFont(Font.BOLD, 24));
+        l3.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l3.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 2; gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
@@ -115,7 +113,7 @@ public class editCoursePage2 {
 
         // Row 3: Credits (Editable)
         JLabel l4 = new JLabel("Credits:");
-        l4.setFont(gFont.deriveFont(Font.BOLD, 24));
+        l4.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l4.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 3; gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
@@ -163,37 +161,24 @@ public class editCoursePage2 {
         // --- Action Listeners ---
         assignButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                try (Connection connection = DatabaseConnector.getErpConnection()) {
-                // Use an UPDATE statement
-                try (PreparedStatement statement = connection.prepareStatement(
-                        """
-                        UPDATE courses 
-                        SET title = ?, credits = ?
-                        WHERE course_code = ? AND section = ?;
-                        """)) {
-                    
-                    // Set the new values
-                    statement.setString(1, t3.getText().trim()); // roll_no
-                    statement.setString(2, t4.getText().trim()); // day_time
-                    statement.setString(3, t1.getText().trim()); // WHERE course_code
-                    statement.setString(4, t2.getText().trim()); // WHERE section
-
-                    int rowsUpdated = statement.executeUpdate();
-                    if (rowsUpdated == 0) {
-                        JOptionPane.showMessageDialog(null, "Error: Couldn't update course.", "Error", JOptionPane.ERROR_MESSAGE);
-                        System.out.println("Error: Couldn't update course.");
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Section updated successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
-                        System.out.println("Update Successful.");
-                    }
+                int rowsUpdated = -1;
+                try {
+                    rowsUpdated = ErpCommandRunner.courseUpdater(t3.getText().trim(), t4.getText().trim(), t1.getText().trim(), t2.getText().trim());
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "Error: Couldn't update course: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
+                    System.out.println("Error: Couldn't update course." + ex);
                 }
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(null, "Error updating: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
-                ex.printStackTrace();
-            }
+                if (rowsUpdated == 0) {
+                    JOptionPane.showMessageDialog(null, "Error: Course code and Section dont match.", "Error", JOptionPane.ERROR_MESSAGE);
+                    System.out.println("Error: Course code and Section dont match.");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Section updated successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    System.out.println("Update Successful.");
+                }
                 new adminDashboard(roll_no);
                 f.dispose();
-            }   
+            }
         });
 
         backButton.addActionListener(new ActionListener() {
