@@ -1,4 +1,6 @@
 package edu.univ.erp.ui.common;
+import edu.univ.erp.ui.admin.adminDashboard;
+import edu.univ.erp.ui.student.studentDashboard;
 
 import javax.swing.*;
 import javax.swing.table.JTableHeader;
@@ -21,10 +23,9 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;   
 import java.awt.event.ActionListener;
 
-public class AllCourses {
+public class sections {
 
-    // Note: If you need to go back to StudentDashboard, you might need to pass 'username' and 'password' here too.
-    public AllCourses(String roll_no, String role) {
+    public sections(String username, String role, String password, String roll_no) {
 
         Font breatheFont = BREATHEFONT.fontGen();
         Font gFont = BREATHEFONT.gFontGen();
@@ -35,7 +36,7 @@ public class AllCourses {
             e.printStackTrace();
         }
 
-        JFrame f = new JFrame("Course Catalog");
+        JFrame f = new JFrame("Section Catalog");
         f.setSize(800, 600);
         f.setLayout(new BorderLayout());
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
@@ -46,7 +47,7 @@ public class AllCourses {
         p1.setOpaque(true); 
         p1.setBackground(Color.decode("#051072")); 
         
-        JLabel l0 = new JLabel("COURSE CATALOG");
+        JLabel l0 = new JLabel("SECTION CATALOG");
         l0.setForeground(Color.decode("#dbd3c5"));
         l0.setFont(breatheFont.deriveFont(Font.BOLD, 80f)); 
         l0.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0));
@@ -62,8 +63,8 @@ public class AllCourses {
         searchPanel.setBackground(Color.decode("#dbd3c5"));
         
         JLabel searchLabel = new JLabel("Search Code:");
-        searchLabel.setFont(gFont.deriveFont(Font.BOLD, 18f));  
-        searchLabel.setForeground(Color.decode("#051072"));
+        searchLabel.setFont(gFont.deriveFont(Font.PLAIN, 18f));  
+        searchLabel.setForeground(Color.decode("#030c5d"));
         
         JTextField t1 = new JTextField(20);
         t1.setFont(gFont.deriveFont(Font.PLAIN, 18f));
@@ -71,7 +72,7 @@ public class AllCourses {
         JButton searchButton = new JButton("🔍 Search");
         searchButton.setBackground(Color.decode("#2f77b1"));
         searchButton.setForeground(Color.WHITE);
-        searchButton.setFont(gFont.deriveFont(Font.BOLD, 16f));
+        searchButton.setFont(gFont.deriveFont(Font.PLAIN, 16f));
         
         searchPanel.add(searchLabel);
         searchPanel.add(t1);
@@ -80,7 +81,7 @@ public class AllCourses {
         centerPanel.add(searchPanel, BorderLayout.NORTH);
 
         String data[][] = dataPull();
-        String columName[] = {"Code", "Title", "Section", "Credits"};
+        String columName[] = {"Course Code", "Section", "Roll No", "Day_Time", "Room", "Capacity", "Semester", "Year"};
         
         JTable t = new JTable(data, columName);
         t.setFillsViewportHeight(true);
@@ -88,7 +89,7 @@ public class AllCourses {
         JTableHeader header = t.getTableHeader();
         header.setBackground(Color.decode("#051072"));
         header.setForeground(Color.decode("#dbd3c5"));
-        header.setFont(gFont.deriveFont(Font.BOLD, 18));
+        header.setFont(gFont.deriveFont(Font.PLAIN, 18));
         header.setOpaque(true);
         
         t.setFont(gFont.deriveFont(Font.PLAIN, 16));
@@ -115,10 +116,8 @@ public class AllCourses {
         backButton.setMargin(new Insets(10, 30, 5, 30));
         
         p3.add(backButton);
-        f.add(p3, BorderLayout.SOUTH);
-        
+        f.add(p3, BorderLayout.SOUTH);        
         f.setVisible(true);
-
 
         // --- Action Listeners ---
         searchButton.addActionListener(new ActionListener() {
@@ -136,7 +135,6 @@ public class AllCourses {
                         break;
                     }
                 }
-                
                 if (!found) {
                     JOptionPane.showMessageDialog(f, "Course not found: " + input, "Result", JOptionPane.INFORMATION_MESSAGE);
                 }
@@ -148,17 +146,15 @@ public class AllCourses {
                 System.out.println("\tGoing Back...");
                 if (role.equalsIgnoreCase("student")) {
                     f.dispose();
-                    // Note: studentDashboard requires (username, role, pass, roll_no). 
-                    // You may need to pass these to AllCourses to use them here.
-                    // new studentDashboard(..., ..., ..., roll_no); 
+                    new studentDashboard(username, role, password, roll_no); 
                 }
                 else if (role.equalsIgnoreCase("instructor")) {
                     f.dispose();
-                    new InstructorDashboard(roll_no);
+                    new InstructorDashboard(username, role, password, roll_no);
                 }
                 else if (role.equalsIgnoreCase("admin")) {
                     f.dispose();
-                    // new adminDashboard(Integer.parseInt(roll_no));
+                    new adminDashboard(roll_no);
                 }
             }
         });
@@ -168,18 +164,22 @@ public class AllCourses {
         ArrayList<String[]> arrList = new ArrayList<>();
         try (Connection connection = DatabaseConnector.getErpConnection()) {
             try (PreparedStatement statement = connection.prepareStatement("""
-                        Select course_code, title, section, credits FROM courses; 
+                        Select course_code, section, roll_no, day_time, room, capacity, semester, year FROM sections   ; 
                     """)) {
                 try (ResultSet resultSet = statement.executeQuery()) {
                     boolean empty = true;
                     while (resultSet.next()) {
                         empty = false;
                         String course_code = resultSet.getString("course_code");
-                        String title = resultSet.getString("title");
                         String section = resultSet.getString("section");
-                        String credits = resultSet.getString("credits");
+                        String rollNo = resultSet.getString("roll_no");
+                        String day_time = resultSet.getString("day_time");
+                        String room = resultSet.getString("room");
+                        String capacity = resultSet.getString("capacity");
+                        String semester = resultSet.getString("semester");
+                        String year = resultSet.getString("year");
              
-                        arrList.add(new String[]{course_code, title, section, credits});
+                        arrList.add(new String[]{course_code, section, rollNo, day_time, room, capacity, semester, year});
                     } 
                     if (empty) {
                         System.out.println("\t (no data)");
@@ -190,7 +190,7 @@ public class AllCourses {
             JOptionPane.showMessageDialog(null, "Database Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         }
-        String[][] strArr = new String[arrList.size()][4];
+        String[][] strArr = new String[arrList.size()][8];
         arrList.toArray(strArr);
         return strArr;
     }    

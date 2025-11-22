@@ -1,14 +1,11 @@
 package edu.univ.erp.ui.student;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import edu.univ.erp.data.ErpCommandRunner;  
 
 import javax.swing.*;
 
 import com.formdev.flatlaf.FlatLightLaf;
 
-import edu.univ.erp.data.DatabaseConnector;
 import edu.univ.erp.util.BREATHEFONT;
 
 import java.awt.BorderLayout;
@@ -63,10 +60,10 @@ public class registerFrame {
         gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
         p2.add(l1, gbc);
 
-        JTextField t1 = new JTextField(20);
-        t1.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        JTextField tCourseCode = new JTextField(20);
+        tCourseCode.setFont(gFont.deriveFont(Font.PLAIN, 21));
         gbc.gridx = 1; gbc.gridy = 0; gbc.weightx = 1;
-        p2.add(t1, gbc);
+        p2.add(tCourseCode, gbc);
 
         JLabel l2 = new JLabel("Section:");
         l2.setFont(gFont.deriveFont(Font.PLAIN, 24));
@@ -74,11 +71,11 @@ public class registerFrame {
         gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0;
         p2.add(l2, gbc);
 
-        JTextField t2 = new JTextField(20);
-        t2.setFont(gFont.deriveFont(Font.PLAIN, 21));
-        t2.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        JTextField tSection = new JTextField(20);
+        tSection.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        tSection.setFont(gFont.deriveFont(Font.PLAIN, 21));
         gbc.gridx = 1; gbc.gridy = 1; gbc.weightx = 1;
-        p2.add(t2, gbc);
+        p2.add(tSection, gbc);
 
         f.add(p2, BorderLayout.CENTER);
 
@@ -115,26 +112,10 @@ public class registerFrame {
         // --- Action Listeners ---
         b1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                try (Connection connection = DatabaseConnector.getErpConnection()) {
-                    try (PreparedStatement statement = connection.prepareStatement("""
-                                INSERT INTO enrollments(roll_no, course_code , section, status) VALUES (?, ?, ?, ?);
-                            """)) {
-                        statement.setString(1, roll_no);
-                        statement.setString(2, t1.getText().trim());
-                        statement.setString(3, t2.getText().trim());
-                        statement.setString(4, "enrolled");
-                        int rowsInsreted = statement.executeUpdate();
-                        if (rowsInsreted == 0) {
-                            JOptionPane.showMessageDialog(null, "Error: Couldn't register in database.", "Error", JOptionPane.ERROR_MESSAGE);
-                            System.out.println("Error: Couldn't register in database.");
-                        } else {
-                            JOptionPane.showMessageDialog(null, "Registered successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
-                            System.out.println("Registered Successfully.");
-                        }
-                    }
-                } catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(null, "Error registering: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
-                    ex.printStackTrace();
+                int rowsInserted = ErpCommandRunner.studentRegisterHelper(roll_no, tCourseCode.getText().trim(), tSection.getText().trim(), "enrolled");
+                if (rowsInserted > 0) {
+                    JOptionPane.showMessageDialog(null, "Registered successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    System.out.println("Registered Successfully.");
                 }
                 new studentDashboard(username, role, in_pass, roll_no);
                 f.dispose();

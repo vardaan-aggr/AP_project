@@ -11,7 +11,7 @@ import javax.swing.UIManager;
 
 import com.formdev.flatlaf.FlatLightLaf;
 
-import edu.univ.erp.data.DatabaseConnector;
+import edu.univ.erp.data.ErpCommandRunner;
 import edu.univ.erp.util.BREATHEFONT;
 
 import java.awt.BorderLayout;
@@ -22,8 +22,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.awt.event.ActionEvent;
 
@@ -68,35 +66,35 @@ public class createSection {
 
         // Row 0: Course Code
         addLabel(p2, gFont, "Course Code:", 0, gbc);
-        JTextField t1 = addField(p2, gFont, 0, gbc);
+        JTextField tCourseCode = addField(p2, gFont, 0, gbc);
 
         // Row 1: Section
         addLabel(p2, gFont, "Section:", 1, gbc);
-        JTextField t2 = addField(p2, gFont, 1, gbc);
+        JTextField tSection = addField(p2, gFont, 1, gbc);
 
         // Row 2: Instructor Roll
         addLabel(p2, gFont, "Instructor Roll No:", 2, gbc);
-        JTextField t3 = addField(p2, gFont, 2, gbc);
+        JTextField tInstructorRollNo = addField(p2, gFont, 2, gbc);
 
         // Row 3: Day & Time
         addLabel(p2, gFont, "Day & Time:", 3, gbc);
-        JTextField t4 = addField(p2, gFont, 3, gbc);
+        JTextField tDayTime = addField(p2, gFont, 3, gbc);
 
         // Row 4: Room No
         addLabel(p2, gFont, "Room No:", 4, gbc);
-        JTextField t5 = addField(p2, gFont, 4, gbc);
+        JTextField tRoomNo = addField(p2, gFont, 4, gbc);
 
         // Row 5: Capacity
         addLabel(p2, gFont, "Capacity:", 5, gbc);
-        JTextField t6 = addField(p2, gFont, 5, gbc);
+        JTextField tCapacity = addField(p2, gFont, 5, gbc);
 
         // Row 6: Semester
         addLabel(p2, gFont, "Semester:", 6, gbc);
-        JTextField t7 = addField(p2, gFont, 6, gbc);
+        JTextField tSemester = addField(p2, gFont, 6, gbc);
 
         // Row 7: Year
         addLabel(p2, gFont, "Year:", 7, gbc);
-        JTextField t8 = addField(p2, gFont, 7, gbc);
+        JTextField tYear = addField(p2, gFont, 7, gbc);
 
         // --- BUTTONS ---
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
@@ -133,30 +131,48 @@ public class createSection {
         // --- Action Listeners ---
         assignButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                try (Connection connection = DatabaseConnector.getErpConnection()) {
-                    try (PreparedStatement statement = connection.prepareStatement("""
-                                INSERT INTO sections(course_code ,section ,roll_no ,day_time ,room ,capacity,semester,year ) VALUES (?,?, ?,?,?, ?, ?, ?);
-                            """)) {
-                        statement.setString(1, t1.getText().trim());
-                        statement.setString(2, t2.getText().trim());
-                        statement.setString(3, t3.getText().trim());
-                        statement.setString(4, t4.getText().trim());
-                        statement.setString(5, t5.getText().trim());
-                        statement.setString(6, t6.getText().trim());
-                        statement.setString(7, t7.getText().trim());
-                        statement.setString(8, t8.getText().trim());
-
-                        int rowsInsreted = statement.executeUpdate();
-                        if (rowsInsreted == 0) {
-                            JOptionPane.showMessageDialog(null, "Error: Couldn't register in database.", "Error", JOptionPane.ERROR_MESSAGE);
-                            System.out.println("Error: Couldn't register in database.");
-                        } else {
-                            JOptionPane.showMessageDialog(null, "Registered successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
-                            System.out.println("Registered Successfully.");
-                        }
+                if (tCourseCode.getText().trim().isEmpty() || tSection.getText().trim().isEmpty() || tInstructorRollNo.getText().trim().isEmpty() || tDayTime.getText().trim().isEmpty() || tRoomNo.getText().trim().isEmpty() || tCapacity.getText().trim().isEmpty() || tSemester.getText().trim().isEmpty() || tYear.getText().trim().isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "All fields must be filled out.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                try {
+                    // Validate Instructor Roll No 
+                    try {
+                        Integer.parseInt(tInstructorRollNo.getText().trim()); 
+                    } catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(null, "Instructor Roll No must be a valid integer.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                        return;
                     }
+                    // Validate Capacity 
+                    try {
+                        int cap = Integer.parseInt(tCapacity.getText().trim());
+                        if (cap <= 0) {
+                            JOptionPane.showMessageDialog(null, "Capacity must be a positive number.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+                    } catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(null, "Capacity must be a valid integer.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    // Validate Year 
+                    try {
+                        int yr = Integer.parseInt(tYear.getText().trim());
+                        if (yr <= 0) {
+                            JOptionPane.showMessageDialog(null, "Year must be a positive number.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+                    } catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(null, "Year must be a valid integer.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(null, "Invalid input data.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                try {
+                    ErpCommandRunner.createSectionHelper(tCourseCode.getText().trim(), tSection.getText().trim(), tInstructorRollNo.getText().trim(), tDayTime.getText().trim(), tRoomNo.getText().trim(), tCapacity.getText().trim(), tSemester.getText().trim(), tYear.getText().trim());    
                 } catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(null, "Error registering: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Error while creating section: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
                     ex.printStackTrace();
                 }
                 new adminDashboard(roll_no);
@@ -175,7 +191,7 @@ public class createSection {
 
     private static void addLabel(JPanel p, Font f, String text, int y, GridBagConstraints gbc) {
         JLabel l = new JLabel(text);
-        l.setFont(f.deriveFont(Font.BOLD, 18)); // Slightly smaller font for dense form
+        l.setFont(f.deriveFont(Font.BOLD, 18)); 
         l.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = y; gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;

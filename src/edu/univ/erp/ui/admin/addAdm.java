@@ -1,5 +1,7 @@
 package edu.univ.erp.ui.admin;
 
+import edu.univ.erp.data.AuthCommandRunner;
+
 import java.awt.event.ActionListener;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -9,8 +11,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import javax.swing.BorderFactory;
@@ -24,7 +24,6 @@ import javax.swing.UIManager;
 
 import com.formdev.flatlaf.FlatLightLaf;
 
-import edu.univ.erp.data.DatabaseConnector;
 import edu.univ.erp.util.BREATHEFONT;
 import edu.univ.erp.util.HashGenerator;
 
@@ -65,7 +64,7 @@ public class addAdm {
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         JLabel l1 = new JLabel("Username:");
-        l1.setFont(gFont.deriveFont(Font.BOLD, 24));
+        l1.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l1.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
@@ -78,7 +77,7 @@ public class addAdm {
         p2.add(t1, gbc);
 
         JLabel l2 = new JLabel("Password:");
-        l2.setFont(gFont.deriveFont(Font.BOLD, 24));
+        l2.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l2.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
@@ -129,28 +128,20 @@ public class addAdm {
                     return;
                 }
                 String hash_pass = HashGenerator.makeHash(t2.getText().trim());
-                try (Connection connection = DatabaseConnector.getAuthConnection()) {
-                    try (PreparedStatement statement = connection.prepareStatement("""
-                                INSERT INTO auth_table (username, role, hash_password) VALUES
-                                    (?, ?, ?)
-                            """)) {
-                        statement.setString(1, t1.getText().trim());
-                        statement.setString(2, "admin");
-                        statement.setString(3, hash_pass);
-                        int rowsAffected = statement.executeUpdate();
-                        if (rowsAffected > 0) {
-                            JOptionPane.showMessageDialog(null, "Admin added successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
-                            System.out.println("Admin added successfully..");
-                        } else {
-                            JOptionPane.showMessageDialog(null, "Error: Failed to add info into auth db!", "Error", JOptionPane.ERROR_MESSAGE);
-                            System.out.println("Error: Failed to add info into auth db");
-                            return;
-                        }
-                    } 
+                int rowsAffected = -1;
+                try {
+                    rowsAffected = AuthCommandRunner.registerAuth(t1.getText().trim(), hash_pass);
                 } catch (SQLException ex) {
                     JOptionPane.showMessageDialog(null, "Error: Failed to add info into auth db!", "Error", JOptionPane.ERROR_MESSAGE);
                     System.out.println("Error: Failed to add info into auth db");
                     ex.printStackTrace();
+                }
+                if (rowsAffected > 0) {
+                    JOptionPane.showMessageDialog(null, "Admin added successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    System.out.println("Admin added successfully..");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Error: Failed to add info into auth db!", "Error", JOptionPane.ERROR_MESSAGE);
+                    System.out.println("Error: Failed to add info into auth db");
                     return;
                 }
                 System.out.println("\tGoing back to Admin Dashboard..");

@@ -1,10 +1,6 @@
 package edu.univ.erp.ui.admin.searchDB;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import java.util.ArrayList;
 
 import javax.swing.*;
@@ -20,7 +16,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Insets;
 
-import edu.univ.erp.data.DatabaseConnector;
+import edu.univ.erp.data.AuthCommandRunner;
 import edu.univ.erp.ui.admin.adminDashboard;
 import edu.univ.erp.util.BREATHEFONT;
 
@@ -54,6 +50,12 @@ public class searchAdm {
 
         // ---- MIDDLE ----
         String[][] data = dataPull();
+        if (dataPull() == null) {
+            System.out.println("\tGoing back to admin dashboard..");
+            new adminDashboard(roll_no_inp);
+            f.dispose();
+            return;
+        } 
         String[] columName = {"Username", "Admin ID"}; 
         
         JTable t = new JTable(data, columName);
@@ -62,7 +64,7 @@ public class searchAdm {
         JTableHeader header = t.getTableHeader();
         header.setBackground(Color.decode("#051072"));
         header.setForeground(Color.decode("#dbd3c5"));
-        header.setFont(gFont.deriveFont(Font.BOLD, 18));
+        header.setFont(gFont.deriveFont(Font.PLAIN, 18));
         header.setOpaque(true);
         
         t.setFont(gFont.deriveFont(Font.PLAIN, 16));
@@ -105,29 +107,10 @@ public class searchAdm {
 
     private String[][] dataPull() {
         ArrayList<String[]> data = new ArrayList<>();
-        try (Connection connection = DatabaseConnector.getAuthConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement("""
-                        Select roll_no, username FROM auth_table WHERE role = ?;
-                    """)) {
-                statement.setString(1, "admin");
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    boolean empty = true;
-                    while (resultSet.next()) {
-                        empty = false;
-                        String rollNo = resultSet.getString("roll_no");
-                        String username = resultSet.getString("username");
-                        data.add(new String[]{username, rollNo});
-                    }
-                    if (empty) {
-                        JOptionPane.showMessageDialog(null, "Error: No admin in database", "Error", JOptionPane.ERROR_MESSAGE);
-                        System.out.println("\t (No admin in database)");
-                    }
-                }
-            }
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "A database error occurred.", "Error", JOptionPane.ERROR_MESSAGE);
-            System.out.println("Error fetching admin data from databases: " + ex);
-            ex.printStackTrace();
+        try {
+            data = AuthCommandRunner.searchAuthAuth();
+        } catch (SQLException e) {
+            return null;
         }
 
         String[][] strArr = new String[data.size()][2];

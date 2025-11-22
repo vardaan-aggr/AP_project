@@ -56,7 +56,7 @@ public class adminDashboard {
         Dimension buttonSize = new Dimension(280, 80);
         Color btnBg = Color.decode("#2f77b1");
         Color btnFg = Color.WHITE;
-        Font btnFont = gFont.deriveFont(Font.BOLD, 21f);
+        Font btnFont = gFont.deriveFont(Font.PLAIN, 21f);
         Insets btnMargin = new Insets(10, 30, 5, 30);
 
         gbc.gridx = 0; gbc.gridy = 0;
@@ -65,7 +65,7 @@ public class adminDashboard {
         p2.add(b1, gbc);
 
         gbc.gridx = 1; gbc.gridy = 0;
-        JButton b2 = new JButton("Manage Courses");
+        JButton b2 = new JButton("Edit course/section");
         styleButton(b2, btnBg, btnFg, btnFont, buttonSize, btnMargin);
         p2.add(b2, gbc);
 

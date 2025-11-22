@@ -12,6 +12,7 @@ import javax.swing.UIManager;
 import com.formdev.flatlaf.FlatLightLaf;
 
 import edu.univ.erp.data.DatabaseConnector;
+import edu.univ.erp.data.ErpCommandRunner;
 import edu.univ.erp.util.BREATHEFONT;
 
 import java.awt.Color;
@@ -143,6 +144,23 @@ public class editSectionPage2 {
         // --- Action Listeners ---
         assignButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                int rowsUpdated = -1;
+                try {
+                    rowsUpdated = ErpCommandRunner.sectionUpdater(t3.getText().trim(), t4.getText().trim(), t5.getText().trim(), t6.getText().trim(), t7.getText().trim(), t8.getText().trim(), t1.getText().trim(), t2.getText().trim());
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "Error: Couldn't update course: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
+                    System.out.println("Error: Couldn't update course." + ex);
+                }
+                if (rowsUpdated == 0) {
+                    JOptionPane.showMessageDialog(null, "Error: Course code and Section dont match.", "Error", JOptionPane.ERROR_MESSAGE);
+                    System.out.println("Error: Course code and Section dont match.");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Section updated successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    System.out.println("Update Successful.");
+                }
+                new adminDashboard(roll_no);
+                f.dispose();
                 try (Connection connection = DatabaseConnector.getErpConnection()) {
                 // Use an UPDATE statement
                 try (PreparedStatement statement = connection.prepareStatement(
@@ -166,7 +184,7 @@ public class editSectionPage2 {
                     statement.setString(7, t1.getText().trim()); // WHERE course_code
                     statement.setString(8, t2.getText().trim()); // WHERE section
 
-                    int rowsUpdated = statement.executeUpdate();
+                    rowsUpdated = statement.executeUpdate();
                     if (rowsUpdated == 0) {
                         JOptionPane.showMessageDialog(null, "Error: Couldn't update section.", "Error", JOptionPane.ERROR_MESSAGE);
                         System.out.println("Error: Couldn't update section.");

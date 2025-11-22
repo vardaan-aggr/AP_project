@@ -13,13 +13,13 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 
-import edu.univ.erp.ui.common.AllCourses;
+import edu.univ.erp.ui.common.catalog;
 import edu.univ.erp.util.BREATHEFONT;
 import edu.univ.erp.util.modeOps;
 
 public class InstructorDashboard {
     
-    public InstructorDashboard(String roll_no) {
+    public InstructorDashboard(String username, String role, String password, String roll_no) {
         
         Font breatheFont = BREATHEFONT.fontGen();
         Font gFont = BREATHEFONT.gFontGen();
@@ -60,7 +60,7 @@ public class InstructorDashboard {
 
         Color btnBg = Color.decode("#2f77b1");
         Color btnFg = Color.WHITE;
-        Font btnFont = gFont.deriveFont(Font.BOLD, 20f); 
+        Font btnFont = gFont.deriveFont(Font.PLAIN, 20f); 
         Dimension btnSize = new Dimension(440, 60); 
 
         gbc.gridy = 0;
@@ -107,7 +107,7 @@ public class InstructorDashboard {
         b1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Opening My Sections...");
-                new MySectionsFrame(roll_no);
+                new MySectionsFrame(username, role, password, roll_no);
                 f.dispose(); 
             }
         });
@@ -121,7 +121,7 @@ public class InstructorDashboard {
                     ;
                 } else {
                     System.out.println("Opening Compute Final Grades...");
-                    new ComputeFinalFrame(roll_no);
+                    new ComputeFinalFrame(username, role, password, roll_no);
                     f.dispose();
                 }
             }
@@ -130,7 +130,7 @@ public class InstructorDashboard {
         b3.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Opening Class Statistics...");
-                new ClassStatisticsFrame(roll_no);
+                new ClassStatisticsFrame(username, role, password, roll_no);
                 f.dispose();
             }
         });
@@ -138,7 +138,7 @@ public class InstructorDashboard {
         b4.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Opening Course Catalog...");
-                new AllCourses(roll_no, "instructor");
+                new catalog(username, role, password, roll_no);
                 f.dispose();
             }
         });

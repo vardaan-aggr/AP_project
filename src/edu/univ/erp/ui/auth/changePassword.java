@@ -64,7 +64,7 @@ public class changePassword {
         gbc.insets = new Insets(10, 10, 10, 10); 
         
         JLabel l1 = new JLabel("Roll No:");
-        l1.setFont(gFont.deriveFont(Font.BOLD, 24));
+        l1.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l1.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
@@ -78,7 +78,7 @@ public class changePassword {
         p2.add(t1, gbc);
 
         JLabel l2 = new JLabel("New Password:");
-        l2.setFont(gFont.deriveFont(Font.BOLD, 24));
+        l2.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l2.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0;
         gbc.fill = GridBagConstraints.NONE;

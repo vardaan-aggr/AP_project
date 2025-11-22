@@ -1,5 +1,8 @@
 package edu.univ.erp.ui.admin;
 
+import edu.univ.erp.data.AuthCommandRunner;
+import edu.univ.erp.data.ErpCommandRunner;
+
 import java.awt.event.ActionListener;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -9,11 +12,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -26,7 +25,6 @@ import javax.swing.UIManager;
 
 import com.formdev.flatlaf.FlatLightLaf;
 
-import edu.univ.erp.data.DatabaseConnector;
 import edu.univ.erp.util.BREATHEFONT;
 import edu.univ.erp.util.HashGenerator;
 
@@ -68,7 +66,7 @@ public class addIns {
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         JLabel l1 = new JLabel("Username:");
-        l1.setFont(gFont.deriveFont(Font.BOLD, 24));
+        l1.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l1.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
@@ -81,7 +79,7 @@ public class addIns {
         p2.add(t1, gbc);
 
         JLabel l2 = new JLabel("Password:");
-        l2.setFont(gFont.deriveFont(Font.BOLD, 24));
+        l2.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l2.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
@@ -94,7 +92,7 @@ public class addIns {
         p2.add(t2, gbc);
 
         JLabel l3 = new JLabel("Department:");
-        l3.setFont(gFont.deriveFont(Font.BOLD, 24));
+        l3.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l3.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 2; gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
@@ -145,79 +143,39 @@ public class addIns {
         // ---- Action Listeners ----
         b2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                // Validate inputs
                 if (t1.getText().trim().isEmpty() || t2.getText().trim().isEmpty() || t3.getText().trim().isEmpty()) {
                     JOptionPane.showMessageDialog(null, "All fields must be filled out.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                int rollNoTemp = -1;
-                String hash_pass = HashGenerator.makeHash(t2.getText().trim());
-                
-                try (Connection connection = DatabaseConnector.getAuthConnection()) {
-                    try (PreparedStatement statement = connection.prepareStatement("""
-                                INSERT INTO auth_table (username, role, hash_password) VALUES
-                                    (?, ?, ?)
-                            """, Statement.RETURN_GENERATED_KEYS)) {
-                        statement.setString(1, t1.getText().trim());
-                        statement.setString(2, "instructor");
-                        statement.setString(3, hash_pass);
-                        int rowsAffected = statement.executeUpdate();
-                        if (rowsAffected > 0) {
-                            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
-                                if (generatedKeys.next()) {
-                                    rollNoTemp = generatedKeys.getInt(1);
-                                    System.out.println("Instructor added successfully in Auth with roll no: " + rollNoTemp);
-                                } else {
-                                    // the insert worked, but we couldn't get the new ID.
-                                    JOptionPane.showMessageDialog(null, "Failed to retrieve new instructor's ID", "Error", JOptionPane.ERROR_MESSAGE);
-                                    System.out.println("Failed to get generated key for new instructor.");
-                                    return; 
-                                }
-                            }
-                        } else {
-                            JOptionPane.showMessageDialog(null, "Failed to add instructor info in database.", "Error", JOptionPane.ERROR_MESSAGE);
-                            System.out.println("Failed to add instructor info in database.");
-                            System.out.println("\tGoing back to Admin Dashboard..");
-                            return;
-                        }
-                    } 
-                } catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(null, "Database Error (Auth): " + ex, "Error", JOptionPane.ERROR_MESSAGE);
-                    System.out.println("Database Error (ERP): " + ex);
-                    ex.printStackTrace();
-                    return;
-                }
 
-                if (rollNoTemp != -1) {
-                    try (Connection connection = DatabaseConnector.getErpConnection()) {
-                        try (PreparedStatement statement = connection.prepareStatement("""
-                                    INSERT INTO instructors (roll_no, department) VALUES
-                                        (?, ?)
-                                """)) {
-                            statement.setString(1, String.valueOf(rollNoTemp));
-                            statement.setString(2, t2.getText().trim());
-                            int rowsAffected = statement.executeUpdate();
-                            if (rowsAffected > 0) {
-                                JOptionPane.showMessageDialog(null, "Added successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
-                                System.out.println("Instructor added successfully in Erp db");
-                            } else {
-                                JOptionPane.showMessageDialog(null, "Failed to add instructor to ERP database", "Error", JOptionPane.ERROR_MESSAGE);
-                                System.out.println("Failed to add instructor in Erp database");
-                                return;
-                            }
-                        } 
-                    } catch (SQLException ex) {
-                        JOptionPane.showMessageDialog(null, "Database Error (ERP)", "Error", JOptionPane.ERROR_MESSAGE);
-                        System.out.println("Database Error (ERP): " + ex);
-                        ex.printStackTrace();
-                        return;
+                String username = t1.getText().trim();
+                String rawPassword = t2.getText().trim();
+                String department = t3.getText().trim(); 
+                
+                String hash_pass = HashGenerator.makeHash(rawPassword);
+
+                try {
+                    int newRollNo = AuthCommandRunner.registerUserAuth(username, "instructor", hash_pass);
+
+                    if (newRollNo != -1) {
+                        // 2. Add to ERP Database
+                        boolean success = ErpCommandRunner.registerInstructorErp(newRollNo, department);
+                        
+                        if (success) {
+                            JOptionPane.showMessageDialog(null, "Instructor Added! ID: " + newRollNo, "Success", JOptionPane.INFORMATION_MESSAGE);
+                            new adminDashboard(rollNo);
+                            f.dispose();
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Auth created, but failed to add details to ERP.", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Failed to create User in Auth DB.", "Error", JOptionPane.ERROR_MESSAGE);
                     }
-                } else {
-                    System.out.println("Skipping ERP insert because auth insert failed.");
-                    return;
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(null, "Database Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    ex.printStackTrace();
                 }
-                System.out.println("\tGoing back to Admin Dashboard..");
-                new adminDashboard(rollNo);
-                f.dispose();
             }
         });
 

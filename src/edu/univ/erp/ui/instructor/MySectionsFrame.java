@@ -13,18 +13,13 @@ import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;   
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 
-import edu.univ.erp.data.DatabaseConnector;
+import edu.univ.erp.data.ErpCommandRunner;
 import edu.univ.erp.util.BREATHEFONT;
 
 public class MySectionsFrame {
-
-    public MySectionsFrame(String roll_no) {
+    public MySectionsFrame(String username, String role, String password, String roll_no) {
 
         Font breatheFont = BREATHEFONT.fontGen();
         Font gFont = BREATHEFONT.gFontGen();
@@ -58,31 +53,39 @@ public class MySectionsFrame {
         p2.setBackground(Color.decode("#dbd3c5"));
         p2.setBorder(new EmptyBorder(20, 50, 20, 50));
 
-        String data[][] = dataPull(roll_no);
-        String columName[] = {"Course Code"};
-        
-        JTable t = new JTable(data, columName);
-        t.setFillsViewportHeight(true);
+        try {
+            String data[][] = ErpCommandRunner.instructorMySectionsHelper(roll_no);
+            String columName[] = {"Course Code"};
+            
+            JTable t = new JTable(data, columName);
+            t.setFillsViewportHeight(true);
 
-        JTableHeader header = t.getTableHeader();
-        header.setBackground(Color.decode("#051072"));
-        header.setForeground(Color.decode("#dbd3c5"));
-        header.setFont(gFont.deriveFont(Font.BOLD, 18));
-        header.setOpaque(true);
+            JTableHeader header = t.getTableHeader();
+            header.setBackground(Color.decode("#051072"));
+            header.setForeground(Color.decode("#dbd3c5"));
+            header.setFont(gFont.deriveFont(Font.PLAIN, 18));
+            header.setOpaque(true);
+            
+            t.setFont(gFont.deriveFont(Font.PLAIN, 16));
+            t.setRowHeight(30);
+            t.setSelectionBackground(Color.decode("#2f77b1"));
+            t.setSelectionForeground(Color.WHITE);
+            t.setShowGrid(true);
+            t.setGridColor(Color.decode("#051072"));
+                    
+            JScrollPane sp = new JScrollPane(t);
+            sp.getViewport().setBackground(Color.WHITE);
+            p2.add(sp, BorderLayout.CENTER);
+            
+            f.add(p2, BorderLayout.CENTER);
+            
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Error getting your sections: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
+            System.out.println("Error getting your sections: " + ex);
+            ex.printStackTrace();
+        }
         
-        t.setFont(gFont.deriveFont(Font.PLAIN, 16));
-        t.setRowHeight(30);
-        t.setSelectionBackground(Color.decode("#2f77b1"));
-        t.setSelectionForeground(Color.WHITE);
-        t.setShowGrid(true);
-        t.setGridColor(Color.decode("#051072"));
-        
-        JScrollPane sp = new JScrollPane(t);
-        sp.getViewport().setBackground(Color.WHITE);
-        p2.add(sp, BorderLayout.CENTER);
-        
-        f.add(p2, BorderLayout.CENTER);
- 
+
         // ---- LOWS ----
         JPanel p3 = new JPanel(new FlowLayout(FlowLayout.RIGHT, 30, 20));
         p3.setBackground(Color.decode("#dbd3c5")); 
@@ -101,37 +104,9 @@ public class MySectionsFrame {
 
         b1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new InstructorDashboard(roll_no);
+                new InstructorDashboard(username, role, password, roll_no);
                 f.dispose();
             }
         });
-    }
-
-    private String[][] dataPull(String roll_no) {
-        ArrayList<String[]> arrList = new ArrayList<>();
-        try (Connection connection = DatabaseConnector.getErpConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement("""
-                        Select course_code FROM sections WHERE roll_no = ?; 
-                    """)) {
-                statement.setString(1, roll_no); // Replace with actual instructor ID
-
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    boolean empty = true;
-                    while (resultSet.next()) {
-                        empty = false;
-                        String course_code = resultSet.getString("course_code");
-                        arrList.add(new String[]{course_code });
-                    } 
-                    if (empty) {
-                        System.out.println("\t (no data)");
-                    }
-                }
-            } 
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-        String[][] strArr = new String[arrList.size()][1];
-        arrList.toArray(strArr);
-        return strArr;
     }
 }
