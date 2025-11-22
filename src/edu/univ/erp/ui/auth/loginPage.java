@@ -3,6 +3,8 @@ package edu.univ.erp.ui.auth;
 import edu.univ.erp.util.BREATHEFONT;
 import edu.univ.erp.data.AuthCommandRunner;
 import java.sql.SQLException;
+import java.util.HashMap; 
+import java.util.Map;     
 
 import javax.swing.*;
 import org.mindrot.jbcrypt.BCrypt;
@@ -23,6 +25,28 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 
 public class loginPage {
+    
+    private static class LoginAttemptInfo {
+        int failedAttemptCount = 0;
+        long lastFailedAttemptTimestamp = 0; // in milliseconds
+        int lifeUsed = 0;
+
+        public void increment() {
+            lifeUsed++;
+            failedAttemptCount++;
+            lastFailedAttemptTimestamp = System.currentTimeMillis();
+        }
+
+        public void reset() {
+            failedAttemptCount = 0;
+            lastFailedAttemptTimestamp = 0;
+        }
+    }
+
+    private static final Map<String, LoginAttemptInfo> loginAttempts = new HashMap<>();
+    private static final int MAX_ATTEMPTS = 5;
+    private static final long LOCKOUT_TIME_MS = 30000; // 30 seconds (30000 ms)
+
     private static String roll_no = "";
 
     public loginPage() {
@@ -160,6 +184,41 @@ public class loginPage {
                     }
                 } catch (SQLException ex) {
                     ex.printStackTrace();
+                    JOptionPane.showMessageDialog(f, "Database error during login.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return; 
+                }
+
+                // 3. Handle login outcome
+                if (loginSuccessful) {
+                    System.out.println("\nCorrect Password");
+                    // Reset failed attempts on success
+                    loginAttempts.remove(username_input);
+                    roll_no = retrieved_roll_no; // Update static roll_no member
+
+                    if (role_db.equals("student")) {
+                        new studentDashboard(username_input, role_db, password_input, roll_no);
+                        System.out.println("\tOpening Student Dashboard..");
+                    }
+                    else if (role_db.equals("instructor")) {
+                        new InstructorDashboard(roll_no);
+                        System.out.println("\tOpening Instructor Dashboard");
+                    }
+                    else if (role_db.equals("admin")) {
+                        new adminDashboard(roll_no);
+                        System.out.println("\tOpening Admin Dashboard");
+                    }
+                    f.dispose();
+                } else {
+                    // Update failed attempts on wrong password or user not found
+                    attemptInfo.increment();
+                    
+                    String message = "Invalid username or password.";
+                    if (attemptInfo.failedAttemptCount >= MAX_ATTEMPTS) {
+                         message += "\nToo many failed attempts. Account locked for 30 seconds.";
+                    }
+
+                    JOptionPane.showMessageDialog(f, message, "Login Failed", JOptionPane.ERROR_MESSAGE);
+                    System.out.println("WrongPassword. Failed attempts for " + username_input + ": " + attemptInfo.failedAttemptCount);
                 }
             }
         });
