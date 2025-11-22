@@ -1,10 +1,6 @@
 package edu.univ.erp.ui.admin.searchDB;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import java.util.ArrayList;
 
 import javax.swing.*;
@@ -20,7 +16,8 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Insets;
 
-import edu.univ.erp.data.DatabaseConnector;
+import edu.univ.erp.data.AuthCommandRunner;
+import edu.univ.erp.data.ErpCommandRunner;
 import edu.univ.erp.ui.admin.adminDashboard;
 import edu.univ.erp.util.BREATHEFONT;
 
@@ -38,7 +35,7 @@ public class searchStd {
 
         JFrame f = new JFrame();
         f.setSize(800, 600);
-        f.setLayout(new BorderLayout()); // Use BorderLayout
+        f.setLayout(new BorderLayout()); 
 
         // ---- TOP ----
         JPanel p1 = new JPanel();
@@ -47,14 +44,20 @@ public class searchStd {
         
         JLabel l0 = new JLabel("STUDENT INFO");
         l0.setForeground(Color.decode("#dbd3c5"));
-        l0.setFont(breatheFont.deriveFont(Font.BOLD, 80f)); // Adjusted size
+        l0.setFont(breatheFont.deriveFont(Font.BOLD, 80f)); 
         l0.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0));
         p1.add(l0);
         f.add(p1, BorderLayout.NORTH);
 
         // ---- MIDDLE ----
         String[][] data = dataPull();
-        String[] columName = {"Username", "Roll No", "Program", "Year"};
+        if (data == null || data.length == 0) {
+            System.out.println("\tGoing back to admin dashboard..");
+            new adminDashboard(roll_no_inp);
+            f.dispose();
+            return;
+        } 
+        String[] columName = {"Roll No", "Username", "Program", "Year"};
         
         JTable t = new JTable(data, columName);
         t.setFillsViewportHeight(true);
@@ -62,7 +65,7 @@ public class searchStd {
         JTableHeader header = t.getTableHeader();
         header.setBackground(Color.decode("#051072"));
         header.setForeground(Color.decode("#dbd3c5"));
-        header.setFont(gFont.deriveFont(Font.BOLD, 18));
+        header.setFont(gFont.deriveFont(Font.PLAIN, 18));
         header.setOpaque(true);
         
         t.setFont(gFont.deriveFont(Font.PLAIN, 16));
@@ -104,40 +107,17 @@ public class searchStd {
     }
 
     private String[][] dataPull() {
-        ArrayList<String[]> data = new ArrayList<>();
-        String bedebop = """
-                        Select auth_db.auth_table.roll_no, auth_db.auth_table.username, erp_db.students.program, erp_db.students.year 
-                        From auth_db.auth_table
-                        Join erp_db.students ON auth_db.auth_table.roll_no = erp_db.students.roll_no
-                        Where auth_db.auth_table.role = ?;
-                    """;
-        try (Connection connection = DatabaseConnector.getAuthConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement(bedebop)) {
-                statement.setString(1, "student");
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    boolean empty = true;
-                    while (resultSet.next()) {
-                        empty = false;
-                        String rollNo = resultSet.getString("roll_no");
-                        String username = resultSet.getString("username");
-                        String program = resultSet.getString("program");
-                        String year = resultSet.getString("year");
-                        data.add(new String[]{username, rollNo, program, year});
-                    }
-                    if (empty) {
-                        JOptionPane.showMessageDialog(null, "Error: No student in both database together", "Error", JOptionPane.ERROR_MESSAGE);
-                        System.out.println("\t (Error: No student in both database together)");
-                    }
-                }
-            }
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "Error opening student info from database.", "Error", JOptionPane.ERROR_MESSAGE);
-            System.out.println("Error opening student info from database: " + ex);
-            ex.printStackTrace();
+        ArrayList<String[]> arrList = new ArrayList<>();
+        try {
+            arrList = AuthCommandRunner.searchStudentAuth();
+            if (arrList == null) { return null; }
+            arrList = ErpCommandRunner.searchStudentErp(arrList);
+        } catch (SQLException e) {
+            System.err.println("SQL Error in dataPull: " + e.getMessage());
+            return null;
         }
-
-        String[][] strArr = new String[data.size()][4];
-        data.toArray(strArr);
+        String[][] strArr = new String[arrList.size()][4];
+        arrList.toArray(strArr);
         return strArr;
     }
 }

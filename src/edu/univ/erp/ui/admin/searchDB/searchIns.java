@@ -1,10 +1,6 @@
 package edu.univ.erp.ui.admin.searchDB;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import java.util.ArrayList;
 
 import javax.swing.*;
@@ -20,10 +16,10 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Insets;
 
-import edu.univ.erp.data.DatabaseConnector;
+import edu.univ.erp.data.AuthCommandRunner;
+import edu.univ.erp.data.ErpCommandRunner;
 import edu.univ.erp.ui.admin.adminDashboard;
 import edu.univ.erp.util.BREATHEFONT;
-
 
 public class searchIns {
     public searchIns(String roll_no_inp) {
@@ -55,7 +51,13 @@ public class searchIns {
 
         // ---- MIDDLE ----
         String[][] data = dataPull();
-        String[] columName = {"Username", "ID", "Department"};
+        if (dataPull() == null) {
+            System.out.println("\tGoing back to admin dashboard..");
+            new adminDashboard(roll_no_inp);
+            f.dispose();
+            return;
+        } 
+        String[] columName = {"RollNo", "Username", "Department"};
         
         JTable t = new JTable(data, columName);
         t.setFillsViewportHeight(true);
@@ -63,7 +65,7 @@ public class searchIns {
         JTableHeader header = t.getTableHeader();
         header.setBackground(Color.decode("#051072"));
         header.setForeground(Color.decode("#dbd3c5"));
-        header.setFont(gFont.deriveFont(Font.BOLD, 18));
+        header.setFont(gFont.deriveFont(Font.PLAIN, 18));
         header.setOpaque(true);
         
         t.setFont(gFont.deriveFont(Font.PLAIN, 16));
@@ -105,39 +107,16 @@ public class searchIns {
     }
 
     private String[][] dataPull() {
-        ArrayList<String[]> data = new ArrayList<>();
-        String bedebop = """
-                        Select auth_db.auth_table.roll_no, auth_db.auth_table.username, erp_db.instructors.department
-                        From auth_db.auth_table
-                        Join erp_db.instructors ON auth_db.auth_table.roll_no = erp_db.instructors.roll_no
-                        Where auth_db.auth_table.role = ?;
-                    """;
-        try (Connection connection = DatabaseConnector.getAuthConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement(bedebop)) {
-                statement.setString(1, "instructor");
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    boolean empty = true;
-                    while (resultSet.next()) {
-                        empty = false;
-                        String rollNo = resultSet.getString("roll_no");
-                        String username = resultSet.getString("username");
-                        String department = resultSet.getString("department");
-                        data.add(new String[]{username, rollNo, department});
-                    }
-                    if (empty) {
-                        JOptionPane.showMessageDialog(null, "Error: no instructor in both databases alltogether", "Error", JOptionPane.ERROR_MESSAGE);
-                        System.out.println("\t (no instructor in both databases alltogether)");
-                    }
-                }
-            }
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "Error fetching instructors from database", "Error", JOptionPane.ERROR_MESSAGE);
-            System.out.println("Error fetching instructors: " + ex);
-            ex.printStackTrace();
+        ArrayList<String[]> arrList = new ArrayList<>();
+        try {
+            arrList = AuthCommandRunner.searchInstructorAuth();
+            arrList = ErpCommandRunner.searchInstructorErp(arrList);
+        } catch (SQLException e) {
+            return null;
         }
-
-        String[][] strArr = new String[data.size()][3];
-        data.toArray(strArr);
+        String[][] strArr = new String[arrList.size()][4];
+        arrList.toArray(strArr);
         return strArr;
     }
+
 }

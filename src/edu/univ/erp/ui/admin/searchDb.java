@@ -66,7 +66,7 @@ public class searchDb {
 
         Color btnBg = Color.decode("#2f77b1");
         Color btnFg = Color.WHITE;
-        Font btnFont = gFont.deriveFont(Font.BOLD, 20f); 
+        Font btnFont = gFont.deriveFont(Font.PLAIN, 20f); 
         Dimension btnSize = new Dimension(440, 60);
 
         gbc.gridy = 0;

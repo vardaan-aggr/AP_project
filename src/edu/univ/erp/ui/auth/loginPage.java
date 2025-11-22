@@ -1,8 +1,7 @@
 package edu.univ.erp.ui.auth;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import edu.univ.erp.util.BREATHEFONT;
+import edu.univ.erp.data.AuthCommandRunner;
 import java.sql.SQLException;
 import java.util.HashMap; 
 import java.util.Map;     
@@ -11,7 +10,7 @@ import javax.swing.*;
 import org.mindrot.jbcrypt.BCrypt;
 import com.formdev.flatlaf.FlatLightLaf;
 
-import edu.univ.erp.data.DatabaseConnector;
+import edu.univ.erp.data.AuthCommandRunner.loginResult;
 import edu.univ.erp.ui.student.studentDashboard;
 import edu.univ.erp.ui.admin.adminDashboard;
 import edu.univ.erp.ui.instructor.InstructorDashboard;
@@ -24,8 +23,6 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-
-import edu.univ.erp.util.BREATHEFONT;
 
 public class loginPage {
     
@@ -84,11 +81,10 @@ public class loginPage {
         p2.setBackground(Color.decode("#dbd3c5")); 
         p2.setBorder(BorderFactory.createEmptyBorder(100, 100, 100, 100));
         GridBagConstraints gbc = new GridBagConstraints();
-
         gbc.insets = new Insets(10, 10, 10, 10);
 
         JLabel l1 = new JLabel("Username:");
-        l1.setFont(gFont.deriveFont(Font.BOLD, 24));
+        l1.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l1.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.EAST;
@@ -102,7 +98,7 @@ public class loginPage {
         p2.add(t1, gbc);
         
         JLabel l2 = new JLabel("Password:");
-        l2.setFont(gFont.deriveFont(Font.BOLD, 24));
+        l2.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l2.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0;
         gbc.fill= GridBagConstraints.NONE;
@@ -146,56 +142,46 @@ public class loginPage {
         f.setVisible(true);
         
         // For testing purposes only: remove in production
-        t1.setText("admin1");
-        t2.setText("admin1");
+        t1.setText("student1");
+        t2.setText("mdo1");
 
         b1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String username_input = t1.getText().trim();
-                String password_input = new String(t2.getPassword());
-
-                // 1. Get or create login attempt info
-                LoginAttemptInfo attemptInfo = loginAttempts.computeIfAbsent(username_input, k -> new LoginAttemptInfo());
-
-                // 2. Check for lockout
-                if (attemptInfo.failedAttemptCount >= MAX_ATTEMPTS || attemptInfo.lifeUsed >= MAX_ATTEMPTS) {
-                    long elapsed = System.currentTimeMillis() - attemptInfo.lastFailedAttemptTimestamp;
-                    long remainingSeconds = (LOCKOUT_TIME_MS - elapsed) / 1000;
-
-                    if (elapsed < LOCKOUT_TIME_MS) {
-                        JOptionPane.showMessageDialog(f, 
-                            "Too many failed attempts. Please wait " + (remainingSeconds + 1) + " seconds.", 
-                            "Login Locked", 
-                            JOptionPane.WARNING_MESSAGE);
-                        System.out.println("\tLogin attempt blocked for " + username_input + ". Remaining time: " + (remainingSeconds + 1) + "s");
-                        return; // Block the login attempt
-                    } else {
-                        // Lockout time has expired, clear the old state (reset count/timestamp)
-                        attemptInfo.reset();
+                String username_in = t1.getText().trim();
+                String password_in = new String(t2.getPassword());
+                loginResult lr = new loginResult();
+                try {
+                    lr = AuthCommandRunner.fetchUser(username_in);
+                    if(lr == null) {
+                        System.out.println("\t (no data for given username found)");
+                        JOptionPane.showMessageDialog(null, "Username not found.", "Error", JOptionPane.ERROR_MESSAGE);
                     }
-                }
-                
-                boolean loginSuccessful = false;
-                String role_db = null;
-                String retrieved_roll_no = null;
-
-                try (Connection connection = DatabaseConnector.getAuthConnection()) {
-                    try (PreparedStatement statement = connection.prepareStatement("""
-                                Select hash_password, role, roll_no FROM auth_table WHERE username = ?; 
-                            """)) {
-                        statement.setString(1, username_input);
-                        try (ResultSet resultSet = statement.executeQuery()) {
-                            if (resultSet.next()) {
-                                String hash_pass_db = resultSet.getString("hash_password");
-                                role_db = resultSet.getString("role");
-                                retrieved_roll_no = resultSet.getString("roll_no");
-                                
-                                if (BCrypt.checkpw(password_input, hash_pass_db)) {
-                                    loginSuccessful = true;
-                                }
+                    else {
+                        if (BCrypt.checkpw(password_in, lr.hashPass)) {
+                            System.out.println("\nCorrect Password");
+                            if (lr.role.equals("student")) {
+                                new studentDashboard(username_in, lr.role, password_in, roll_no);
+                                System.out.println("\tOpening Student Dashboard..");
+                                f.dispose();
+                                return;
                             }
+                            else if (lr.role.equals("instructor")) {
+                                new InstructorDashboard(username_in, lr.role, password_in, roll_no);
+                                System.out.println("\tOpening Instructor Dashboard");
+                                f.dispose();
+                                return;
+                            }
+                            else if (lr.role.equals("admin")) {
+                                new adminDashboard(roll_no);
+                                System.out.println("\tOpening Admin Dashboard");
+                                f.dispose();
+                                return;
+                            }
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Wrong Password sorry", "Error", JOptionPane.ERROR_MESSAGE);
+                            System.out.println("WrongPassword");
                         }
-                    } 
+                    }
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                     JOptionPane.showMessageDialog(f, "Database error during login.", "Error", JOptionPane.ERROR_MESSAGE);

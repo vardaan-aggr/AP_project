@@ -1,14 +1,12 @@
 package edu.univ.erp.ui.student;
+import edu.univ.erp.data.ErpCommandRunner;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import javax.swing.*;
 
 import com.formdev.flatlaf.FlatLightLaf;
 
-import edu.univ.erp.data.DatabaseConnector;
 import edu.univ.erp.util.BREATHEFONT;
 
 import java.awt.BorderLayout;
@@ -100,20 +98,14 @@ public class dropCourseFrame {
         // --- Action Listeners ---
         b1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                try (Connection connection = DatabaseConnector.getErpConnection()) {
-                    try (PreparedStatement statement = connection.prepareStatement("""
-                                delete from enrollments where roll_no = ? and course_code = ?;
-                            """)) {
-                        statement.setString(1, roll_no);
-                        statement.setString(2, t1.getText().trim());
-                        int rowsDeleted = statement.executeUpdate();
-                        if (rowsDeleted == 0) {
-                            JOptionPane.showMessageDialog(null, "Error: Couldn't Drop in database.", "Error", JOptionPane.ERROR_MESSAGE);
-                            System.out.println("Error: Couldn't Drop in database.");
-                        } else {
-                            JOptionPane.showMessageDialog(null, "Course dropped successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
-                            System.out.println("Course droped successfully.");
-                        }
+                try {
+                    int rowsDeleted = ErpCommandRunner.studentDropCourseHelper(roll_no, t1.getText().trim());
+                    if (rowsDeleted == 0) {
+                        JOptionPane.showMessageDialog(null, "Error: Couldn't Drop in database.", "Error", JOptionPane.ERROR_MESSAGE);
+                        System.out.println("Error: Couldn't Drop in database.");
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Course dropped successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                        System.out.println("Course droped successfully.");
                     }
                 } catch (SQLException ex) {
                     JOptionPane.showMessageDialog(null, "Error Droping: " + ex, "Error", JOptionPane.ERROR_MESSAGE);

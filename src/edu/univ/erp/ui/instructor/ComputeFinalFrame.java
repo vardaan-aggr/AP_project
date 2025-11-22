@@ -1,9 +1,7 @@
 package edu.univ.erp.ui.instructor;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
+import edu.univ.erp.data.ErpCommandRunner;  
+ 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -25,11 +23,10 @@ import java.awt.event.ActionListener;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import edu.univ.erp.data.DatabaseConnector;
 import edu.univ.erp.util.BREATHEFONT;
 
 public class ComputeFinalFrame {
-    public ComputeFinalFrame(String roll_no) {
+    public ComputeFinalFrame(String username, String role, String password, String roll_no) {
 
         Font breatheFont = BREATHEFONT.fontGen();
         Font gFont = BREATHEFONT.gFontGen();
@@ -190,64 +187,28 @@ public class ComputeFinalFrame {
                 String userRollno_input = num.getText().trim();
                 String courseCode_input = code.getText().trim();
                 String section_input = sectionField.getText().trim();
-                
+                int rows = -1;
                 try {
-                    char finalGrade = computeGrade(quizMarks.getText().trim(), midsemField.getText().trim(), endsemField.getText().trim());
-                    
-                    try (Connection connection = DatabaseConnector.getErpConnection()) {
-                        try (PreparedStatement statement = connection.prepareStatement("""
-                        INSERT INTO grades (roll_no, course_code, section, grade) VALUES
-                            (?,?,?,?);     """)) {
-                            statement.setString(1, userRollno_input);
-                            statement.setString(2, courseCode_input);
-                            statement.setString(3, section_input);
-                            statement.setString(4, String.valueOf(finalGrade));
-                            int rows = statement.executeUpdate(); 
-                            if (rows > 0) {
-                                JOptionPane.showMessageDialog(null, "Grade computed and updated successfully!\nFinal Grade: " + finalGrade, "Success", JOptionPane.INFORMATION_MESSAGE);
-                                new InstructorDashboard(roll_no);
-                                f.dispose();
-                            } else {
-                                JOptionPane.showMessageDialog(null, "Failed to update grade.", "Error", JOptionPane.ERROR_MESSAGE);
-                            }
-                        }
-                    } catch (SQLException ex) {
-                        JOptionPane.showMessageDialog(null, "Database Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                        ex.printStackTrace();
-                    }
-                } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(null, "Marks must be numbers only.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                    rows = ErpCommandRunner.instructorGradeComputeHelper(quizMarks.getText().trim(), midsemField.getText().trim(), endsemField.getText().trim(), userRollno_input, courseCode_input, section_input);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "Error: ", "Error", JOptionPane.ERROR_MESSAGE);
                 }
+                if (rows > 0) {
+                    JOptionPane.showMessageDialog(null, "Grade computed and updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    new InstructorDashboard(username, role, password, roll_no);
+                    f.dispose();
+                }   
             }
         });
         
         backButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new InstructorDashboard(roll_no);
+                new InstructorDashboard(username, role, password, roll_no);
                 f.dispose();
             }
         });
     }
 
-    private char computeGrade(String quizMarks, String midsemMarks, String endsemMarks) throws NumberFormatException {
-        int quiz = Integer.parseInt(quizMarks);
-        int midsem = Integer.parseInt(midsemMarks); 
-        int endsem = Integer.parseInt(endsemMarks);
-
-        if (quiz > 10 || midsem > 10 || endsem > 10) {
-            throw new NumberFormatException("Marks cannot exceed 10");
-        }
-
-        int finalGrade = (int)(0.2 * quiz + 0.3 * midsem + 0.5 * endsem); 
-        
-        if (finalGrade >= 8) {
-            return 'A';
-        } else if (finalGrade >= 6) {
-            return 'B';
-        } else if (finalGrade >= 4) {
-            return 'C';
-        } else {
-            return 'F';
-        }
-    }
+    
 }

@@ -65,7 +65,7 @@ public class assignIns {
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         JLabel l1 = new JLabel("Course Code:");
-        l1.setFont(gFont.deriveFont(Font.BOLD, 24));
+        l1.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l1.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
@@ -78,7 +78,7 @@ public class assignIns {
         p2.add(t1, gbc);
 
         JLabel l2 = new JLabel("Section:");
-        l2.setFont(gFont.deriveFont(Font.BOLD, 24));
+        l2.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l2.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
@@ -91,7 +91,7 @@ public class assignIns {
         p2.add(t2, gbc);
 
         JLabel l3 = new JLabel("Instructor ID:");
-        l3.setFont(gFont.deriveFont(Font.BOLD, 24));
+        l3.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l3.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 2; gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
@@ -154,6 +154,7 @@ public class assignIns {
                         int rowsAffected = statement.executeUpdate();
                         if (rowsAffected > 0) {
                             System.out.println("Added instructor successfully in Auth..");
+                            JOptionPane.showMessageDialog(null, "Added instructor successfully in Auth..", "Success", JOptionPane.ERROR_MESSAGE);
                         } else {
                             JOptionPane.showMessageDialog(null, "Failed to add instructor!", "Error", JOptionPane.ERROR_MESSAGE);
                             System.out.println("Failed to add instructor in Auth");
