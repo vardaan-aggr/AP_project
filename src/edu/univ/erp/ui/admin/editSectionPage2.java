@@ -42,7 +42,7 @@ public class editSectionPage2 {
 
         JFrame f = new JFrame("Edit Section Details");
         // Increased height to fit 8 fields comfortably
-        f.setSize(800, 650); 
+        f.setSize(800, 600); 
         f.setLayout(new BorderLayout());
 
         // ---- TOP ----
@@ -69,63 +69,63 @@ public class editSectionPage2 {
 
         // Row 0: Course Code (Read Only)
         addLabel(p2, gFont, "Course Code:", 0, gbc);
-        JTextField t1 = addField(p2, gFont, 0, gbc);
-        t1.setText(arrgs[0]);
-        t1.setEditable(false);
+        JTextField tCourseCode = addField(p2, gFont, 0, gbc);
+        tCourseCode.setText(arrgs[0]);
+        tCourseCode.setEditable(false);
 
         // Row 1: Section (Read Only)
         addLabel(p2, gFont, "Section:", 1, gbc);
-        JTextField t2 = addField(p2, gFont, 1, gbc);
-        t2.setText(arrgs[1]);
-        t2.setEditable(false);
+        JTextField tSection = addField(p2, gFont, 1, gbc);
+        tSection.setText(arrgs[1]);
+        tSection.setEditable(false);
 
         // Row 2: Instructor Roll
         addLabel(p2, gFont, "Instructor Roll No:", 2, gbc);
-        JTextField t3 = addField(p2, gFont, 2, gbc);
-        t3.setText(arrgs[2]);
+        JTextField tInsRollNo = addField(p2, gFont, 2, gbc);
+        tInsRollNo.setText(arrgs[2]);
 
         // Row 3: Day & Time
         addLabel(p2, gFont, "Day & Time:", 3, gbc);
-        JTextField t4 = addField(p2, gFont, 3, gbc);
-        t4.setText(arrgs[3]);
+        JTextField tDayTime = addField(p2, gFont, 3, gbc);
+        tDayTime.setText(arrgs[3]);
 
         // Row 4: Room No
         addLabel(p2, gFont, "Room No:", 4, gbc);
-        JTextField t5 = addField(p2, gFont, 4, gbc);
-        t5.setText(arrgs[4]);
+        JTextField tRoom = addField(p2, gFont, 4, gbc);
+        tRoom.setText(arrgs[4]);
 
         // Row 5: Capacity
         addLabel(p2, gFont, "Capacity:", 5, gbc);
-        JTextField t6 = addField(p2, gFont, 5, gbc);
-        t6.setText(arrgs[5]);
+        JTextField tCapacity = addField(p2, gFont, 5, gbc);
+        tCapacity.setText(arrgs[5]);
 
         // Row 6: Semester
         addLabel(p2, gFont, "Semester:", 6, gbc);
-        JTextField t7 = addField(p2, gFont, 6, gbc);
-        t7.setText(arrgs[6]);
+        JTextField tSemester = addField(p2, gFont, 6, gbc);
+        tSemester.setText(arrgs[6]);
 
         // Row 7: Year
         addLabel(p2, gFont, "Year:", 7, gbc);
-        JTextField t8 = addField(p2, gFont, 7, gbc);
-        t8.setText(arrgs[7]);
+        JTextField tYear = addField(p2, gFont, 7, gbc);
+        tYear.setText(arrgs[7]);
 
         // --- BUTTONS ---
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
         buttonPanel.setOpaque(false);
 
-        JButton assignButton = new JButton("Save Changes"); 
-        assignButton.setBackground(Color.decode("#2f77b1")); 
-        assignButton.setForeground(Color.WHITE); 
-        assignButton.setFont(breatheFont.deriveFont(Font.PLAIN, 30));
-        assignButton.setMargin(new Insets(5, 20, 5, 20));
-        buttonPanel.add(assignButton);
+        JButton bAssign = new JButton("Save Changes"); 
+        bAssign.setBackground(Color.decode("#2f77b1")); 
+        bAssign.setForeground(Color.WHITE); 
+        bAssign.setFont(breatheFont.deriveFont(Font.PLAIN, 30));
+        bAssign.setMargin(new Insets(5, 20, 5, 20));
+        buttonPanel.add(bAssign);
         
-        JButton backButton = new JButton("Back"); 
-        backButton.setBackground(Color.decode("#2f77b1")); 
-        backButton.setForeground(Color.WHITE); 
-        backButton.setFont(breatheFont.deriveFont(Font.PLAIN, 30));
-        backButton.setMargin(new Insets(5, 20, 5, 20));
-        buttonPanel.add(backButton);
+        JButton bBack = new JButton("Back"); 
+        bBack.setBackground(Color.decode("#2f77b1")); 
+        bBack.setForeground(Color.WHITE); 
+        bBack.setFont(breatheFont.deriveFont(Font.PLAIN, 30));
+        bBack.setMargin(new Insets(5, 20, 5, 20));
+        buttonPanel.add(bBack);
 
         // Place buttons
         gbc.gridx = 0; gbc.gridy = 8; 
@@ -142,15 +142,14 @@ public class editSectionPage2 {
         f.setVisible(true);
 
         // --- Action Listeners ---
-        assignButton.addActionListener(new ActionListener() {
+        bAssign.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 int rowsUpdated = -1;
                 try {
-                    rowsUpdated = ErpCommandRunner.sectionUpdater(t3.getText().trim(), t4.getText().trim(), t5.getText().trim(), t6.getText().trim(), t7.getText().trim(), t8.getText().trim(), t1.getText().trim(), t2.getText().trim());
+                    rowsUpdated = ErpCommandRunner.sectionUpdater(tInsRollNo.getText().trim(), tDayTime.getText().trim(), tRoom.getText().trim(), tCapacity.getText().trim(), tSemester.getText().trim(), tYear.getText().trim(), tCourseCode.getText().trim(), tSection.getText().trim());
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                     JOptionPane.showMessageDialog(null, "Error: Couldn't update course: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
-                    System.out.println("Error: Couldn't update course." + ex);
                 }
                 if (rowsUpdated == 0) {
                     JOptionPane.showMessageDialog(null, "Error: Course code and Section dont match.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -171,18 +170,18 @@ public class editSectionPage2 {
                         """)) {
                     
                     // Set the new values
-                    statement.setString(1, t3.getText().trim()); // roll_no
-                    statement.setString(2, t4.getText().trim()); // day_time
-                    statement.setString(3, t5.getText().trim()); // room
-                    statement.setString(4, t6.getText().trim()); // capacity
-                    statement.setString(5, t7.getText().trim()); // semester
-                    statement.setString(6, t8.getText().trim()); // year
+                    statement.setString(1, tInsRollNo.getText().trim()); // roll_no
+                    statement.setString(2, tDayTime.getText().trim()); // day_time
+                    statement.setString(3, tRoom.getText().trim()); // room
+                    statement.setString(4, tCapacity.getText().trim()); // capacity
+                    statement.setString(5, tSemester.getText().trim()); // semester
+                    statement.setString(6, tYear.getText().trim()); // year
 
                     // Use the original course_code and section from the text fields for the WHERE clause
-                    // Note: It's better to make t1 (course_code) and t2 (section) non-editable
+                    // Note: It's better to make tCourseCode (course_code) and tSection (section) non-editable
                     // to prevent users from changing the primary key during an edit.
-                    statement.setString(7, t1.getText().trim()); // WHERE course_code
-                    statement.setString(8, t2.getText().trim()); // WHERE section
+                    statement.setString(7, tCourseCode.getText().trim()); // WHERE course_code
+                    statement.setString(8, tSection.getText().trim()); // WHERE section
 
                     rowsUpdated = statement.executeUpdate();
                     if (rowsUpdated == 0) {
@@ -202,7 +201,7 @@ public class editSectionPage2 {
             }   
         });
 
-        backButton.addActionListener(new ActionListener() {
+        bBack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Going back to Admin Dashboard..");
                 new adminDashboard(roll_no);

@@ -72,13 +72,13 @@ public class editCoursePage2 {
         gbc.anchor = GridBagConstraints.EAST;
         p2.add(l1, gbc);
 
-        JTextField t1 = new JTextField(20);
-        t1.setFont(gFont.deriveFont(Font.PLAIN, 21));
-        t1.setText(arrgs[0]); // Pre-fill
-        t1.setEditable(false); // Read-only
+        JTextField tCourseCode = new JTextField(20);
+        tCourseCode.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        tCourseCode.setText(arrgs[0]); // Pre-fill
+        tCourseCode.setEditable(false); // Read-only
         gbc.gridx = 1; gbc.gridy = 0; gbc.weightx = 1;
         gbc.anchor = GridBagConstraints.WEST;
-        p2.add(t1, gbc);
+        p2.add(tCourseCode, gbc);
 
         // Row 1: Section (Non-Editable)
         JLabel l2 = new JLabel("Section:");
@@ -88,13 +88,13 @@ public class editCoursePage2 {
         gbc.anchor = GridBagConstraints.EAST;
         p2.add(l2, gbc);
 
-        JTextField t2 = new JTextField(20);
-        t2.setFont(gFont.deriveFont(Font.PLAIN, 21));
-        t2.setText(arrgs[2]); // Pre-fill
-        t2.setEditable(false); // Read-only
+        JTextField tSection = new JTextField(20);
+        tSection.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        tSection.setText(arrgs[2]); // Pre-fill
+        tSection.setEditable(false); // Read-only
         gbc.gridx = 1; gbc.gridy = 1; gbc.weightx = 1;
         gbc.anchor = GridBagConstraints.WEST;
-        p2.add(t2, gbc);
+        p2.add(tSection, gbc);
 
         // Row 2: Title (Editable)
         JLabel l3 = new JLabel("Title:");
@@ -104,12 +104,12 @@ public class editCoursePage2 {
         gbc.anchor = GridBagConstraints.EAST;
         p2.add(l3, gbc);
 
-        JTextField t3 = new JTextField(20);
-        t3.setFont(gFont.deriveFont(Font.PLAIN, 21));
-        t3.setText(arrgs[1]); // Pre-fill
+        JTextField tTitle = new JTextField(20);
+        tTitle.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        tTitle.setText(arrgs[1]); // Pre-fill
         gbc.gridx = 1; gbc.gridy = 2; gbc.weightx = 1;
         gbc.anchor = GridBagConstraints.WEST;
-        p2.add(t3, gbc);
+        p2.add(tTitle, gbc);
 
         // Row 3: Credits (Editable)
         JLabel l4 = new JLabel("Credits:");
@@ -119,30 +119,30 @@ public class editCoursePage2 {
         gbc.anchor = GridBagConstraints.EAST;
         p2.add(l4, gbc);
 
-        JTextField t4 = new JTextField(20);
-        t4.setFont(gFont.deriveFont(Font.PLAIN, 21));
-        t4.setText(arrgs[3]); // Pre-fill
+        JTextField tCredits = new JTextField(20);
+        tCredits.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        tCredits.setText(arrgs[3]); // Pre-fill
         gbc.gridx = 1; gbc.gridy = 3; gbc.weightx = 1;
         gbc.anchor = GridBagConstraints.WEST;
-        p2.add(t4, gbc);
+        p2.add(tCredits, gbc);
 
         // --- BUTTONS ---
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
         buttonPanel.setOpaque(false);
 
-        JButton assignButton = new JButton("Save"); 
-        assignButton.setBackground(Color.decode("#2f77b1")); 
-        assignButton.setForeground(Color.WHITE); 
-        assignButton.setFont(breatheFont.deriveFont(Font.PLAIN, 35));
-        assignButton.setMargin(new Insets(10, 30, 5, 30));
-        buttonPanel.add(assignButton);
+        JButton bAssign = new JButton("Save"); 
+        bAssign.setBackground(Color.decode("#2f77b1")); 
+        bAssign.setForeground(Color.WHITE); 
+        bAssign.setFont(breatheFont.deriveFont(Font.PLAIN, 35));
+        bAssign.setMargin(new Insets(10, 30, 5, 30));
+        buttonPanel.add(bAssign);
 
-        JButton backButton = new JButton("Back");
-        backButton.setBackground(Color.decode("#2f77b1")); 
-        backButton.setForeground(Color.WHITE); 
-        backButton.setFont(breatheFont.deriveFont(Font.PLAIN, 35));
-        backButton.setMargin(new Insets(10, 30, 5, 30));
-        buttonPanel.add(backButton);
+        JButton bBack = new JButton("Back");
+        bBack.setBackground(Color.decode("#2f77b1")); 
+        bBack.setForeground(Color.WHITE); 
+        bBack.setFont(breatheFont.deriveFont(Font.PLAIN, 35));
+        bBack.setMargin(new Insets(10, 30, 5, 30));
+        buttonPanel.add(bBack);
 
         // Place buttons
         gbc.gridx = 0; gbc.gridy = 4; 
@@ -159,11 +159,11 @@ public class editCoursePage2 {
         f.setVisible(true);
 
         // --- Action Listeners ---
-        assignButton.addActionListener(new ActionListener() {
+        bAssign.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 int rowsUpdated = -1;
                 try {
-                    rowsUpdated = ErpCommandRunner.courseUpdater(t3.getText().trim(), t4.getText().trim(), t1.getText().trim(), t2.getText().trim());
+                    rowsUpdated = ErpCommandRunner.courseUpdater(tTitle.getText().trim(), tCredits.getText().trim(), tCourseCode.getText().trim(), tSection.getText().trim());
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                     JOptionPane.showMessageDialog(null, "Error: Couldn't update course: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
@@ -181,7 +181,7 @@ public class editCoursePage2 {
             }
         });
 
-        backButton.addActionListener(new ActionListener() {
+        bBack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Going back to Admin Dashboard..");
                 new adminDashboard(roll_no);

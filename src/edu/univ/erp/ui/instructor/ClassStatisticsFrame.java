@@ -91,12 +91,12 @@ public class ClassStatisticsFrame {
         seeStats.setMargin(new Insets(10, 30, 5, 30));
         p3.add(seeStats);
 
-        JButton backButton = new JButton("Back");
-        backButton.setBackground(Color.decode("#2f77b1"));
-        backButton.setForeground(Color.WHITE);
-        backButton.setFont(breatheFont.deriveFont(Font.PLAIN, 35f));
-        backButton.setMargin(new Insets(10, 30, 5, 30));
-        p3.add(backButton);
+        JButton bBack = new JButton("Back");
+        bBack.setBackground(Color.decode("#2f77b1"));
+        bBack.setForeground(Color.WHITE);
+        bBack.setFont(breatheFont.deriveFont(Font.PLAIN, 35f));
+        bBack.setMargin(new Insets(10, 30, 5, 30));
+        p3.add(bBack);
 
         f.add(p3, BorderLayout.SOUTH);
         f.setVisible(true);
@@ -104,20 +104,22 @@ public class ClassStatisticsFrame {
         // --- Action Listeners ---
         seeStats.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String courseCode_input = code.getText().trim();
-                String section_input = sectionField.getText().trim();
+                String courseCode_in = code.getText().trim();
+                String section_in = sectionField.getText().trim();
                 
-                if(courseCode_input.isEmpty() || section_input.isEmpty()) {
+                if(courseCode_in.isEmpty() || section_in.isEmpty()) {
                     JOptionPane.showMessageDialog(null, "Please enter both Course Code and Section.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
-                double stats = computeStats(courseCode_input, section_input);                
-                JOptionPane.showMessageDialog(null, "Average CGPA for " + courseCode_input + " (" + section_input + ") = " + String.format("%.2f", stats), "Statistics", JOptionPane.INFORMATION_MESSAGE);
+                double stats = computeStats(courseCode_in, section_in);
+                if (stats != 0.0) {
+                    JOptionPane.showMessageDialog(null, "Average CGPA for " + courseCode_in + " (" + section_in + ") = " + String.format("%.2f", stats), "Statistics", JOptionPane.INFORMATION_MESSAGE);
+                }      
             }
         });
 
-        backButton.addActionListener(new ActionListener() {
+        bBack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("\tGoing back to Instructor Dashboard..");
                 new InstructorDashboard(username, role, password, roll_no);
@@ -140,7 +142,7 @@ public class ClassStatisticsFrame {
     
     private double computeStats(String courseCode, String section) {
         String[] grades = gradesArr(courseCode, section);
-        if (grades.length == 0) return 0.0;
+        if (grades == null || grades.length == 0) { return 0.0; }
         int totalPoints = 0;
         for (String grade : grades) {
             switch (grade.toUpperCase()) {

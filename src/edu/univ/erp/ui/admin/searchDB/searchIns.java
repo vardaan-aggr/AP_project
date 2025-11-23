@@ -18,6 +18,7 @@ import java.awt.Insets;
 
 import edu.univ.erp.data.AuthCommandRunner;
 import edu.univ.erp.data.ErpCommandRunner;
+import edu.univ.erp.domain.Instructor;
 import edu.univ.erp.ui.admin.adminDashboard;
 import edu.univ.erp.util.BREATHEFONT;
 
@@ -107,15 +108,20 @@ public class searchIns {
     }
 
     private String[][] dataPull() {
-        ArrayList<String[]> arrList = new ArrayList<>();
+        ArrayList<Instructor> insList = new ArrayList<>();
         try {
-            arrList = AuthCommandRunner.searchInstructorAuth();
-            arrList = ErpCommandRunner.searchInstructorErp(arrList);
+            insList = AuthCommandRunner.searchInstructorAuth();
+            insList = ErpCommandRunner.searchInstructorErp(insList);
         } catch (SQLException e) {
             return null;
         }
-        String[][] strArr = new String[arrList.size()][4];
-        arrList.toArray(strArr);
+        String[][] strArr = new String[insList.size()][4];
+        for(int i = 0; i < insList.size(); i++) {
+            Instructor ins = insList.get(i);
+            strArr[i][0] = ins.getRollNo();
+            strArr[i][1] = ins.getUsername();
+            strArr[i][2] = ins.getDepartment();
+        } 
         return strArr;
     }
 

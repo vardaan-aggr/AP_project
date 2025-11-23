@@ -49,6 +49,12 @@ public class gradeFrame {
 
         try {
             String data[][] = ErpCommandRunner.studentGradeHelper(roll_no); 
+            if (data == null) {
+                System.out.println("\tGoing back to Student Dashboard..");
+                new studentDashboard(username, role, in_pass, roll_no);
+                f.dispose();
+                return;
+            }
             String columName[] = {"Course code", "Grade"};
             JTable t = new JTable(data, columName);
 

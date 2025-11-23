@@ -127,7 +127,7 @@ public class BackupRestorePage {
                     }
 
                     if (performRestore(fixedPath)) {
-                        JOptionPane.showMessageDialog(f, "Restore Success!\nPlease restart the app.");
+                        JOptionPane.showMessageDialog(f, "Restore Success!\n");
                     } else {
                         JOptionPane.showMessageDialog(f, "Restore Failed.\nCheck console for errors.");
                     }

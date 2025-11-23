@@ -60,10 +60,10 @@ public class dropCourseFrame {
         gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
         p2.add(l1, gbc);
 
-        JTextField t1 = new JTextField(20);
-        t1.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        JTextField tCourseCode = new JTextField(20);
+        tCourseCode.setFont(gFont.deriveFont(Font.PLAIN, 21));
         gbc.gridx = 1; gbc.gridy = 0; gbc.weightx = 1;
-        p2.add(t1, gbc);
+        p2.add(tCourseCode, gbc);
 
         f.add(p2, BorderLayout.CENTER);
 
@@ -72,21 +72,21 @@ public class dropCourseFrame {
         p3.setBackground(Color.decode("#dbd3c5"));
         p3.setBorder(BorderFactory.createEmptyBorder(0, 0, 50, 0));
   
-        JButton b1 = new JButton("Drop");
-        b1.setBackground(Color.decode("#2f77b1")); 
-        b1.setForeground(Color.WHITE); 
-        b1.setFont(breatheFont.deriveFont(Font.PLAIN, 35));
-        b1.setMargin(new Insets(10, 30, 5, 30));
-        p3.add(b1);
+        JButton bDrop = new JButton("Drop");
+        bDrop.setBackground(Color.decode("#2f77b1")); 
+        bDrop.setForeground(Color.WHITE); 
+        bDrop.setFont(breatheFont.deriveFont(Font.PLAIN, 35));
+        bDrop.setMargin(new Insets(10, 30, 5, 30));
+        p3.add(bDrop);
 
         p3.add(Box.createHorizontalStrut(20));
 
-        JButton b2 = new JButton("Back");
-        b2.setBackground(Color.decode("#2f77b1")); 
-        b2.setForeground(Color.WHITE); 
-        b2.setFont(breatheFont.deriveFont(Font.PLAIN, 35));
-        b2.setMargin(new Insets(10, 30, 5, 30));
-        p3.add(b2);
+        JButton bBack = new JButton("Back");
+        bBack.setBackground(Color.decode("#2f77b1")); 
+        bBack.setForeground(Color.WHITE); 
+        bBack.setFont(breatheFont.deriveFont(Font.PLAIN, 35));
+        bBack.setMargin(new Insets(10, 30, 5, 30));
+        p3.add(bBack);
 
         f.add(p3, BorderLayout.SOUTH);
 
@@ -96,27 +96,22 @@ public class dropCourseFrame {
 
 
         // --- Action Listeners ---
-        b1.addActionListener(new ActionListener() {
+        bDrop.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                try {
-                    int rowsDeleted = ErpCommandRunner.studentDropCourseHelper(roll_no, t1.getText().trim());
-                    if (rowsDeleted == 0) {
-                        JOptionPane.showMessageDialog(null, "Error: Couldn't Drop in database.", "Error", JOptionPane.ERROR_MESSAGE);
-                        System.out.println("Error: Couldn't Drop in database.");
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Course dropped successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
-                        System.out.println("Course droped successfully.");
-                    }
-                } catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(null, "Error Droping: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
-                    ex.printStackTrace();
+                int rowsDeleted = ErpCommandRunner.studentDropCourseHelper(roll_no, tCourseCode.getText().trim());
+                if (rowsDeleted == 0) {
+                    JOptionPane.showMessageDialog(null, "Error: Not enrolled in given course.", "Error", JOptionPane.ERROR_MESSAGE);
+                    System.out.println("Error: Not enrolled in given course.");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Course dropped successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    System.out.println("Course droped successfully.");
                 }
                 new studentDashboard(username, role, in_pass, roll_no);
                 f.dispose();
             }
         });
 
-        b2.addActionListener(new ActionListener() {
+        bBack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("\tGoing back to Student Dashboard..");
                 new studentDashboard(username, role, in_pass, roll_no);

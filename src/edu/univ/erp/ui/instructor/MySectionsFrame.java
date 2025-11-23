@@ -16,6 +16,7 @@ import java.awt.event.ActionListener;
 import java.sql.SQLException;
 
 import edu.univ.erp.data.ErpCommandRunner;
+import edu.univ.erp.ui.student.studentDashboard;
 import edu.univ.erp.util.BREATHEFONT;
 
 public class MySectionsFrame {
@@ -55,6 +56,12 @@ public class MySectionsFrame {
 
         try {
             String data[][] = ErpCommandRunner.instructorMySectionsHelper(roll_no);
+            if (data == null) {
+                System.out.println("\tGoing back to Student Dashboard..");
+                new InstructorDashboard(username, role, password, roll_no);
+                f.dispose();
+                return;
+            }
             String columName[] = {"Course Code"};
             
             JTable t = new JTable(data, columName);
@@ -84,7 +91,6 @@ public class MySectionsFrame {
             System.out.println("Error getting your sections: " + ex);
             ex.printStackTrace();
         }
-        
 
         // ---- LOWS ----
         JPanel p3 = new JPanel(new FlowLayout(FlowLayout.RIGHT, 30, 20));
