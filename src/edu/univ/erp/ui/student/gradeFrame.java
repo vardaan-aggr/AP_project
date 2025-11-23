@@ -1,7 +1,8 @@
 package edu.univ.erp.ui.student;
 
 import edu.univ.erp.util.BREATHEFONT;
-import edu.univ.erp.data.ErpCommandRunner;
+import edu.univ.erp.service.StudentService;
+
 import java.sql.SQLException;
 
 import com.formdev.flatlaf.FlatLightLaf;
@@ -48,13 +49,20 @@ public class gradeFrame {
         p2.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
 
         try {
-            String data[][] = ErpCommandRunner.studentGradeHelper(roll_no); 
-            if (data == null) {
+            StudentService service = new StudentService();
+            String data[][] = service.gradeData(roll_no); 
+
+            if (data == null || data.length == 0) {
+                
+                JOptionPane.showMessageDialog(null, "Error: no courses in grade table", "Error", JOptionPane.ERROR_MESSAGE);
+                System.out.println("\t (no courses in grade table)");
                 System.out.println("\tGoing back to Student Dashboard..");
+
                 new studentDashboard(username, role, in_pass, roll_no);
                 f.dispose();
                 return;
             }
+
             String columName[] = {"Course code", "Grade"};
             JTable t = new JTable(data, columName);
 
