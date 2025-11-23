@@ -9,7 +9,9 @@ import java.util.Map;
 import javax.swing.*;
 import org.mindrot.jbcrypt.BCrypt;
 import com.formdev.flatlaf.FlatLightLaf;
-
+import edu.univ.erp.service.LoginService;
+import edu.univ.erp.service.LoginService.LoginStatus;
+import edu.univ.erp.service.LoginService.ServiceLoginResult;
 import edu.univ.erp.data.AuthCommandRunner.loginResult;
 import edu.univ.erp.ui.student.studentDashboard;
 import edu.univ.erp.ui.admin.adminDashboard;
@@ -26,28 +28,8 @@ import java.awt.Insets;
 
 public class loginPage {
     
-    private static class LoginAttemptInfo {
-        int failedAttemptCount = 0;
-        long lastFailedAttemptTimestamp = 0; // in milliseconds
-        int lifeUsed = 0;
-
-        public void increment() {
-            lifeUsed++;
-            failedAttemptCount++;
-            lastFailedAttemptTimestamp = System.currentTimeMillis();
-        }
-
-        public void reset() {
-            failedAttemptCount = 0;
-            lastFailedAttemptTimestamp = 0;
-        }
-    }
-
-    private static final Map<String, LoginAttemptInfo> loginAttempts = new HashMap<>();
-    private static final int MAX_ATTEMPTS = 5;
-    private static final long LOCKOUT_TIME_MS = 30000; // 30 seconds (30000 ms)
-
     private static String roll_no = "";
+    private final LoginService loginService = new LoginService();
 
     public loginPage() {
         Font breatheFont = BREATHEFONT.fontGen();
@@ -149,76 +131,54 @@ public class loginPage {
             public void actionPerformed(ActionEvent e) {
                 String username_in = t1.getText().trim();
                 String password_in = new String(t2.getPassword());
-                loginResult lr = new loginResult();
-                try {
-                    lr = AuthCommandRunner.fetchUser(username_in);
-                    if(lr == null) {
-                        System.out.println("\t (no data for given username found)");
-                        JOptionPane.showMessageDialog(null, "Username not found.", "Error", JOptionPane.ERROR_MESSAGE);
-                    }
-                    else {
-                        if (BCrypt.checkpw(password_in, lr.hashPass)) {
-                            System.out.println("\nCorrect Password");
-                            if (lr.role.equals("student")) {
-                                new studentDashboard(username_in, lr.role, password_in, roll_no);
-                                System.out.println("\tOpening Student Dashboard..");
-                                f.dispose();
-                                return;
-                            }
-                            else if (lr.role.equals("instructor")) {
-                                new InstructorDashboard(username_in, lr.role, password_in, roll_no);
-                                System.out.println("\tOpening Instructor Dashboard");
-                                f.dispose();
-                                return;
-                            }
-                            else if (lr.role.equals("admin")) {
-                                new adminDashboard(roll_no);
-                                System.out.println("\tOpening Admin Dashboard");
-                                f.dispose();
-                                return;
-                            }
-                        } else {
-                            JOptionPane.showMessageDialog(null, "Wrong Password sorry", "Error", JOptionPane.ERROR_MESSAGE);
-                            System.out.println("WrongPassword");
-                        }
-                    }
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(f, "Database error during login.", "Error", JOptionPane.ERROR_MESSAGE);
-                    return; 
-                }
 
-                // 3. Handle login outcome
-                if (loginSuccessful) {
+                // 1. Call the new Service layer
+                ServiceLoginResult result = loginService.attemptLogin(username_in, password_in);
+
+                // 2. Handle the result from the Service
+                if (result.status == LoginStatus.SUCCESS) {
                     System.out.println("\nCorrect Password");
-                    // Reset failed attempts on success
-                    loginAttempts.remove(username_input);
-                    roll_no = retrieved_roll_no; // Update static roll_no member
+                    roll_no = result.userDetails.rollNo; // Update static roll_no member
 
-                    if (role_db.equals("student")) {
-                        new studentDashboard(username_input, role_db, password_input, roll_no);
+                    if (result.userDetails.role.equals("student")) {
+                        new studentDashboard(username_in, result.userDetails.role, password_in, roll_no);
                         System.out.println("\tOpening Student Dashboard..");
                     }
-                    else if (role_db.equals("instructor")) {
-                        new InstructorDashboard(roll_no);
+                    else if (result.userDetails.role.equals("instructor")) {
+                        new InstructorDashboard(username_in, result.userDetails.role, password_in, roll_no);
                         System.out.println("\tOpening Instructor Dashboard");
                     }
-                    else if (role_db.equals("admin")) {
+                    else if (result.userDetails.role.equals("admin")) {
                         new adminDashboard(roll_no);
                         System.out.println("\tOpening Admin Dashboard");
                     }
                     f.dispose();
-                } else {
-                    // Update failed attempts on wrong password or user not found
-                    attemptInfo.increment();
+
+                }  else if (result.status == LoginStatus.ACCOUNT_LOCKED) {
+                    long currentTime = System.currentTimeMillis();
+                    long endsTime = result.lockoutEndsTimestamp;
+                    long timeLeftMs = endsTime - currentTime;
                     
-                    String message = "Invalid username or password.";
-                    if (attemptInfo.failedAttemptCount >= MAX_ATTEMPTS) {
-                         message += "\nToo many failed attempts. Account locked for 30 seconds.";
+                    // Convert ms to seconds, rounding up to ensure the user sees at least 1 second
+                    long timeLeftSeconds = Math.max(0, (timeLeftMs / 1000) + 1); 
+                    
+                    String message;
+                    if (timeLeftSeconds > 0) {
+                        message = String.format("Account locked due to too many failed attempts. Please try again in approximately %d seconds.", timeLeftSeconds);
+                    } else {
+                        // Edge case: Lockout just expired, but the service still returned ACCOUNT_LOCKED
+                        message = "Account lock expired. You may try logging in again now.";
                     }
 
-                    JOptionPane.showMessageDialog(f, message, "Login Failed", JOptionPane.ERROR_MESSAGE);
-                    System.out.println("WrongPassword. Failed attempts for " + username_input + ": " + attemptInfo.failedAttemptCount);
+                    JOptionPane.showMessageDialog(f,
+                        message,
+                        "Login Locked", JOptionPane.ERROR_MESSAGE);
+
+                } else if (result.status == LoginStatus.INVALID_CREDENTIALS)  {
+                    JOptionPane.showMessageDialog(f, "Invalid username or password.", "Login Failed", JOptionPane.ERROR_MESSAGE);
+
+                } else if (result.status == LoginStatus.DATABASE_ERROR) {
+                    JOptionPane.showMessageDialog(f, "Database error during login. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
