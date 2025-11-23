@@ -70,7 +70,7 @@ public class adminDashboard {
         p2.add(b2, gbc);
 
         gbc.gridx = 0; gbc.gridy = 1;
-        JButton b3 = new JButton("Assign Instructor");
+        JButton b3 = new JButton("Unassign Instructor");
         styleButton(b3, btnBg, btnFg, btnFont, buttonSize, btnMargin);
         p2.add(b3, gbc);
 
@@ -130,7 +130,7 @@ public class adminDashboard {
         b3.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Opening assign instructor interface..");
-                new assignIns(rollNo);
+                new unassignIns(rollNo);
                 f.dispose();
             }
         });

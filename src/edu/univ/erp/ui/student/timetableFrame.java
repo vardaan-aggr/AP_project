@@ -1,5 +1,6 @@
 package edu.univ.erp.ui.student;
 import edu.univ.erp.data.ErpCommandRunner;
+import edu.univ.erp.ui.admin.adminDashboard;
 
 import java.sql.SQLException;
 
@@ -52,6 +53,12 @@ public class timetableFrame {
 
         try {
             String data[][] = ErpCommandRunner.studentTimeTableHelper(roll_no);
+            if (data == null) {
+                System.out.println("\tGoing back to Student Dashboard..");
+                new studentDashboard(username, role, in_pass, roll_no);
+                f.dispose();
+                return;
+            }
             String columName[] = {"Code", "Day_Time", "Room"};
             
             JTable t = new JTable(data, columName);

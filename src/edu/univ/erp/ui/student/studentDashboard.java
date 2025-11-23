@@ -55,75 +55,75 @@ public class studentDashboard {
 
         // Register
         gbc.gridx = 0; gbc.gridy = 0;
-        JButton b1 = new JButton("Register");
-        b1.setPreferredSize(buttonSize);
-        b1.setMargin(new Insets(10, 30, 5, 30));
-        b1.setBackground(Color.decode("#2f77b1")); 
-        b1.setForeground(Color.WHITE); 
-        b1.setFont(gFont.deriveFont(Font.PLAIN, 21f));
-        p2.add(b1, gbc);
+        JButton bRegister = new JButton("Register");
+        bRegister.setPreferredSize(buttonSize);
+        bRegister.setMargin(new Insets(10, 30, 5, 30));
+        bRegister.setBackground(Color.decode("#2f77b1")); 
+        bRegister.setForeground(Color.WHITE); 
+        bRegister.setFont(gFont.deriveFont(Font.PLAIN, 21f));
+        p2.add(bRegister, gbc);
 
         // My timetable
         gbc.gridx = 1; gbc.gridy = 0;
-        JButton b2 = new JButton("My Time Table");
-        b2.setPreferredSize(buttonSize);
-        b2.setMargin(new Insets(10, 30, 5, 30));
-        b2.setBackground(Color.decode("#2f77b1")); 
-        b2.setForeground(Color.WHITE); 
-        b2.setFont(gFont.deriveFont(Font.PLAIN, 21f));
-        p2.add(b2, gbc);
+        JButton bTimetable = new JButton("My Time Table");
+        bTimetable.setPreferredSize(buttonSize);
+        bTimetable.setMargin(new Insets(10, 30, 5, 30));
+        bTimetable.setBackground(Color.decode("#2f77b1")); 
+        bTimetable.setForeground(Color.WHITE); 
+        bTimetable.setFont(gFont.deriveFont(Font.PLAIN, 21f));
+        p2.add(bTimetable, gbc);
 
         // My Grades
         gbc.gridx = 0; gbc.gridy = 1;
-        JButton b3 = new JButton("My Grades");
-        b3.setPreferredSize(buttonSize);
-        b3.setMargin(new Insets(10, 30, 5, 30));
-        b3.setBackground(Color.decode("#2f77b1")); 
-        b3.setForeground(Color.WHITE); 
-        b3.setFont(gFont.deriveFont(Font.PLAIN, 21f));
-        p2.add(b3, gbc);
+        JButton bGrades = new JButton("My Grades");
+        bGrades.setPreferredSize(buttonSize);
+        bGrades.setMargin(new Insets(10, 30, 5, 30));
+        bGrades.setBackground(Color.decode("#2f77b1")); 
+        bGrades.setForeground(Color.WHITE); 
+        bGrades.setFont(gFont.deriveFont(Font.PLAIN, 21f));
+        p2.add(bGrades, gbc);
 
         // Download transcript
         gbc.gridx = 1; gbc.gridy = 1;
-        JButton b4 = new JButton("Download Transcript");
-        b4.setPreferredSize(buttonSize);
-        b4.setMargin(new Insets(10, 30, 5, 30));
-        b4.setBackground(Color.decode("#2f77b1")); 
-        b4.setForeground(Color.WHITE); 
-        b4.setFont(gFont.deriveFont(Font.PLAIN, 21f));
-        p2.add(b4, gbc);
+        JButton bTranscript = new JButton("Download Transcript");
+        bTranscript.setPreferredSize(buttonSize);
+        bTranscript.setMargin(new Insets(10, 30, 5, 30));
+        bTranscript.setBackground(Color.decode("#2f77b1")); 
+        bTranscript.setForeground(Color.WHITE); 
+        bTranscript.setFont(gFont.deriveFont(Font.PLAIN, 21f));
+        p2.add(bTranscript, gbc);
 
         // Catalog
         gbc.gridx = 0; gbc.gridy = 2;
-        JButton b6 = new JButton("Catalog");
-        b6.setPreferredSize(buttonSize);
-        b6.setMargin(new Insets(10, 30, 5, 30));
-        b6.setBackground(Color.decode("#2f77b1")); 
-        b6.setForeground(Color.WHITE); 
-        b6.setFont(gFont.deriveFont(Font.PLAIN, 21f));
-        p2.add(b6, gbc);
+        JButton bCatalog = new JButton("Catalog");
+        bCatalog.setPreferredSize(buttonSize);
+        bCatalog.setMargin(new Insets(10, 30, 5, 30));
+        bCatalog.setBackground(Color.decode("#2f77b1")); 
+        bCatalog.setForeground(Color.WHITE); 
+        bCatalog.setFont(gFont.deriveFont(Font.PLAIN, 21f));
+        p2.add(bCatalog, gbc);
 
         // Drop Course
         gbc.gridx = 1; gbc.gridy = 2;
-        JButton b7 = new JButton("Drop Course");
-        b7.setPreferredSize(buttonSize);
-        b7.setMargin(new Insets(10, 30, 5, 30));
-        b7.setBackground(Color.decode("#2f77b1")); 
-        b7.setForeground(Color.WHITE); 
-        b7.setFont(gFont.deriveFont(Font.PLAIN, 21f));
-        p2.add(b7, gbc);
+        JButton bDrop = new JButton("Drop Course");
+        bDrop.setPreferredSize(buttonSize);
+        bDrop.setMargin(new Insets(10, 30, 5, 30));
+        bDrop.setBackground(Color.decode("#2f77b1")); 
+        bDrop.setForeground(Color.WHITE); 
+        bDrop.setFont(gFont.deriveFont(Font.PLAIN, 21f));
+        p2.add(bDrop, gbc);
         f.add(p2, BorderLayout.CENTER);
 
         // Logout 
         JPanel p3 = new JPanel();
         p3.setBackground(Color.decode("#dbd3c5"));
         p3.setBorder(BorderFactory.createEmptyBorder(0, 0, 50, 0));
-        JButton b5 = new JButton("Logout");
-        b5.setBackground(Color.decode("#2f77b1")); 
-        b5.setForeground(Color.WHITE); 
-        b5.setFont(breatheFont.deriveFont(Font.BOLD, 35f));
-        b5.setMargin(new Insets(10, 30, 5, 30));
-        p3.add(b5);
+        JButton bLogout = new JButton("Logout");
+        bLogout.setBackground(Color.decode("#2f77b1")); 
+        bLogout.setForeground(Color.WHITE); 
+        bLogout.setFont(breatheFont.deriveFont(Font.BOLD, 35f));
+        bLogout.setMargin(new Insets(10, 30, 5, 30));
+        p3.add(bLogout);
         f.add(p3, BorderLayout.SOUTH);
 
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
@@ -131,7 +131,7 @@ public class studentDashboard {
         f.setVisible(true);
         
         // --- Action Listeners ---
-        b1.addActionListener(new ActionListener() {
+        bRegister.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (modeOps.getMaintainMode().equals("true")) {
                     JOptionPane.showMessageDialog(null, "Cannot change, Maintainance mode is on.", "FYI", JOptionPane.INFORMATION_MESSAGE);
@@ -146,7 +146,7 @@ public class studentDashboard {
             }
         });
 
-        b2.addActionListener(new ActionListener() {
+        bTimetable.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("\tOpening timetable..");
                 new timetableFrame(username, role, in_pass, roll_no);
@@ -154,7 +154,7 @@ public class studentDashboard {
             }
         });
 
-        b3.addActionListener(new ActionListener() {
+        bGrades.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("\tOpening grades..");
                 new gradeFrame(username, role, in_pass, roll_no);
@@ -162,7 +162,7 @@ public class studentDashboard {
             }
         });
 
-        b4.addActionListener(new ActionListener() {
+        bTranscript.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("\tDownloading transcript..");
                 new transcriptFrame(username, role, in_pass, roll_no);
@@ -170,7 +170,7 @@ public class studentDashboard {
             }
         });
 
-        b5.addActionListener(new ActionListener() {
+        bLogout.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JOptionPane.showMessageDialog(null, "Logging out..");
                 System.out.println("\nLogged out successfully...");
@@ -178,7 +178,7 @@ public class studentDashboard {
             }
         });
 
-        b6.addActionListener(new ActionListener() {
+        bCatalog.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Opening Course Catalog...");
                 new catalog(username, role, in_pass, roll_no);
@@ -186,7 +186,7 @@ public class studentDashboard {
             }
         });
 
-        b7.addActionListener(new ActionListener() {
+        bDrop.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (modeOps.getMaintainMode().equals("true")) {
                     JOptionPane.showMessageDialog(null, "Cannot change, Maintainance mode is on.", "FYI", JOptionPane.INFORMATION_MESSAGE);

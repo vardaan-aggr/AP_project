@@ -21,6 +21,7 @@ import edu.univ.erp.data.ErpCommandRunner;
 import edu.univ.erp.ui.admin.adminDashboard;
 import edu.univ.erp.util.BREATHEFONT;
 
+import edu.univ.erp.domain.Student;
 
 public class searchStd {
     public searchStd(String roll_no_inp) {
@@ -107,17 +108,23 @@ public class searchStd {
     }
 
     private String[][] dataPull() {
-        ArrayList<String[]> arrList = new ArrayList<>();
+        ArrayList<Student> stdList = new ArrayList<>();
         try {
-            arrList = AuthCommandRunner.searchStudentAuth();
-            if (arrList == null) { return null; }
-            arrList = ErpCommandRunner.searchStudentErp(arrList);
+            stdList = AuthCommandRunner.searchStudentAuth();
+            if (stdList == null) { return null; }
+            stdList = ErpCommandRunner.searchStudentErp(stdList);
         } catch (SQLException e) {
             System.err.println("SQL Error in dataPull: " + e.getMessage());
             return null;
         }
-        String[][] strArr = new String[arrList.size()][4];
-        arrList.toArray(strArr);
+        String[][] strArr = new String[stdList.size()][4];
+        for (int i = 0; i < stdList.size(); i++) {
+            Student s = stdList.get(i);
+            strArr[i][0] = s.getRollNo();
+            strArr[i][1] = s.getUsername();
+            strArr[i][2] = s.getProgram();
+            strArr[i][3] = s.getYear();
+        }
         return strArr;
     }
 }

@@ -107,10 +107,10 @@ public class ComputeFinalFrame {
         gbc.gridx = 0; gbc.gridy = 3; gbc.weightx = 0;
         p2.add(quizLabel, gbc);
 
-        JTextField quizMarks = new JTextField(15);
-        quizMarks.setFont(fieldFont);
+        JTextField tquizMarks = new JTextField(15);
+        tquizMarks.setFont(fieldFont);
         gbc.gridx = 1; gbc.gridy = 3; gbc.weightx = 1;
-        p2.add(quizMarks, gbc);
+        p2.add(tquizMarks, gbc);
         
         JLabel suffixQuiz = new JLabel("/ 10");
         suffixQuiz.setFont(labelFont);
@@ -124,10 +124,10 @@ public class ComputeFinalFrame {
         gbc.gridx = 0; gbc.gridy = 4; gbc.weightx = 0;
         p2.add(midsemLabel, gbc);
 
-        JTextField midsemField = new JTextField(15);
-        midsemField.setFont(fieldFont);
+        JTextField tmidsem = new JTextField(15);
+        tmidsem.setFont(fieldFont);
         gbc.gridx = 1; gbc.gridy = 4; gbc.weightx = 1;
-        p2.add(midsemField, gbc);
+        p2.add(tmidsem, gbc);
 
         JLabel suffixMidsem = new JLabel("/ 10");
         suffixMidsem.setFont(labelFont);
@@ -141,10 +141,10 @@ public class ComputeFinalFrame {
         gbc.gridx = 0; gbc.gridy = 5; gbc.weightx = 0;
         p2.add(endsemLabel, gbc);
 
-        JTextField endsemField = new JTextField(15);
-        endsemField.setFont(fieldFont);
+        JTextField tendsem = new JTextField(15);
+        tendsem.setFont(fieldFont);
         gbc.gridx = 1; gbc.gridy = 5; gbc.weightx = 1;
-        p2.add(endsemField, gbc);
+        p2.add(tendsem, gbc);
 
         JLabel suffixEndsem = new JLabel("/ 10");
         suffixEndsem.setFont(labelFont);
@@ -158,12 +158,12 @@ public class ComputeFinalFrame {
         JPanel p3 = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 20));
         p3.setBackground(Color.decode("#dbd3c5"));
         
-        JButton backButton = new JButton("Back");
-        backButton.setBackground(Color.decode("#2f77b1"));
-        backButton.setForeground(Color.WHITE);
-        backButton.setFont(breatheFont.deriveFont(Font.PLAIN, 35f));
-        backButton.setMargin(new Insets(10, 30, 5, 30));
-        p3.add(backButton);
+        JButton bBack = new JButton("Back");
+        bBack.setBackground(Color.decode("#2f77b1"));
+        bBack.setForeground(Color.WHITE);
+        bBack.setFont(breatheFont.deriveFont(Font.PLAIN, 35f));
+        bBack.setMargin(new Insets(10, 30, 5, 30));
+        p3.add(bBack);
 
         JButton add = new JButton("Add Grade");
         add.setBackground(Color.decode("#2f77b1"));
@@ -179,30 +179,33 @@ public class ComputeFinalFrame {
         add.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (num.getText().trim().isEmpty() || code.getText().trim().isEmpty() || sectionField.getText().trim().isEmpty() || 
-                    quizMarks.getText().trim().isEmpty() || midsemField.getText().trim().isEmpty() || endsemField.getText().trim().isEmpty()) {
+                    tquizMarks.getText().trim().isEmpty() || tmidsem.getText().trim().isEmpty() || tendsem.getText().trim().isEmpty()) {
                     JOptionPane.showMessageDialog(null, "Please fill all fields.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
-                String userRollno_input = num.getText().trim();
-                String courseCode_input = code.getText().trim();
-                String section_input = sectionField.getText().trim();
+                String rollNo_in = num.getText().trim();
+                String courseCode_in = code.getText().trim();
+                String section_in = sectionField.getText().trim();
                 int rows = -1;
-                try {
-                    rows = ErpCommandRunner.instructorGradeComputeHelper(quizMarks.getText().trim(), midsemField.getText().trim(), endsemField.getText().trim(), userRollno_input, courseCode_input, section_input);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(null, "Error: ", "Error", JOptionPane.ERROR_MESSAGE);
+                // validate rollNo & coursecode from enrollments if exists  
+                {
+
                 }
+                rows = ErpCommandRunner.instructorGradeComputeHelper(tquizMarks.getText().trim(), tmidsem.getText().trim(), tendsem.getText().trim(), rollNo_in, courseCode_in, section_in);
                 if (rows > 0) {
                     JOptionPane.showMessageDialog(null, "Grade computed and updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                     new InstructorDashboard(username, role, password, roll_no);
                     f.dispose();
-                }   
+                } else {
+                    System.out.println("\tGoing back to Instructor Dashboard..");
+                    new InstructorDashboard(username, role, password, roll_no);
+                    f.dispose();
+                }
             }
         });
         
-        backButton.addActionListener(new ActionListener() {
+        bBack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 new InstructorDashboard(username, role, password, roll_no);
                 f.dispose();

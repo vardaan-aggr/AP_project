@@ -6,8 +6,7 @@ import com.formdev.flatlaf.FlatLightLaf;
 
 import edu.univ.erp.util.BREATHEFONT;
 import edu.univ.erp.util.HashGenerator;
-import edu.univ.erp.data.AuthCommandRunner;
-import edu.univ.erp.data.ErpCommandRunner;
+import edu.univ.erp.service.AdminService;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -18,7 +17,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.SQLException;
 
 public class addStd {
     public addStd(String rollNo) {
@@ -64,11 +62,11 @@ public class addStd {
         gbc.anchor = GridBagConstraints.EAST;
         p2.add(l1, gbc);
 
-        JTextField t1 = new JTextField(20);
-        t1.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        JTextField tUsername = new JTextField(20);
+        tUsername.setFont(gFont.deriveFont(Font.PLAIN, 21));
         gbc.gridx = 1; gbc.gridy = 0; gbc.weightx = 1;
         gbc.anchor = GridBagConstraints.WEST;
-        p2.add(t1, gbc);
+        p2.add(tUsername, gbc);
 
         JLabel l2 = new JLabel("Password:");
         l2.setFont(gFont.deriveFont(Font.PLAIN, 24));
@@ -77,11 +75,11 @@ public class addStd {
         gbc.anchor = GridBagConstraints.EAST;
         p2.add(l2, gbc);
 
-        JTextField t2 = new JTextField(20); 
-        t2.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        JTextField tPassword = new JTextField(20); 
+        tPassword.setFont(gFont.deriveFont(Font.PLAIN, 21));
         gbc.gridx = 1; gbc.gridy = 1; gbc.weightx = 1;
         gbc.anchor = GridBagConstraints.WEST;
-        p2.add(t2, gbc);
+        p2.add(tPassword, gbc);
 
         JLabel l3 = new JLabel("Program:");
         l3.setFont(gFont.deriveFont(Font.PLAIN, 24));
@@ -90,11 +88,11 @@ public class addStd {
         gbc.anchor = GridBagConstraints.EAST;
         p2.add(l3, gbc);
 
-        JTextField t3 = new JTextField(20);
-        t3.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        JTextField tProgram = new JTextField(20);
+        tProgram.setFont(gFont.deriveFont(Font.PLAIN, 21));
         gbc.gridx = 1; gbc.gridy = 2; gbc.weightx = 1;
         gbc.anchor = GridBagConstraints.WEST;
-        p2.add(t3, gbc);
+        p2.add(tProgram, gbc);
 
         JLabel l4 = new JLabel("Year:");
         l4.setFont(gFont.deriveFont(Font.PLAIN, 24));
@@ -103,29 +101,29 @@ public class addStd {
         gbc.anchor = GridBagConstraints.EAST;
         p2.add(l4, gbc);
 
-        JTextField t4 = new JTextField(20);
-        t4.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        JTextField tYear = new JTextField(20);
+        tYear.setFont(gFont.deriveFont(Font.PLAIN, 21));
         gbc.gridx = 1; gbc.gridy = 3; gbc.weightx = 1;
         gbc.anchor = GridBagConstraints.WEST;
-        p2.add(t4, gbc);
+        p2.add(tYear, gbc);
 
         // --- LOWS ---
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
         buttonPanel.setOpaque(false);
 
-        JButton b1 = new JButton("Back");
-        b1.setBackground(Color.decode("#2f77b1")); 
-        b1.setForeground(Color.WHITE); 
-        b1.setFont(breatheFont.deriveFont(Font.PLAIN, 35));
-        b1.setMargin(new Insets(10, 30, 5, 30));
-        buttonPanel.add(b1);
+        JButton bBack = new JButton("Back");
+        bBack.setBackground(Color.decode("#2f77b1")); 
+        bBack.setForeground(Color.WHITE); 
+        bBack.setFont(breatheFont.deriveFont(Font.PLAIN, 35));
+        bBack.setMargin(new Insets(10, 30, 5, 30));
+        buttonPanel.add(bBack);
 
-        JButton b2 = new JButton("Register");
-        b2.setBackground(Color.decode("#2f77b1")); 
-        b2.setForeground(Color.WHITE); 
-        b2.setFont(breatheFont.deriveFont(Font.PLAIN, 35));
-        b2.setMargin(new Insets(10, 30, 5, 30));
-        buttonPanel.add(b2);
+        JButton bRegister = new JButton("Register");
+        bRegister.setBackground(Color.decode("#2f77b1")); 
+        bRegister.setForeground(Color.WHITE); 
+        bRegister.setFont(breatheFont.deriveFont(Font.PLAIN, 35));
+        bRegister.setMargin(new Insets(10, 30, 5, 30));
+        buttonPanel.add(bRegister);
 
         gbc.gridx = 0; gbc.gridy = 4; 
         gbc.gridwidth = 2; 
@@ -141,45 +139,35 @@ public class addStd {
         f.setVisible(true);
 
         // ---- Action Listeners ----
-        b2.addActionListener(new ActionListener() {
+        bRegister.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (t1.getText().trim().isEmpty() || t2.getText().trim().isEmpty() || 
-                    t3.getText().trim().isEmpty() || t4.getText().trim().isEmpty()) {
+                if (tUsername.getText().isEmpty() || tPassword.getText().trim().isEmpty() || 
+                    tProgram.getText().trim().isEmpty() || tYear.getText().trim().isEmpty()) {
                     JOptionPane.showMessageDialog(null, "All fields must be filled out.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
-                String username = t1.getText().trim();
-                String rawPassword = t2.getText().trim(); 
-                String program = t3.getText().trim();     
-                String year = t4.getText().trim();        
-                
-                String hash_pass = HashGenerator.makeHash(rawPassword); 
+                String username = tUsername.getText();
+                String hashPass = HashGenerator.makeHash(tPassword.getText().trim()); 
+                String program = tProgram.getText().trim();     
+                String year = tYear.getText().trim();                        
 
-                try {
-                    int newRollNo = AuthCommandRunner.registerStudentAuth(username, hash_pass);
+                AdminService service = new AdminService();  
+                String result = service.registerStudent(username, hashPass, program, year);
 
-                    if (newRollNo != -1) {
-                        boolean success = ErpCommandRunner.registerStudentErp(newRollNo, program, year);
-                        
-                        if (success) {
-                            JOptionPane.showMessageDialog(null, "Student Added! Roll No: " + newRollNo, "Success", JOptionPane.INFORMATION_MESSAGE);
-                            new adminDashboard(rollNo);
-                            f.dispose();
-                        } else {
-                            JOptionPane.showMessageDialog(null, "Auth created, but failed to add details to ERP.", "Error", JOptionPane.ERROR_MESSAGE);
-                        }
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Failed to create User in Auth DB.", "Error", JOptionPane.ERROR_MESSAGE);
-                    }
-                } catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(null, "Database Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                    ex.printStackTrace();
+                if (result.startsWith("Success")) {
+                    JOptionPane.showMessageDialog(null, result, "Success", JOptionPane.INFORMATION_MESSAGE);
+                    f.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(null, result, "Error", JOptionPane.ERROR_MESSAGE);
                 }
+                System.out.println("\tGoing back to Admin Dashboard..");
+                new adminDashboard(rollNo);
+                f.dispose();
             }
         });
 
-        b1.addActionListener(new ActionListener() {
+        bBack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println(" to Admin Dashboard..");
                 new adminDashboard(rollNo);

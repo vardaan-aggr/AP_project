@@ -70,12 +70,12 @@ public class changePassword {
         gbc.anchor = GridBagConstraints.EAST;
         p2.add(l1, gbc);
 
-        JTextField t1 = new JTextField(50);
-        t1.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        JTextField tRollNo = new JTextField(50);
+        tRollNo.setFont(gFont.deriveFont(Font.PLAIN, 21));
         gbc.gridx = 1; gbc.gridy = 0; gbc.weightx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.CENTER;
-        p2.add(t1, gbc);
+        p2.add(tRollNo, gbc);
 
         JLabel l2 = new JLabel("New Password:");
         l2.setFont(gFont.deriveFont(Font.PLAIN, 24));
@@ -85,12 +85,12 @@ public class changePassword {
         gbc.anchor = GridBagConstraints.EAST;
         p2.add(l2, gbc);
 
-        JTextField t2 = new JTextField(50); 
-        t2.setFont(gFont.deriveFont(Font.PLAIN, 22));
+        JTextField tNewPassword = new JTextField(50); 
+        tNewPassword.setFont(gFont.deriveFont(Font.PLAIN, 22));
         gbc.gridx = 1; gbc.gridy = 1; gbc.weightx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.CENTER;
-        p2.add(t2, gbc);
+        p2.add(tNewPassword, gbc);
 
         f.add(p2, BorderLayout.CENTER);
 
@@ -129,8 +129,8 @@ public class changePassword {
                     try (PreparedStatement statement = connection.prepareStatement("""
                                 update auth_table set hash_password = ? where roll_no = ?;
                             """)) {
-                        statement.setString(2, t1.getText().trim());
-                        String hashedPass = HashGenerator.makeHash(t2.getText().trim());
+                        statement.setString(2, tRollNo.getText().trim());
+                        String hashedPass = HashGenerator.makeHash(tNewPassword.getText().trim());
                         statement.setString(1, hashedPass);
                         int rowsUpdated = statement.executeUpdate();
                         if (rowsUpdated == 0) {

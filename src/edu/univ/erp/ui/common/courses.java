@@ -8,7 +8,8 @@
 
     import edu.univ.erp.ui.instructor.InstructorDashboard;
     import edu.univ.erp.data.DatabaseConnector;
-    import edu.univ.erp.util.BREATHEFONT;
+import edu.univ.erp.domain.Course;
+import edu.univ.erp.util.BREATHEFONT;
 
     import java.sql.Connection;
     import java.sql.PreparedStatement;
@@ -66,8 +67,8 @@
             searchLabel.setFont(gFont.deriveFont(Font.PLAIN, 18f));  
             searchLabel.setForeground(Color.decode("#030c5d"));
             
-            JTextField t1 = new JTextField(20);
-            t1.setFont(gFont.deriveFont(Font.PLAIN, 18f));
+            JTextField tSearchCode = new JTextField(20);
+            tSearchCode.setFont(gFont.deriveFont(Font.PLAIN, 18f));
             
             JButton searchButton = new JButton("🔍 Search");
             searchButton.setBackground(Color.decode("#2f77b1"));
@@ -75,7 +76,7 @@
             searchButton.setFont(gFont.deriveFont(Font.PLAIN, 16f));
             
             searchPanel.add(searchLabel);
-            searchPanel.add(t1);
+            searchPanel.add(tSearchCode);
             searchPanel.add(searchButton);
             
             centerPanel.add(searchPanel, BorderLayout.NORTH);
@@ -109,20 +110,20 @@
             JPanel p3 = new JPanel(new FlowLayout(FlowLayout.RIGHT, 30, 20));
             p3.setBackground(Color.decode("#dbd3c5"));
             
-            JButton backButton = new JButton("Back");
-            backButton.setBackground(Color.decode("#2f77b1"));
-            backButton.setForeground(Color.WHITE);
-            backButton.setFont(breatheFont.deriveFont(Font.PLAIN, 35f));
-            backButton.setMargin(new Insets(10, 30, 5, 30));
+            JButton bBack = new JButton("Back");
+            bBack.setBackground(Color.decode("#2f77b1"));
+            bBack.setForeground(Color.WHITE);
+            bBack.setFont(breatheFont.deriveFont(Font.PLAIN, 35f));
+            bBack.setMargin(new Insets(10, 30, 5, 30));
             
-            p3.add(backButton);
+            p3.add(bBack);
             f.add(p3, BorderLayout.SOUTH);        
             f.setVisible(true);
 
             // --- Action Listeners ---
             searchButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    String input = t1.getText().trim().trim();
+                    String input = tSearchCode.getText().trim().trim();
                     if(input.isEmpty()) return;
 
                     boolean found = false;
@@ -141,7 +142,7 @@
                 }
             });
 
-            backButton.addActionListener(new ActionListener() {
+            bBack.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     System.out.println("\tGoing Back...");
                     if (role.equalsIgnoreCase("student")) {
@@ -161,7 +162,7 @@
         }
 
         private String[][] dataPull() {
-            ArrayList<String[]> arrList = new ArrayList<>();
+            ArrayList<Course> courseList = new ArrayList<>();
             try (Connection connection = DatabaseConnector.getErpConnection()) {
                 try (PreparedStatement statement = connection.prepareStatement("""
                             Select course_code, title, section, credits FROM courses; 
@@ -169,13 +170,14 @@
                     try (ResultSet resultSet = statement.executeQuery()) {
                         boolean empty = true;
                         while (resultSet.next()) {
+                            Course c = new Course();
                             empty = false;
-                            String course_code = resultSet.getString("course_code");
-                            String title = resultSet.getString("title");
-                            String section = resultSet.getString("section");
-                            String credits = resultSet.getString("credits");
+                            c.setCourseCode(resultSet.getString("course_code"));
+                            c.setTitle(resultSet.getString("title"));
+                            c.setSection(resultSet.getString("section"));
+                            c.setCredits(resultSet.getString("credits"));
                 
-                            arrList.add(new String[]{course_code, title, section, credits});
+                            courseList.add(c);
                         } 
                         if (empty) {
                             System.out.println("\t (no data)");
@@ -186,8 +188,14 @@
                 JOptionPane.showMessageDialog(null, "Database Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 ex.printStackTrace();
             }
-            String[][] strArr = new String[arrList.size()][4];
-            arrList.toArray(strArr);
+            String[][] strArr = new String[courseList.size()][4];
+            for (int i = 0; i < courseList.size(); i++) {
+                Course c = courseList.get(i);
+                strArr[i][0] = c.getCourseCode();
+                strArr[i][1] = c.getTitle();
+                strArr[i][2] = c.getSection();
+                strArr[i][3] = c.getCredits();
+            }
             return strArr;
         }    
     }

@@ -3,8 +3,6 @@ package edu.univ.erp.ui.auth;
 import edu.univ.erp.util.BREATHEFONT;
 import edu.univ.erp.data.AuthCommandRunner;
 import java.sql.SQLException;
-import java.util.HashMap; 
-import java.util.Map;     
 
 import javax.swing.*;
 import org.mindrot.jbcrypt.BCrypt;
@@ -63,6 +61,7 @@ public class loginPage {
         p2.setBackground(Color.decode("#dbd3c5")); 
         p2.setBorder(BorderFactory.createEmptyBorder(100, 100, 100, 100));
         GridBagConstraints gbc = new GridBagConstraints();
+
         gbc.insets = new Insets(10, 10, 10, 10);
 
         JLabel l1 = new JLabel("Username:");
@@ -72,12 +71,12 @@ public class loginPage {
         gbc.anchor = GridBagConstraints.EAST;
         p2.add(l1, gbc);
 
-        JTextField t1 = new JTextField(50);
-        t1.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        JTextField tUsername = new JTextField(50);
+        tUsername.setFont(gFont.deriveFont(Font.PLAIN, 21));
         gbc.gridx = 1; gbc.weightx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.CENTER;
-        p2.add(t1, gbc);
+        p2.add(tUsername, gbc);
         
         JLabel l2 = new JLabel("Password:");
         l2.setFont(gFont.deriveFont(Font.PLAIN, 24));
@@ -86,14 +85,14 @@ public class loginPage {
         gbc.fill= GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.EAST;
         p2.add(l2, gbc);
-        JPasswordField t2 = new JPasswordField(50);
-        t2.setFont(gFont.deriveFont(Font.PLAIN, 22));
+        JPasswordField tPassword = new JPasswordField(50);
+        tPassword.setFont(gFont.deriveFont(Font.PLAIN, 22));
         gbc.gridx = 1;
         gbc.gridy = 1;
         gbc.weightx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.CENTER;
-        p2.add(t2, gbc);
+        p2.add(tPassword, gbc);
         f.add(p2, BorderLayout.CENTER);
         
         // ---- Low ----
@@ -124,13 +123,14 @@ public class loginPage {
         f.setVisible(true);
         
         // For testing purposes only: remove in production
-        t1.setText("student1");
-        t2.setText("mdo1");
+        tUsername.setText("std1");
+        tPassword.setText("mdo1");
 
+        // --- LOGIN BUTTON LOGIC ---
         b1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String username_in = t1.getText().trim();
-                String password_in = new String(t2.getPassword());
+                String username_in = tUsername.getText().trim();
+                String password_in = new String(tPassword.getPassword());
 
                 // 1. Call the new Service layer
                 ServiceLoginResult result = loginService.attemptLogin(username_in, password_in);
@@ -183,11 +183,21 @@ public class loginPage {
             }
         });
 
+        // --- CHANGE PASSWORD BUTTON LOGIC ---
         b2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new changePassword(roll_no);
-                System.out.println("Change Password clicked");
-                f.dispose();
+                // LOGIC FIX: We must check if the user entered a username first
+                String userForChange = tUsername.getText();
+                
+                if(userForChange.isEmpty()) {
+                     JOptionPane.showMessageDialog(f, "Please enter your Username in the text box first.", "Missing Information", JOptionPane.WARNING_MESSAGE);
+                } else {
+                    // Pass the entered username as the roll_no context
+                    roll_no = userForChange; 
+                    new changePassword(roll_no);
+                    System.out.println("Change Password clicked for: " + roll_no);
+                    f.dispose();
+                }
             }
         });
     }

@@ -9,6 +9,9 @@ import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
+import edu.univ.erp.domain.Instructor;
+import edu.univ.erp.domain.Student;
+
 public class AuthCommandRunner {
     public static class loginResult {
         public String hashPass;
@@ -39,14 +42,14 @@ public class AuthCommandRunner {
         return null;
     }
 
-    public static int registerStudentAuth(String username, String hashPass) throws SQLException {
+    public static int registerUserAuth(String username, String role, String hashPass) throws SQLException {
         String query = "INSERT INTO auth_table (username, role, hash_password) VALUES (?, ?, ?)";
         
         try (Connection connection = DatabaseConnector.getAuthConnection();
-             PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             
             statement.setString(1, username);
-            statement.setString(2, "student");
+            statement.setString(2, role);
             statement.setString(3, hashPass);
             
             int rows = statement.executeUpdate();
@@ -59,7 +62,7 @@ public class AuthCommandRunner {
         return -1; 
     }
 
-    public static int registerUserAuth(String username, String role, String hashPass) throws SQLException {
+    public static int UserAuth(String username, String role, String hashPass) throws SQLException {
         String query = "INSERT INTO auth_table (username, role, hash_password) VALUES (?, ?, ?)";
         
         try (Connection connection = DatabaseConnector.getAuthConnection();
@@ -97,8 +100,8 @@ public class AuthCommandRunner {
         return rowsAffected;
     }
 
-    public static ArrayList<String[]> searchStudentAuth() throws SQLException {
-        ArrayList<String[]> arrList = new ArrayList<>();
+    public static ArrayList<Student> searchStudentAuth() throws SQLException {
+        ArrayList<Student> stdList = new ArrayList<>();
         try (Connection connection = DatabaseConnector.getAuthConnection()) {
             try (PreparedStatement statement = connection.prepareStatement("""
                         Select roll_no, username FROM auth_table WHERE role = ?;
@@ -108,7 +111,10 @@ public class AuthCommandRunner {
                     boolean empty = true;
                     while (resultSet.next()) {
                         empty = false;
-                        arrList.add(new String[]{resultSet.getString("roll_no"), resultSet.getString("username"), "N/A", "N/A"});
+                        Student s = new Student();
+                        s.setRollNo(resultSet.getString("roll_no"));
+                        s.setRollNo(resultSet.getString("username"));
+                        stdList.add(s);
                     }
                     if (empty) {
                         JOptionPane.showMessageDialog(null, "Error: No student with given inputs exists.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -122,11 +128,11 @@ public class AuthCommandRunner {
             e.printStackTrace();
             throw new SQLException(e);
         }
-        return arrList;
+        return stdList;
     }
 
-    public static ArrayList<String[]> searchInstructorAuth() throws SQLException {
-        ArrayList<String[]> arrList = new ArrayList<>();
+    public static ArrayList<Instructor> searchInstructorAuth() throws SQLException {
+        ArrayList<Instructor> insList = new ArrayList<>();
         try (Connection connection = DatabaseConnector.getAuthConnection()) {
             try (PreparedStatement statement = connection.prepareStatement("""
                         Select roll_no, username FROM auth_table WHERE role = ?;
@@ -136,7 +142,9 @@ public class AuthCommandRunner {
                     boolean empty = true;
                     while (resultSet.next()) {
                         empty = false;
-                        arrList.add(new String[]{resultSet.getString("roll_no"), resultSet.getString("username"), "N/A"});
+                        Instructor i = new Instructor();
+                        i.setRollNo(resultSet.getString("roll_no"));
+                        i.setUsername(resultSet.getString("username"));
                     }
                     if (empty) {
                         JOptionPane.showMessageDialog(null, "Error: No instructor with given inputs exists.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -150,7 +158,7 @@ public class AuthCommandRunner {
             e.printStackTrace();
             throw new SQLException(e);
         }
-        return arrList;
+        return insList;
     }
 
     public static ArrayList<String[]> searchAuthAuth() throws SQLException {

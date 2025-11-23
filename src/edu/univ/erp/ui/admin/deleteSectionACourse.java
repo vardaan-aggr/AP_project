@@ -69,11 +69,11 @@ public class deleteSectionACourse {
         gbc.anchor = GridBagConstraints.EAST;
         p2.add(l1, gbc);
 
-        JTextField t1 = new JTextField(20);
-        t1.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        JTextField tCourseCode = new JTextField(20);
+        tCourseCode.setFont(gFont.deriveFont(Font.PLAIN, 21));
         gbc.gridx = 1; gbc.gridy = 0; gbc.weightx = 1;
         gbc.anchor = GridBagConstraints.WEST;
-        p2.add(t1, gbc);
+        p2.add(tCourseCode, gbc);
 
         // Row 1: Section
         JLabel l2 = new JLabel("Section:");
@@ -83,29 +83,29 @@ public class deleteSectionACourse {
         gbc.anchor = GridBagConstraints.EAST;
         p2.add(l2, gbc);
 
-        JTextField t2 = new JTextField(20);
-        t2.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        JTextField tSection = new JTextField(20);
+        tSection.setFont(gFont.deriveFont(Font.PLAIN, 21));
         gbc.gridx = 1; gbc.gridy = 1; gbc.weightx = 1;
         gbc.anchor = GridBagConstraints.WEST;
-        p2.add(t2, gbc);
+        p2.add(tSection, gbc);
 
         // --- BUTTONS ---
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
         buttonPanel.setOpaque(false);
 
-        JButton deleteButton = new JButton("Delete");
-        deleteButton.setBackground(Color.decode("#051072")); 
-        deleteButton.setForeground(Color.WHITE);
-        deleteButton.setFont(breatheFont.deriveFont(Font.PLAIN, 35));
-        deleteButton.setMargin(new Insets(10, 30, 5, 30));
-        buttonPanel.add(deleteButton);
+        JButton bDelete = new JButton("Delete");
+        bDelete.setBackground(Color.decode("#051072")); 
+        bDelete.setForeground(Color.WHITE);
+        bDelete.setFont(breatheFont.deriveFont(Font.PLAIN, 35));
+        bDelete.setMargin(new Insets(10, 30, 5, 30));
+        buttonPanel.add(bDelete);
 
-        JButton backButton = new JButton("Back");
-        backButton.setBackground(Color.decode("#2f77b1"));
-        backButton.setForeground(Color.WHITE);
-        backButton.setFont(breatheFont.deriveFont(Font.PLAIN, 35));
-        backButton.setMargin(new Insets(10, 30, 5, 30));
-        buttonPanel.add(backButton);
+        JButton bBack = new JButton("Back");
+        bBack.setBackground(Color.decode("#2f77b1"));
+        bBack.setForeground(Color.WHITE);
+        bBack.setFont(breatheFont.deriveFont(Font.PLAIN, 35));
+        bBack.setMargin(new Insets(10, 30, 5, 30));
+        buttonPanel.add(bBack);
 
         // Place buttons
         gbc.gridx = 0; gbc.gridy = 2; 
@@ -122,11 +122,11 @@ public class deleteSectionACourse {
         f.setVisible(true);
 
         // --- Action Listeners ---
-        deleteButton.addActionListener(new ActionListener() {
+        bDelete.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 int rowsAffected = -1;
-                String courseCode = t1.getText().trim();
-                String section = t2.getText().trim();
+                String courseCode = tCourseCode.getText().trim();
+                String section = tSection.getText().trim();
 
                 if (courseCode.isEmpty() || section.isEmpty()) {
                     JOptionPane.showMessageDialog(null, "Please enter both Course Code and Section.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -177,7 +177,7 @@ public class deleteSectionACourse {
             }
         });
 
-        backButton.addActionListener(new ActionListener() {
+        bBack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Going back...");
                 new adminDashboard(roll_no);

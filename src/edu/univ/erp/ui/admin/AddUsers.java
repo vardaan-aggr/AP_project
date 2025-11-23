@@ -60,11 +60,11 @@ public class AddUsers {
         gbc.anchor = GridBagConstraints.EAST;
         p2.add(l1, gbc);
 
-        JTextField t1 = new JTextField(20);
-        t1.setFont(gFont.deriveFont(Font.PLAIN, 21)); 
+        JTextField tRole = new JTextField(20);
+        tRole.setFont(gFont.deriveFont(Font.PLAIN, 21)); 
         gbc.gridx = 1; gbc.gridy = 0; gbc.weightx = 1;
         gbc.anchor = GridBagConstraints.WEST;
-        p2.add(t1, gbc);
+        p2.add(tRole, gbc);
         
         // ---- LOWS ----
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
@@ -108,7 +108,7 @@ public class AddUsers {
 
         b2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String role = t1.getText().trim().toLowerCase();
+                String role = tRole.getText().trim().toLowerCase();
                 if (role.equals("student")) {
                     new addStd(rollNo);
                     System.out.println(" to add student user..");
