@@ -8,6 +8,7 @@ import com.formdev.flatlaf.FlatLightLaf;
 
 import edu.univ.erp.ui.instructor.InstructorDashboard;
 import edu.univ.erp.data.DatabaseConnector;
+import edu.univ.erp.domain.Sections;
 import edu.univ.erp.util.BREATHEFONT;
 
 import java.sql.Connection;
@@ -66,22 +67,22 @@ public class sections {
         searchLabel.setFont(gFont.deriveFont(Font.PLAIN, 18f));  
         searchLabel.setForeground(Color.decode("#030c5d"));
         
-        JTextField t1 = new JTextField(20);
-        t1.setFont(gFont.deriveFont(Font.PLAIN, 18f));
+        JTextField tSearchCode = new JTextField(20);
+        tSearchCode.setFont(gFont.deriveFont(Font.PLAIN, 18f));
         
-        JButton searchButton = new JButton("🔍 Search");
-        searchButton.setBackground(Color.decode("#2f77b1"));
-        searchButton.setForeground(Color.WHITE);
-        searchButton.setFont(gFont.deriveFont(Font.PLAIN, 16f));
+        JButton bSearch = new JButton("🔍 Search");
+        bSearch.setBackground(Color.decode("#2f77b1"));
+        bSearch.setForeground(Color.WHITE);
+        bSearch.setFont(gFont.deriveFont(Font.PLAIN, 16f));
         
         searchPanel.add(searchLabel);
-        searchPanel.add(t1);
-        searchPanel.add(searchButton);
+        searchPanel.add(tSearchCode);
+        searchPanel.add(bSearch);
         
         centerPanel.add(searchPanel, BorderLayout.NORTH);
 
         String data[][] = dataPull();
-        String columName[] = {"Course Code", "Section", "Roll No", "Day_Time", "Room", "Capacity", "Semester", "Year"};
+        String columName[] = {"Course Code", "Section", "Instructor Rollno", "Day_Time", "Room", "Capacity", "Semester", "Year"};
         
         JTable t = new JTable(data, columName);
         t.setFillsViewportHeight(true);
@@ -109,20 +110,20 @@ public class sections {
         JPanel p3 = new JPanel(new FlowLayout(FlowLayout.RIGHT, 30, 20));
         p3.setBackground(Color.decode("#dbd3c5"));
         
-        JButton backButton = new JButton("Back");
-        backButton.setBackground(Color.decode("#2f77b1"));
-        backButton.setForeground(Color.WHITE);
-        backButton.setFont(breatheFont.deriveFont(Font.PLAIN, 35f));
-        backButton.setMargin(new Insets(10, 30, 5, 30));
+        JButton bBack = new JButton("Back");
+        bBack.setBackground(Color.decode("#2f77b1"));
+        bBack.setForeground(Color.WHITE);
+        bBack.setFont(breatheFont.deriveFont(Font.PLAIN, 35f));
+        bBack.setMargin(new Insets(10, 30, 5, 30));
         
-        p3.add(backButton);
+        p3.add(bBack);
         f.add(p3, BorderLayout.SOUTH);        
         f.setVisible(true);
 
         // --- Action Listeners ---
-        searchButton.addActionListener(new ActionListener() {
+        bSearch.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String input = t1.getText().trim().trim();
+                String input = tSearchCode.getText().trim().trim();
                 if(input.isEmpty()) return;
 
                 boolean found = false;
@@ -141,7 +142,7 @@ public class sections {
             }
         });
 
-        backButton.addActionListener(new ActionListener() {
+        bBack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("\tGoing Back...");
                 if (role.equalsIgnoreCase("student")) {
@@ -161,7 +162,7 @@ public class sections {
     }
 
     private String[][] dataPull() {
-        ArrayList<String[]> arrList = new ArrayList<>();
+        ArrayList<Sections> sectionList = new ArrayList<>();
         try (Connection connection = DatabaseConnector.getErpConnection()) {
             try (PreparedStatement statement = connection.prepareStatement("""
                         Select course_code, section, roll_no, day_time, room, capacity, semester, year FROM sections   ; 
@@ -169,17 +170,18 @@ public class sections {
                 try (ResultSet resultSet = statement.executeQuery()) {
                     boolean empty = true;
                     while (resultSet.next()) {
+                        Sections s = new Sections();
                         empty = false;
-                        String course_code = resultSet.getString("course_code");
-                        String section = resultSet.getString("section");
-                        String rollNo = resultSet.getString("roll_no");
-                        String day_time = resultSet.getString("day_time");
-                        String room = resultSet.getString("room");
-                        String capacity = resultSet.getString("capacity");
-                        String semester = resultSet.getString("semester");
-                        String year = resultSet.getString("year");
+                        s.setCourseCode(resultSet.getString("course_code"));
+                        s.setSection(resultSet.getString("section"));
+                        s.setRollNo(resultSet.getString("roll_no"));
+                        s.setDayTime(resultSet.getString("day_time"));
+                        s.setRoom(resultSet.getString("room"));
+                        s.setCapacity(resultSet.getString("capacity"));
+                        s.setSemester(resultSet.getString("semester"));
+                        s.setYear(resultSet.getString("year"));
              
-                        arrList.add(new String[]{course_code, section, rollNo, day_time, room, capacity, semester, year});
+                        sectionList.add(s);
                     } 
                     if (empty) {
                         System.out.println("\t (no data)");
@@ -190,8 +192,18 @@ public class sections {
             JOptionPane.showMessageDialog(null, "Database Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         }
-        String[][] strArr = new String[arrList.size()][8];
-        arrList.toArray(strArr);
+        String[][] strArr = new String[sectionList.size()][8];
+        for (int i = 0; i < sectionList.size(); i++) {
+            Sections s = sectionList.get(i);
+            strArr[i][0] = s.getCourseCode();
+            strArr[i][1] = s.getSection();
+            strArr[i][2] = s.getRollNo();
+            strArr[i][3] = s.getDayTime();
+            strArr[i][4] = s.getRoom();
+            strArr[i][5] = s.getCapacity();
+            strArr[i][6] = s.getSemester();
+            strArr[i][7] = s.getYear();
+        }
         return strArr;
     }    
 }

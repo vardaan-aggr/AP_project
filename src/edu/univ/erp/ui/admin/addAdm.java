@@ -1,6 +1,6 @@
 package edu.univ.erp.ui.admin;
 
-import edu.univ.erp.data.AuthCommandRunner;
+import edu.univ.erp.service.AdminService;
 
 import java.awt.event.ActionListener;
 import java.awt.BorderLayout;
@@ -11,7 +11,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.sql.SQLException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -70,11 +69,11 @@ public class addAdm {
         gbc.anchor = GridBagConstraints.EAST;
         p2.add(l1, gbc);
 
-        JTextField t1 = new JTextField(20);
-        t1.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        JTextField tUsername = new JTextField(20);
+        tUsername.setFont(gFont.deriveFont(Font.PLAIN, 21));
         gbc.gridx = 1; gbc.gridy = 0; gbc.weightx = 1;
         gbc.anchor = GridBagConstraints.WEST;
-        p2.add(t1, gbc);
+        p2.add(tUsername, gbc);
 
         JLabel l2 = new JLabel("Password:");
         l2.setFont(gFont.deriveFont(Font.PLAIN, 24));
@@ -83,11 +82,11 @@ public class addAdm {
         gbc.anchor = GridBagConstraints.EAST;
         p2.add(l2, gbc);
 
-        JTextField t2 = new JTextField(20); 
-        t2.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        JTextField tPassword = new JTextField(20); 
+        tPassword.setFont(gFont.deriveFont(Font.PLAIN, 21));
         gbc.gridx = 1; gbc.gridy = 1; gbc.weightx = 1;
         gbc.anchor = GridBagConstraints.WEST;
-        p2.add(t2, gbc);
+        p2.add(tPassword, gbc);
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
         buttonPanel.setOpaque(false);
@@ -123,26 +122,21 @@ public class addAdm {
         // ---- Action Listeners ----
         b2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (t1.getText().trim().isEmpty() || t2.getText().trim().isEmpty()) {
+                if (tUsername.getText().isEmpty() || tPassword.getText().trim().isEmpty()) {
                     JOptionPane.showMessageDialog(null, "All fields must be filled out.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                String hash_pass = HashGenerator.makeHash(t2.getText().trim());
-                int rowsAffected = -1;
-                try {
-                    rowsAffected = AuthCommandRunner.registerAuth(t1.getText().trim(), hash_pass);
-                } catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(null, "Error: Failed to add info into auth db!", "Error", JOptionPane.ERROR_MESSAGE);
-                    System.out.println("Error: Failed to add info into auth db");
-                    ex.printStackTrace();
-                }
-                if (rowsAffected > 0) {
-                    JOptionPane.showMessageDialog(null, "Admin added successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
-                    System.out.println("Admin added successfully..");
+                String username = tUsername.getText();
+                String hashPass = HashGenerator.makeHash(tPassword.getText().trim());
+
+                AdminService service = new AdminService();  
+                String result = service.registerAdmin(username, hashPass);
+
+                if (result.startsWith("Success")) {
+                    JOptionPane.showMessageDialog(null, result, "Success", JOptionPane.INFORMATION_MESSAGE);
+                    f.dispose();
                 } else {
-                    JOptionPane.showMessageDialog(null, "Error: Failed to add info into auth db!", "Error", JOptionPane.ERROR_MESSAGE);
-                    System.out.println("Error: Failed to add info into auth db");
-                    return;
+                    JOptionPane.showMessageDialog(null, result, "Error", JOptionPane.ERROR_MESSAGE);
                 }
                 System.out.println("\tGoing back to Admin Dashboard..");
                 new adminDashboard(rollNo);

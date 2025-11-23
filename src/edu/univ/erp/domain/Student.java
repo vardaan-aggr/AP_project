@@ -6,12 +6,12 @@ public class Student {
     private String program;
     private String year;
 
-    public Student(String roll_no, String username, String program, String year) {
-        this.roll_no = roll_no;
-        this.username = username;
-        this.program = program;
-        this.year = year;
-    }
+    // public Student(String roll_no, String username, String program, String year) {
+    //     this.roll_no = roll_no;
+    //     this.username = username;
+    //     this.program = program;
+    //     this.year = year;
+    // }
 
     public String getUsername() { return username; }
     public String getRollNo() { return roll_no; }

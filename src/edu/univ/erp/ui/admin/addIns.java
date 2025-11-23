@@ -1,7 +1,6 @@
 package edu.univ.erp.ui.admin;
 
-import edu.univ.erp.data.AuthCommandRunner;
-import edu.univ.erp.data.ErpCommandRunner;
+import edu.univ.erp.service.AdminService;
 
 import java.awt.event.ActionListener;
 import java.awt.BorderLayout;
@@ -12,7 +11,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.sql.SQLException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -72,11 +70,11 @@ public class addIns {
         gbc.anchor = GridBagConstraints.EAST;
         p2.add(l1, gbc);
 
-        JTextField t1 = new JTextField(20);
-        t1.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        JTextField tUsername = new JTextField(20);
+        tUsername.setFont(gFont.deriveFont(Font.PLAIN, 21));
         gbc.gridx = 1; gbc.gridy = 0; gbc.weightx = 1;
         gbc.anchor = GridBagConstraints.WEST;
-        p2.add(t1, gbc);
+        p2.add(tUsername, gbc);
 
         JLabel l2 = new JLabel("Password:");
         l2.setFont(gFont.deriveFont(Font.PLAIN, 24));
@@ -85,11 +83,11 @@ public class addIns {
         gbc.anchor = GridBagConstraints.EAST;
         p2.add(l2, gbc);
 
-        JTextField t2 = new JTextField(20); 
-        t2.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        JTextField tPassword = new JTextField(20); 
+        tPassword.setFont(gFont.deriveFont(Font.PLAIN, 21));
         gbc.gridx = 1; gbc.gridy = 1; gbc.weightx = 1;
         gbc.anchor = GridBagConstraints.WEST;
-        p2.add(t2, gbc);
+        p2.add(tPassword, gbc);
 
         JLabel l3 = new JLabel("Department:");
         l3.setFont(gFont.deriveFont(Font.PLAIN, 24));
@@ -98,11 +96,11 @@ public class addIns {
         gbc.anchor = GridBagConstraints.EAST;
         p2.add(l3, gbc);
 
-        JTextField t3 = new JTextField(20);
-        t3.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        JTextField tDepartment = new JTextField(20);
+        tDepartment.setFont(gFont.deriveFont(Font.PLAIN, 21));
         gbc.gridx = 1; gbc.gridy = 2; gbc.weightx = 1;
         gbc.anchor = GridBagConstraints.WEST;
-        p2.add(t3, gbc);
+        p2.add(tDepartment, gbc);
 
         // --- Empty Row 3 for spacing (to push buttons down) ---
         // This is done implicitly by adjusting the button panel inset, but adding a spacer helps center the form better
@@ -144,38 +142,27 @@ public class addIns {
         b2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // Validate inputs
-                if (t1.getText().trim().isEmpty() || t2.getText().trim().isEmpty() || t3.getText().trim().isEmpty()) {
+                if (tUsername.getText().isEmpty() || tPassword.getText().trim().isEmpty() || tDepartment.getText().trim().isEmpty()) {
                     JOptionPane.showMessageDialog(null, "All fields must be filled out.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
-                String username = t1.getText().trim();
-                String rawPassword = t2.getText().trim();
-                String department = t3.getText().trim(); 
+                String username = tUsername.getText();
+                String department = tDepartment.getText().trim(); 
+                String hash_pass = HashGenerator.makeHash(tPassword.getText().trim());
+
+                AdminService service = new AdminService();
+                String result = service.registerInstructor(username, hash_pass, department);
                 
-                String hash_pass = HashGenerator.makeHash(rawPassword);
-
-                try {
-                    int newRollNo = AuthCommandRunner.registerUserAuth(username, "instructor", hash_pass);
-
-                    if (newRollNo != -1) {
-                        // 2. Add to ERP Database
-                        boolean success = ErpCommandRunner.registerInstructorErp(newRollNo, department);
-                        
-                        if (success) {
-                            JOptionPane.showMessageDialog(null, "Instructor Added! ID: " + newRollNo, "Success", JOptionPane.INFORMATION_MESSAGE);
-                            new adminDashboard(rollNo);
-                            f.dispose();
-                        } else {
-                            JOptionPane.showMessageDialog(null, "Auth created, but failed to add details to ERP.", "Error", JOptionPane.ERROR_MESSAGE);
-                        }
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Failed to create User in Auth DB.", "Error", JOptionPane.ERROR_MESSAGE);
-                    }
-                } catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(null, "Database Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                    ex.printStackTrace();
+                if (result.startsWith("Success")) {
+                    JOptionPane.showMessageDialog(null, result, "Success", JOptionPane.INFORMATION_MESSAGE);
+                    f.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(null, result, "Error", JOptionPane.ERROR_MESSAGE);
                 }
+                System.out.println("\tGoing back to Admin Dashboard..");
+                new adminDashboard(rollNo);
+                f.dispose();
             }
         });
 

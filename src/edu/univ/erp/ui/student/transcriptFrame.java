@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import javax.swing.*;
 import com.opencsv.CSVWriter;
 import edu.univ.erp.data.ErpCommandRunner;
+import edu.univ.erp.domain.Grades;
 
 public class transcriptFrame {
     public transcriptFrame(String username, String role, String in_pass, String rollNo) {
@@ -17,9 +18,9 @@ public class transcriptFrame {
         try (FileWriter outFile = new FileWriter(f);
              CSVWriter csvWriter = new CSVWriter(outFile)) {
             csvWriter.writeNext(new String[]{"Course", "Grade"});
-            ArrayList<String[]> arrCourseCode = ErpCommandRunner.studentTranscriptHelper(rollNo);
-            for (String[] row : arrCourseCode) {
-                csvWriter.writeNext(new String[]{row[0], row[2]});
+            ArrayList<Grades> arrCourseCode = ErpCommandRunner.studentTranscriptHelper(rollNo);
+            for (Grades g : arrCourseCode) {
+                csvWriter.writeNext(new String[]{g.getCourseCode(), g.getGrade()});
             }
             success = true;
         } catch (IOException ioex) {

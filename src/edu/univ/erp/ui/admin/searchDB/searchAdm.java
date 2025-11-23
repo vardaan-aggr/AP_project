@@ -59,6 +59,14 @@ public class searchAdm {
         String[] columName = {"Username", "Admin ID"}; 
         
         JTable t = new JTable(data, columName);
+        if (data == null) {
+            JOptionPane.showMessageDialog(null, "Error: No admin in database", "Error", JOptionPane.ERROR_MESSAGE);
+            System.out.println("\t (No admin in database)");
+            new adminDashboard(roll_no_inp);
+            f.dispose();
+            return;
+        }
+
         t.setFillsViewportHeight(true);
         
         JTableHeader header = t.getTableHeader();

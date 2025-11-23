@@ -84,13 +84,13 @@ public class catalog {
         JPanel p3 = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 20));
         p3.setBackground(Color.decode("#dbd3c5"));
         p3.setBorder(BorderFactory.createEmptyBorder(0, 0, 50, 0));
-        JButton backButton = new JButton("Back");
-        backButton.setBackground(Color.decode("#2f77b1"));
-        backButton.setForeground(Color.WHITE);
-        backButton.setFont(breatheFont.deriveFont(Font.PLAIN, 35f));
-        backButton.setMargin(new Insets(10, 30, 5, 30));
+        JButton bBack = new JButton("Back");
+        bBack.setBackground(Color.decode("#2f77b1"));
+        bBack.setForeground(Color.WHITE);
+        bBack.setFont(breatheFont.deriveFont(Font.PLAIN, 35f));
+        bBack.setMargin(new Insets(10, 30, 5, 30));
 
-        p3.add(backButton);
+        p3.add(bBack);
         f.add(p3, BorderLayout.SOUTH);
         f.setVisible(true);
 
@@ -111,7 +111,7 @@ public class catalog {
             }
         });
 
-        backButton.addActionListener(new ActionListener() {
+        bBack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("\tGoing Back...");
                 if (role.equalsIgnoreCase("student")) {

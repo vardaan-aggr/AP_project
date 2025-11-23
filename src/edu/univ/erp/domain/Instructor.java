@@ -5,11 +5,11 @@ public class Instructor {
     private String username;
     private String department;
 
-    public Instructor(String roll_no, String username, String department) {
-        this.roll_no = roll_no;
-        this.username = username;
-        this.department = department;
-    }
+    // public Instructor(String roll_no, String username, String department) {
+    //     this.roll_no = roll_no;
+    //     this.username = username;
+    //     this.department = department;
+    // }
 
     public String getUsername() { return username; }
     public String getRollNo() { return roll_no; }

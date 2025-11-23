@@ -27,8 +27,8 @@ import com.formdev.flatlaf.FlatLightLaf;
 import edu.univ.erp.data.DatabaseConnector;
 import edu.univ.erp.util.BREATHEFONT;
 
-public class assignIns {
-    public assignIns(String adminRollNo) {
+public class unassignIns {
+    public unassignIns(String adminRollNo) {
 
         Font breatheFont = BREATHEFONT.fontGen();
         Font gFont = BREATHEFONT.gFontGen(); 
@@ -48,7 +48,7 @@ public class assignIns {
         p1.setBackground(Color.decode("#051072")); 
         p1.setOpaque(true); 
         
-        JLabel l0 = new JLabel("ASSIGN INSTRUCTOR"); 
+        JLabel l0 = new JLabel("UNASSIGN INSTRUCTOR"); 
         l0.setForeground(Color.decode("#dbd3c5"));
         l0.setFont(breatheFont.deriveFont(Font.BOLD, 80f)); 
         l0.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0));
@@ -71,11 +71,11 @@ public class assignIns {
         gbc.anchor = GridBagConstraints.EAST;
         p2.add(l1, gbc);
 
-        JTextField t1 = new JTextField(20);
-        t1.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        JTextField tCourseCode = new JTextField(20);
+        tCourseCode.setFont(gFont.deriveFont(Font.PLAIN, 21));
         gbc.gridx = 1; gbc.gridy = 0; gbc.weightx = 1;
         gbc.anchor = GridBagConstraints.WEST;
-        p2.add(t1, gbc);
+        p2.add(tCourseCode, gbc);
 
         JLabel l2 = new JLabel("Section:");
         l2.setFont(gFont.deriveFont(Font.PLAIN, 24));
@@ -84,24 +84,24 @@ public class assignIns {
         gbc.anchor = GridBagConstraints.EAST;
         p2.add(l2, gbc);
 
-        JTextField t2 = new JTextField(20); 
-        t2.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        JTextField tSection = new JTextField(20); 
+        tSection.setFont(gFont.deriveFont(Font.PLAIN, 21));
         gbc.gridx = 1; gbc.gridy = 1; gbc.weightx = 1;
         gbc.anchor = GridBagConstraints.WEST;
-        p2.add(t2, gbc);
+        p2.add(tSection, gbc);
 
-        JLabel l3 = new JLabel("Instructor ID:");
-        l3.setFont(gFont.deriveFont(Font.PLAIN, 24));
-        l3.setForeground(Color.decode("#020A48"));
-        gbc.gridx = 0; gbc.gridy = 2; gbc.weightx = 0;
-        gbc.anchor = GridBagConstraints.EAST;
-        p2.add(l3, gbc);
+        // JLabel l3 = new JLabel("Instructor Rollno:");
+        // l3.setFont(gFont.deriveFont(Font.PLAIN, 24));
+        // l3.setForeground(Color.decode("#020A48"));
+        // gbc.gridx = 0; gbc.gridy = 2; gbc.weightx = 0;
+        // gbc.anchor = GridBagConstraints.EAST;
+        // p2.add(l3, gbc);
 
-        JTextField t3 = new JTextField(20); 
-        t3.setFont(gFont.deriveFont(Font.PLAIN, 21));
-        gbc.gridx = 1; gbc.gridy = 2; gbc.weightx = 1;
-        gbc.anchor = GridBagConstraints.WEST;
-        p2.add(t3, gbc);
+        // JTextField tInsRollNo = new JTextField(20); 
+        // tInsRollNo.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        // gbc.gridx = 1; gbc.gridy = 2; gbc.weightx = 1;
+        // gbc.anchor = GridBagConstraints.WEST;
+        // p2.add(tInsRollNo, gbc);
 
         // --- LOWS ---
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
@@ -139,22 +139,21 @@ public class assignIns {
         // ---- Action Listeners ----
         b1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (t1.getText().trim().isEmpty() || t2.getText().trim().isEmpty() || t3.getText().trim().isEmpty()) {
+                if (tCourseCode.getText().trim().isEmpty() || tSection.getText().trim().isEmpty()) {
                     JOptionPane.showMessageDialog(null, "All fields must be filled out.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 try (Connection connection = DatabaseConnector.getErpConnection()) {
                     try (PreparedStatement statement = connection.prepareStatement("""
-                                INSERT INTO sections (course_code, section, roll_no) VALUES
-                                    (?, ?, ?)
+                                Update sections set roll_no = 'N/A' where course_code = ? and section = ?;
                             """)) {
-                        statement.setString(1, t1.getText().trim());
-                        statement.setString(2, t2.getText().trim());
-                        statement.setString(3, t3.getText().trim());
-                        int rowsAffected = statement.executeUpdate();
-                        if (rowsAffected > 0) {
-                            System.out.println("Added instructor successfully in Auth..");
-                            JOptionPane.showMessageDialog(null, "Added instructor successfully in Auth..", "Success", JOptionPane.ERROR_MESSAGE);
+                        statement.setString(1, tCourseCode.getText().trim());
+                        statement.setString(2, tSection.getText().trim());
+                        // statement.setString(3, tInsRollNo.getText().trim());
+                        int rowsUpdated = statement.executeUpdate();
+                        if (rowsUpdated > 0) {
+                            System.out.println("Unassigned instructor successfully in Auth..");
+                            JOptionPane.showMessageDialog(null, "Unassigned instructor successfully in Auth..", "Success", JOptionPane.ERROR_MESSAGE);
                         } else {
                             JOptionPane.showMessageDialog(null, "Failed to add instructor!", "Error", JOptionPane.ERROR_MESSAGE);
                             System.out.println("Failed to add instructor in Auth");

@@ -100,19 +100,19 @@ public class createSection {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
         buttonPanel.setOpaque(false);
 
-        JButton assignButton = new JButton("Create"); 
-        assignButton.setBackground(Color.decode("#2f77b1")); 
-        assignButton.setForeground(Color.WHITE); 
-        assignButton.setFont(breatheFont.deriveFont(Font.PLAIN, 35)); 
-        assignButton.setMargin(new Insets(5, 20, 5, 20));
-        buttonPanel.add(assignButton);
+        JButton bAssign = new JButton("Create"); 
+        bAssign.setBackground(Color.decode("#2f77b1")); 
+        bAssign.setForeground(Color.WHITE); 
+        bAssign.setFont(breatheFont.deriveFont(Font.PLAIN, 35)); 
+        bAssign.setMargin(new Insets(5, 20, 5, 20));
+        buttonPanel.add(bAssign);
         
-        JButton backButton = new JButton("Back"); 
-        backButton.setBackground(Color.decode("#2f77b1")); 
-        backButton.setForeground(Color.WHITE); 
-        backButton.setFont(breatheFont.deriveFont(Font.PLAIN, 35));
-        backButton.setMargin(new Insets(5, 20, 5, 20));
-        buttonPanel.add(backButton);
+        JButton bBack = new JButton("Back"); 
+        bBack.setBackground(Color.decode("#2f77b1")); 
+        bBack.setForeground(Color.WHITE); 
+        bBack.setFont(breatheFont.deriveFont(Font.PLAIN, 35));
+        bBack.setMargin(new Insets(5, 20, 5, 20));
+        buttonPanel.add(bBack);
 
         // Place buttons
         gbc.gridx = 0; gbc.gridy = 8; 
@@ -129,7 +129,7 @@ public class createSection {
         f.setVisible(true);
 
         // --- Action Listeners ---
-        assignButton.addActionListener(new ActionListener() {
+        bAssign.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (tCourseCode.getText().trim().isEmpty() || tSection.getText().trim().isEmpty() || tInstructorRollNo.getText().trim().isEmpty() || tDayTime.getText().trim().isEmpty() || tRoomNo.getText().trim().isEmpty() || tCapacity.getText().trim().isEmpty() || tSemester.getText().trim().isEmpty() || tYear.getText().trim().isEmpty()) {
                     JOptionPane.showMessageDialog(null, "All fields must be filled out.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -180,7 +180,7 @@ public class createSection {
             }
         });
 
-        backButton.addActionListener(new ActionListener() {
+        bBack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Going back to Admin Dashboard..");
                 new adminDashboard(roll_no);

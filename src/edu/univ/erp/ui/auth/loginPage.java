@@ -3,8 +3,6 @@ package edu.univ.erp.ui.auth;
 import edu.univ.erp.util.BREATHEFONT;
 import edu.univ.erp.data.AuthCommandRunner;
 import java.sql.SQLException;
-import java.util.HashMap; 
-import java.util.Map;     
 
 import javax.swing.*;
 import org.mindrot.jbcrypt.BCrypt;
@@ -25,28 +23,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 
 public class loginPage {
-    
-    private static class LoginAttemptInfo {
-        int failedAttemptCount = 0;
-        long lastFailedAttemptTimestamp = 0; // in milliseconds
-        int lifeUsed = 0;
-
-        public void increment() {
-            lifeUsed++;
-            failedAttemptCount++;
-            lastFailedAttemptTimestamp = System.currentTimeMillis();
-        }
-
-        public void reset() {
-            failedAttemptCount = 0;
-            lastFailedAttemptTimestamp = 0;
-        }
-    }
-
-    private static final Map<String, LoginAttemptInfo> loginAttempts = new HashMap<>();
-    private static final int MAX_ATTEMPTS = 5;
-    private static final long LOCKOUT_TIME_MS = 30000; // 30 seconds (30000 ms)
-
+    // Logic Fix: This variable needs to be updated when data is entered
     private static String roll_no = "";
 
     public loginPage() {
@@ -81,6 +58,7 @@ public class loginPage {
         p2.setBackground(Color.decode("#dbd3c5")); 
         p2.setBorder(BorderFactory.createEmptyBorder(100, 100, 100, 100));
         GridBagConstraints gbc = new GridBagConstraints();
+
         gbc.insets = new Insets(10, 10, 10, 10);
 
         JLabel l1 = new JLabel("Username:");
@@ -90,12 +68,12 @@ public class loginPage {
         gbc.anchor = GridBagConstraints.EAST;
         p2.add(l1, gbc);
 
-        JTextField t1 = new JTextField(50);
-        t1.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        JTextField tUsername = new JTextField(50);
+        tUsername.setFont(gFont.deriveFont(Font.PLAIN, 21));
         gbc.gridx = 1; gbc.weightx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.CENTER;
-        p2.add(t1, gbc);
+        p2.add(tUsername, gbc);
         
         JLabel l2 = new JLabel("Password:");
         l2.setFont(gFont.deriveFont(Font.PLAIN, 24));
@@ -104,14 +82,14 @@ public class loginPage {
         gbc.fill= GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.EAST;
         p2.add(l2, gbc);
-        JPasswordField t2 = new JPasswordField(50);
-        t2.setFont(gFont.deriveFont(Font.PLAIN, 22));
+        JPasswordField tPassword = new JPasswordField(50);
+        tPassword.setFont(gFont.deriveFont(Font.PLAIN, 22));
         gbc.gridx = 1;
         gbc.gridy = 1;
         gbc.weightx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.CENTER;
-        p2.add(t2, gbc);
+        p2.add(tPassword, gbc);
         f.add(p2, BorderLayout.CENTER);
         
         // ---- Low ----
@@ -142,16 +120,24 @@ public class loginPage {
         f.setVisible(true);
         
         // For testing purposes only: remove in production
-        t1.setText("student1");
-        t2.setText("mdo1");
+        tUsername.setText("std1");
+        tPassword.setText("mdo1");
 
+        // --- LOGIN BUTTON LOGIC ---
         b1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String username_in = t1.getText().trim();
-                String password_in = new String(t2.getPassword());
-                loginResult lr = new loginResult();
+                String username_in = tUsername.getText();
+                String password_in = new String(tPassword.getPassword());
+                
+                // Basic validation
+                if(username_in.isEmpty() || password_in.isEmpty()) {
+                    JOptionPane.showMessageDialog(f, "Please enter both username and password.", "Input Error", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
                 try {
-                    lr = AuthCommandRunner.fetchUser(username_in);
+                    loginResult lr = AuthCommandRunner.fetchUser(username_in);
+                    
                     if(lr == null) {
                         System.out.println("\t (no data for given username found)");
                         JOptionPane.showMessageDialog(null, "Username not found.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -159,75 +145,51 @@ public class loginPage {
                     else {
                         if (BCrypt.checkpw(password_in, lr.hashPass)) {
                             System.out.println("\nCorrect Password");
+                            
+                            roll_no = lr.rollNo; 
+
                             if (lr.role.equals("student")) {
                                 new studentDashboard(username_in, lr.role, password_in, roll_no);
                                 System.out.println("\tOpening Student Dashboard..");
                                 f.dispose();
-                                return;
                             }
                             else if (lr.role.equals("instructor")) {
                                 new InstructorDashboard(username_in, lr.role, password_in, roll_no);
                                 System.out.println("\tOpening Instructor Dashboard");
                                 f.dispose();
-                                return;
                             }
                             else if (lr.role.equals("admin")) {
                                 new adminDashboard(roll_no);
                                 System.out.println("\tOpening Admin Dashboard");
                                 f.dispose();
-                                return;
                             }
                         } else {
-                            JOptionPane.showMessageDialog(null, "Wrong Password sorry", "Error", JOptionPane.ERROR_MESSAGE);
+                            JOptionPane.showMessageDialog(null, "Incorrect Password.", "Error", JOptionPane.ERROR_MESSAGE);
                             System.out.println("WrongPassword");
                         }
                     }
                 } catch (SQLException ex) {
                     ex.printStackTrace();
-                    JOptionPane.showMessageDialog(f, "Database error during login.", "Error", JOptionPane.ERROR_MESSAGE);
-                    return; 
-                }
-
-                // 3. Handle login outcome
-                if (loginSuccessful) {
-                    System.out.println("\nCorrect Password");
-                    // Reset failed attempts on success
-                    loginAttempts.remove(username_input);
-                    roll_no = retrieved_roll_no; // Update static roll_no member
-
-                    if (role_db.equals("student")) {
-                        new studentDashboard(username_input, role_db, password_input, roll_no);
-                        System.out.println("\tOpening Student Dashboard..");
-                    }
-                    else if (role_db.equals("instructor")) {
-                        new InstructorDashboard(roll_no);
-                        System.out.println("\tOpening Instructor Dashboard");
-                    }
-                    else if (role_db.equals("admin")) {
-                        new adminDashboard(roll_no);
-                        System.out.println("\tOpening Admin Dashboard");
-                    }
-                    f.dispose();
-                } else {
-                    // Update failed attempts on wrong password or user not found
-                    attemptInfo.increment();
-                    
-                    String message = "Invalid username or password.";
-                    if (attemptInfo.failedAttemptCount >= MAX_ATTEMPTS) {
-                         message += "\nToo many failed attempts. Account locked for 30 seconds.";
-                    }
-
-                    JOptionPane.showMessageDialog(f, message, "Login Failed", JOptionPane.ERROR_MESSAGE);
-                    System.out.println("WrongPassword. Failed attempts for " + username_input + ": " + attemptInfo.failedAttemptCount);
+                    JOptionPane.showMessageDialog(null, "Database Connection Error", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
 
+        // --- CHANGE PASSWORD BUTTON LOGIC ---
         b2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new changePassword(roll_no);
-                System.out.println("Change Password clicked");
-                f.dispose();
+                // LOGIC FIX: We must check if the user entered a username first
+                String userForChange = tUsername.getText();
+                
+                if(userForChange.isEmpty()) {
+                     JOptionPane.showMessageDialog(f, "Please enter your Username in the text box first.", "Missing Information", JOptionPane.WARNING_MESSAGE);
+                } else {
+                    // Pass the entered username as the roll_no context
+                    roll_no = userForChange; 
+                    new changePassword(roll_no);
+                    System.out.println("Change Password clicked for: " + roll_no);
+                    f.dispose();
+                }
             }
         });
     }
