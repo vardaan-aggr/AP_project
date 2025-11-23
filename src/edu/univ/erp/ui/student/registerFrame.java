@@ -1,6 +1,6 @@
 package edu.univ.erp.ui.student;
 
-import edu.univ.erp.data.ErpCommandRunner;  
+import edu.univ.erp.service.StudentService;
 
 import javax.swing.*;
 
@@ -112,11 +112,14 @@ public class registerFrame {
         // --- Action Listeners ---
         b1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                int rowsInserted = ErpCommandRunner.studentRegisterHelper(roll_no, tCourseCode.getText().trim(), tSection.getText().trim(), "enrolled");
+                StudentService service = new StudentService();
+                int rowsInserted = service.registerCourse(roll_no, tCourseCode.getText().trim(), tSection.getText().trim()); 
+
                 if (rowsInserted > 0) {
                     JOptionPane.showMessageDialog(null, "Registered successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
                     System.out.println("Registered Successfully.");
                 }
+                
                 new studentDashboard(username, role, in_pass, roll_no);
                 f.dispose();
             }

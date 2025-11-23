@@ -14,7 +14,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 
-import edu.univ.erp.util.modeOps;
+import edu.univ.erp.service.StudentService;
 import edu.univ.erp.ui.common.catalog;
 import edu.univ.erp.util.BREATHEFONT;
 
@@ -133,15 +133,13 @@ public class studentDashboard {
         // --- Action Listeners ---
         bRegister.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (modeOps.getMaintainMode().equals("true")) {
-                    JOptionPane.showMessageDialog(null, "Cannot change, Maintainance mode is on.", "FYI", JOptionPane.INFORMATION_MESSAGE);
-                    System.out.println("\tCouldn't open bcz maintainance mode is on.");
-                } else if (modeOps.getMaintainMode().equals("failure")) {
-                    ;
-                } else {
+                StudentService service = new StudentService();
+                if (service.isSystemActive()) {
                     System.out.println("\tOpening Registration Portal..");
                     new registerFrame(username, role, in_pass, roll_no);
                     f.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(null, "Cannot change, Maintenance mode is on.", "FYI", JOptionPane.INFORMATION_MESSAGE);
                 }
             }
         });
@@ -188,17 +186,16 @@ public class studentDashboard {
 
         bDrop.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (modeOps.getMaintainMode().equals("true")) {
-                    JOptionPane.showMessageDialog(null, "Cannot change, Maintainance mode is on.", "FYI", JOptionPane.INFORMATION_MESSAGE);
-                    System.out.println("\tCouldn't open bcz maintainance mode is on.");
-                } else if (modeOps.getMaintainMode().equals("failure")) {
-                    ;
+                StudentService service = new StudentService();
+
+                if (service.isSystemActive()) {
+                    System.out.println("\tOpening Drop Course Portal..");
+                    new dropCourseFrame(username, role, in_pass, roll_no);
+                    f.dispose();
                 } else {
-                System.out.println("\tOpening Drop Course Portal..");
-                new dropCourseFrame(username, role, in_pass, roll_no);
-                f.dispose();
+                    JOptionPane.showMessageDialog(null, "Cannot change, Maintenance mode is on.", "FYI", JOptionPane.INFORMATION_MESSAGE);
                 }
-            }   
+            }
         });
     }
 }
