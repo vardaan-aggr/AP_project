@@ -7,7 +7,9 @@ import java.sql.SQLException;
 import javax.swing.*;
 import org.mindrot.jbcrypt.BCrypt;
 import com.formdev.flatlaf.FlatLightLaf;
-
+import edu.univ.erp.service.LoginService;
+import edu.univ.erp.service.LoginService.LoginStatus;
+import edu.univ.erp.service.LoginService.ServiceLoginResult;
 import edu.univ.erp.data.AuthCommandRunner.loginResult;
 import edu.univ.erp.ui.student.studentDashboard;
 import edu.univ.erp.ui.admin.adminDashboard;
@@ -23,8 +25,9 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 
 public class loginPage {
-    // Logic Fix: This variable needs to be updated when data is entered
+    
     private static String roll_no = "";
+    private final LoginService loginService = new LoginService();
 
     public loginPage() {
         Font breatheFont = BREATHEFONT.fontGen();
@@ -126,51 +129,56 @@ public class loginPage {
         // --- LOGIN BUTTON LOGIC ---
         b1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String username_in = tUsername.getText();
+                String username_in = tUsername.getText().trim();
                 String password_in = new String(tPassword.getPassword());
-                
-                // Basic validation
-                if(username_in.isEmpty() || password_in.isEmpty()) {
-                    JOptionPane.showMessageDialog(f, "Please enter both username and password.", "Input Error", JOptionPane.WARNING_MESSAGE);
-                    return;
-                }
 
-                try {
-                    loginResult lr = AuthCommandRunner.fetchUser(username_in);
+                // 1. Call the new Service layer
+                ServiceLoginResult result = loginService.attemptLogin(username_in, password_in);
+
+                // 2. Handle the result from the Service
+                if (result.status == LoginStatus.SUCCESS) {
+                    System.out.println("\nCorrect Password");
+                    roll_no = result.userDetails.rollNo; // Update static roll_no member
+
+                    if (result.userDetails.role.equals("student")) {
+                        new studentDashboard(username_in, result.userDetails.role, password_in, roll_no);
+                        System.out.println("\tOpening Student Dashboard..");
+                    }
+                    else if (result.userDetails.role.equals("instructor")) {
+                        new InstructorDashboard(username_in, result.userDetails.role, password_in, roll_no);
+                        System.out.println("\tOpening Instructor Dashboard");
+                    }
+                    else if (result.userDetails.role.equals("admin")) {
+                        new adminDashboard(roll_no);
+                        System.out.println("\tOpening Admin Dashboard");
+                    }
+                    f.dispose();
+
+                }  else if (result.status == LoginStatus.ACCOUNT_LOCKED) {
+                    long currentTime = System.currentTimeMillis();
+                    long endsTime = result.lockoutEndsTimestamp;
+                    long timeLeftMs = endsTime - currentTime;
                     
-                    if(lr == null) {
-                        System.out.println("\t (no data for given username found)");
-                        JOptionPane.showMessageDialog(null, "Username not found.", "Error", JOptionPane.ERROR_MESSAGE);
+                    // Convert ms to seconds, rounding up to ensure the user sees at least 1 second
+                    long timeLeftSeconds = Math.max(0, (timeLeftMs / 1000) + 1); 
+                    
+                    String message;
+                    if (timeLeftSeconds > 0) {
+                        message = String.format("Account locked due to too many failed attempts. Please try again in approximately %d seconds.", timeLeftSeconds);
+                    } else {
+                        // Edge case: Lockout just expired, but the service still returned ACCOUNT_LOCKED
+                        message = "Account lock expired. You may try logging in again now.";
                     }
-                    else {
-                        if (BCrypt.checkpw(password_in, lr.hashPass)) {
-                            System.out.println("\nCorrect Password");
-                            
-                            roll_no = lr.rollNo; 
 
-                            if (lr.role.equals("student")) {
-                                new studentDashboard(username_in, lr.role, password_in, roll_no);
-                                System.out.println("\tOpening Student Dashboard..");
-                                f.dispose();
-                            }
-                            else if (lr.role.equals("instructor")) {
-                                new InstructorDashboard(username_in, lr.role, password_in, roll_no);
-                                System.out.println("\tOpening Instructor Dashboard");
-                                f.dispose();
-                            }
-                            else if (lr.role.equals("admin")) {
-                                new adminDashboard(roll_no);
-                                System.out.println("\tOpening Admin Dashboard");
-                                f.dispose();
-                            }
-                        } else {
-                            JOptionPane.showMessageDialog(null, "Incorrect Password.", "Error", JOptionPane.ERROR_MESSAGE);
-                            System.out.println("WrongPassword");
-                        }
-                    }
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(null, "Database Connection Error", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(f,
+                        message,
+                        "Login Locked", JOptionPane.ERROR_MESSAGE);
+
+                } else if (result.status == LoginStatus.INVALID_CREDENTIALS)  {
+                    JOptionPane.showMessageDialog(f, "Invalid username or password.", "Login Failed", JOptionPane.ERROR_MESSAGE);
+
+                } else if (result.status == LoginStatus.DATABASE_ERROR) {
+                    JOptionPane.showMessageDialog(f, "Database error during login. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
