@@ -14,8 +14,9 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;   
 import java.awt.event.ActionListener;
 
-import edu.univ.erp.data.ErpCommandRunner;
 import edu.univ.erp.util.BREATHEFONT;
+
+import edu.univ.erp.service.InstructorService;
 
 public class ClassStatisticsFrame {
     public ClassStatisticsFrame(String username, String role, String password, String roll_no) {
@@ -112,10 +113,20 @@ public class ClassStatisticsFrame {
                     return;
                 }
 
-                double stats = computeStats(courseCode_in, section_in);
-                if (stats != 0.0) {
+                InstructorService service = new InstructorService();
+                double stats = 0.0;
+                try {
+                    stats = service.computeStats(courseCode_in, section_in);
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "Database Error: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                if (stats == -1.0) {
+                    JOptionPane.showMessageDialog(null, "No grades found for this course/section.", "Info", JOptionPane.INFORMATION_MESSAGE);
+                } else {
                     JOptionPane.showMessageDialog(null, "Average CGPA for " + courseCode_in + " (" + section_in + ") = " + String.format("%.2f", stats), "Statistics", JOptionPane.INFORMATION_MESSAGE);
-                }      
+                }
             }
         });
 
@@ -126,42 +137,5 @@ public class ClassStatisticsFrame {
                 f.dispose();
             }
         });
-    }
-
-    private String[] gradesArr(String courseCode, String section) {
-        String[] strArr = null;
-        try {
-            strArr = ErpCommandRunner.instructorStatsHelper(courseCode, section);
-        } catch(SQLException ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Database Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            return new String[0];
-        }
-        return strArr;
-    }
-    
-    private double computeStats(String courseCode, String section) {
-        String[] grades = gradesArr(courseCode, section);
-        if (grades == null || grades.length == 0) { return 0.0; }
-        int totalPoints = 0;
-        for (String grade : grades) {
-            switch (grade.toUpperCase()) {
-                case "A":
-                    totalPoints += 3;
-                    break;
-                case "B":
-                    totalPoints += 2;
-                    break;
-                case "C":
-                    totalPoints += 1;
-                    break;
-                case "F":
-                    totalPoints += 0;
-                    break;
-                default:
-                    break;
-            }
-        }
-        return grades.length == 0 ? 0.0 : (double) totalPoints / grades.length;
-    }
+    }    
 }
