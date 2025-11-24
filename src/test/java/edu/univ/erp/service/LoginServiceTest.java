@@ -1,5 +1,4 @@
 package test.java.edu.univ.erp.service;
-
 import edu.univ.erp.data.AuthCommandRunner;
 import edu.univ.erp.data.AuthCommandRunner.loginResult;
 import org.junit.jupiter.api.*;
@@ -11,7 +10,6 @@ import edu.univ.erp.service.LoginService;
 import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 public class LoginServiceTest {
 

@@ -3,6 +3,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "loginPage",
+            "request": "launch",
+            "mainClass": "loginPage",
+            "projectName": "AP_project_25a853fc"
+        },
+        {
+            "type": "java",
             "name": "deleteSectionACourse",
             "request": "launch",
             "mainClass": "edu.univ.erp.ui.admin.deleteSectionACourse",
