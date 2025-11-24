@@ -141,7 +141,6 @@ public class addIns {
         // ---- Action Listeners ----
         b2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // Validate inputs
                 if (tUsername.getText().isEmpty() || tPassword.getText().trim().isEmpty() || tDepartment.getText().trim().isEmpty()) {
                     JOptionPane.showMessageDialog(null, "All fields must be filled out.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;

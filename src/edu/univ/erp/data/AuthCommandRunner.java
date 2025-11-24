@@ -7,10 +7,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-import javax.swing.JOptionPane;
-
 import edu.univ.erp.domain.Instructor;
 import edu.univ.erp.domain.Student;
+import edu.univ.erp.domain.Admin;
 
 public class AuthCommandRunner {
     public static class loginResult {
@@ -102,30 +101,26 @@ public class AuthCommandRunner {
 
     public static ArrayList<Student> searchStudentAuth() throws SQLException {
         ArrayList<Student> stdList = new ArrayList<>();
+        
         try (Connection connection = DatabaseConnector.getAuthConnection()) {
             try (PreparedStatement statement = connection.prepareStatement("""
-                        Select roll_no, username FROM auth_table WHERE role = ?;
+                        SELECT roll_no, username FROM auth_table WHERE role = ?;
                     """)) {
                 statement.setString(1, "student");
+                
                 try (ResultSet resultSet = statement.executeQuery()) {
-                    boolean empty = true;
                     while (resultSet.next()) {
-                        empty = false;
                         Student s = new Student();
                         s.setRollNo(resultSet.getString("roll_no"));
-                        s.setRollNo(resultSet.getString("username"));
+                        s.setUsername(resultSet.getString("username")); 
+                        s.setProgram("N/A");
+                        s.setYear("N/A");
+                        
                         stdList.add(s);
-                    }
-                    if (empty) {
-                        JOptionPane.showMessageDialog(null, "Error: No student with given inputs exists.", "Error", JOptionPane.ERROR_MESSAGE);
-                        System.out.println("\t (no student in auth database with given input)");
-                        return null;
                     }
                 }
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error: Couldn't fetch student details: " + e, "Error", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
             throw new SQLException(e);
         }
         return stdList;
@@ -133,61 +128,54 @@ public class AuthCommandRunner {
 
     public static ArrayList<Instructor> searchInstructorAuth() throws SQLException {
         ArrayList<Instructor> insList = new ArrayList<>();
+        
         try (Connection connection = DatabaseConnector.getAuthConnection()) {
             try (PreparedStatement statement = connection.prepareStatement("""
-                        Select roll_no, username FROM auth_table WHERE role = ?;
+                        SELECT roll_no, username FROM auth_table WHERE role = ?;
                     """)) {
                 statement.setString(1, "instructor");
+                
                 try (ResultSet resultSet = statement.executeQuery()) {
-                    boolean empty = true;
                     while (resultSet.next()) {
-                        empty = false;
                         Instructor i = new Instructor();
                         i.setRollNo(resultSet.getString("roll_no"));
                         i.setUsername(resultSet.getString("username"));
-                    }
-                    if (empty) {
-                        JOptionPane.showMessageDialog(null, "Error: No instructor with given inputs exists.", "Error", JOptionPane.ERROR_MESSAGE);
-                        System.out.println("\t (no instructor in auth database with given input)");
-                        return null;
+                        i.setDepartment("N/A"); 
+                        
+                        insList.add(i); 
                     }
                 }
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error: Couldn't fetch instructor details: " + e, "Error", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
             throw new SQLException(e);
         }
         return insList;
     }
 
-    public static ArrayList<String[]> searchAuthAuth() throws SQLException {
-        ArrayList<String[]> data = new ArrayList<>();
-        try (Connection connection = DatabaseConnector.getAuthConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement("""
-                        Select roll_no, username FROM auth_table WHERE role = ?;
-                    """)) {
-                statement.setString(1, "admin");
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    boolean empty = true;
-                    while (resultSet.next()) {
-                        empty = false;
-                        String rollNo = resultSet.getString("roll_no");
-                        String username = resultSet.getString("username");
-                        data.add(new String[]{username, rollNo});
-                    }
-                    if (empty) {
-                        JOptionPane.showMessageDialog(null, "Error: No admin in database", "Error", JOptionPane.ERROR_MESSAGE);
-                        System.out.println("\t (No admin in database)");
-                        return null;
-                    }
+    public static ArrayList<Admin> searchAuthAuth() throws SQLException {
+    ArrayList<Admin> adminList = new ArrayList<>();
+    
+    try (Connection connection = DatabaseConnector.getAuthConnection()) {
+        try (PreparedStatement statement = connection.prepareStatement("""
+                    SELECT roll_no, username FROM auth_table WHERE role = ?;
+                """)) {
+            statement.setString(1, "admin");
+            
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    Admin a = new Admin(
+                        resultSet.getString("roll_no"),
+                        resultSet.getString("username")
+                    );
+                    adminList.add(a);
                 }
             }
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "Error: Couldn't fetch instructor details: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace();
-            throw new SQLException(ex);
         }
-        return data;
+    } catch (SQLException e) {
+        throw new SQLException(e);
     }
+    return adminList;
+}
+
+    
 }

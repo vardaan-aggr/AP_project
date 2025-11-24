@@ -11,7 +11,7 @@ import javax.swing.UIManager;
 
 import com.formdev.flatlaf.FlatLightLaf;
 
-import edu.univ.erp.data.ErpCommandRunner;
+import edu.univ.erp.service.AdminService;
 import edu.univ.erp.util.BREATHEFONT;
 
 import java.awt.BorderLayout;
@@ -22,7 +22,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
-import java.sql.SQLException;
 import java.awt.event.ActionEvent;
 
 
@@ -131,52 +130,28 @@ public class createSection {
         // --- Action Listeners ---
         bAssign.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (tCourseCode.getText().trim().isEmpty() || tSection.getText().trim().isEmpty() || tInstructorRollNo.getText().trim().isEmpty() || tDayTime.getText().trim().isEmpty() || tRoomNo.getText().trim().isEmpty() || tCapacity.getText().trim().isEmpty() || tSemester.getText().trim().isEmpty() || tYear.getText().trim().isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "All fields must be filled out.", "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
+                // 1. Gather Inputs
+                String iCode = tCourseCode.getText().trim();
+                String iSec = tSection.getText().trim();
+                String iIns = tInstructorRollNo.getText().trim();
+                String iDay = tDayTime.getText().trim();
+                String iRoom = tRoomNo.getText().trim();
+                String iCap = tCapacity.getText().trim();
+                String iSem = tSemester.getText().trim();
+                String iYear = tYear.getText().trim();
+
+                // 2. Call Service
+                AdminService service = new AdminService();
+                String result = service.createSection(iCode, iSec, iIns, iDay, iRoom, iCap, iSem, iYear);
+
+                // 3. Handle Result
+                if ("Success".equals(result)) {
+                    JOptionPane.showMessageDialog(null, "Section created successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    new adminDashboard(roll_no);
+                    f.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(null, result, "Error", JOptionPane.ERROR_MESSAGE);
                 }
-                try {
-                    // Validate Instructor Roll No 
-                    try {
-                        Integer.parseInt(tInstructorRollNo.getText().trim()); 
-                    } catch (NumberFormatException ex) {
-                        JOptionPane.showMessageDialog(null, "Instructor Roll No must be a valid integer.", "Input Error", JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-                    // Validate Capacity 
-                    try {
-                        int cap = Integer.parseInt(tCapacity.getText().trim());
-                        if (cap <= 0) {
-                            JOptionPane.showMessageDialog(null, "Capacity must be a positive number.", "Input Error", JOptionPane.ERROR_MESSAGE);
-                            return;
-                        }
-                    } catch (NumberFormatException ex) {
-                        JOptionPane.showMessageDialog(null, "Capacity must be a valid integer.", "Input Error", JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-                    // Validate Year 
-                    try {
-                        int yr = Integer.parseInt(tYear.getText().trim());
-                        if (yr <= 0) {
-                            JOptionPane.showMessageDialog(null, "Year must be a positive number.", "Input Error", JOptionPane.ERROR_MESSAGE);
-                            return;
-                        }
-                    } catch (NumberFormatException ex) {
-                        JOptionPane.showMessageDialog(null, "Year must be a valid integer.", "Input Error", JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(null, "Invalid input data.", "Input Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                try {
-                    ErpCommandRunner.createSectionHelper(tCourseCode.getText().trim(), tSection.getText().trim(), tInstructorRollNo.getText().trim(), tDayTime.getText().trim(), tRoomNo.getText().trim(), tCapacity.getText().trim(), tSemester.getText().trim(), tYear.getText().trim());    
-                } catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(null, "Error while creating section: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
-                    ex.printStackTrace();
-                }
-                new adminDashboard(roll_no);
-                f.dispose();
             }
         });
 
