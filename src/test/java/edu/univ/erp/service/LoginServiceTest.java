@@ -32,9 +32,7 @@ public class LoginServiceTest {
         }
     }
 
-    // ----------------------------------------------------------
     // 1. Successful Login
-    // ----------------------------------------------------------
     @Test
     void testSuccessfulLogin() {
         try (
@@ -57,9 +55,8 @@ public class LoginServiceTest {
         }
     }
 
-    // ----------------------------------------------------------
+    
     // 2. Wrong Password
-    // ----------------------------------------------------------
     @Test
     void testWrongPassword() {
         try (
@@ -82,9 +79,9 @@ public class LoginServiceTest {
         }
     }
 
-    // ----------------------------------------------------------
+    
     // 3. User Not Found
-    // ----------------------------------------------------------
+    
     @Test
     void testUserNotFound() {
         try (MockedStatic<AuthCommandRunner> mockACR = Mockito.mockStatic(AuthCommandRunner.class)) {
@@ -99,14 +96,13 @@ public class LoginServiceTest {
         }
     }
 
-    // ----------------------------------------------------------
+    
     // 4. Locked out before 30 seconds
-    // ----------------------------------------------------------
+    
     @Test
     void testLockoutBeforeExpiry() throws Exception {
         try (
                 MockedStatic<AuthCommandRunner> mockACR = Mockito.mockStatic(AuthCommandRunner.class);
-                MockedStatic<BCrypt> mockBCrypt = Mockito.mockStatic(BCrypt.class)
         ) {
             mockACR.when(() -> AuthCommandRunner.fetchUser("john"))
                     .thenReturn(null);  // failed login
@@ -123,14 +119,10 @@ public class LoginServiceTest {
         }
     }
 
-    // ----------------------------------------------------------
-    // 5. Lockout expires after 30 seconds
-    // ----------------------------------------------------------
     @Test
     void testLockoutExpires() throws Exception {
         try (
                 MockedStatic<AuthCommandRunner> mockACR = Mockito.mockStatic(AuthCommandRunner.class);
-                MockedStatic<BCrypt> mockBCrypt = Mockito.mockStatic(BCrypt.class)
         ) {
             mockACR.when(() -> AuthCommandRunner.fetchUser("john"))
                     .thenReturn(null); // fail
@@ -160,9 +152,9 @@ public class LoginServiceTest {
         }
     }
 
-    // ----------------------------------------------------------
+    
     // 6. Database Error
-    // ----------------------------------------------------------
+    
     @Test
     void testDatabaseError() {
         try (MockedStatic<AuthCommandRunner> mockACR = Mockito.mockStatic(AuthCommandRunner.class)) {
