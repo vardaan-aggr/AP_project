@@ -1,7 +1,7 @@
 package edu.univ.erp.ui.instructor;
 
-import edu.univ.erp.data.ErpCommandRunner;  
- 
+import edu.univ.erp.service.InstructorService;
+
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -178,8 +178,10 @@ public class ComputeFinalFrame {
         // ---- Action Listeners ----
         add.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (num.getText().trim().isEmpty() || code.getText().trim().isEmpty() || sectionField.getText().trim().isEmpty() || 
-                    tquizMarks.getText().trim().isEmpty() || tmidsem.getText().trim().isEmpty() || tendsem.getText().trim().isEmpty()) {
+                // 1. Basic UI Validation (Empty Fields)
+                if (num.getText().trim().isEmpty() || code.getText().trim().isEmpty() || 
+                    sectionField.getText().trim().isEmpty() || tquizMarks.getText().trim().isEmpty() || 
+                    tmidsem.getText().trim().isEmpty() || tendsem.getText().trim().isEmpty()) {
                     JOptionPane.showMessageDialog(null, "Please fill all fields.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
@@ -187,20 +189,26 @@ public class ComputeFinalFrame {
                 String rollNo_in = num.getText().trim();
                 String courseCode_in = code.getText().trim();
                 String section_in = sectionField.getText().trim();
-                int rows = -1;
-                // validate rollNo & coursecode from enrollments if exists  
-                {
+                
+                // 2. Call Service
+                InstructorService service = new InstructorService();
+                String result = service.computeAndAssignGrade(
+                    rollNo_in, 
+                    courseCode_in, 
+                    section_in, 
+                    tquizMarks.getText().trim(), 
+                    tmidsem.getText().trim(), 
+                    tendsem.getText().trim()
+                );
 
-                }
-                rows = ErpCommandRunner.instructorGradeComputeHelper(tquizMarks.getText().trim(), tmidsem.getText().trim(), tendsem.getText().trim(), rollNo_in, courseCode_in, section_in);
-                if (rows > 0) {
+                // 3. Handle Result
+                if ("Success".equals(result)) {
                     JOptionPane.showMessageDialog(null, "Grade computed and updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                     new InstructorDashboard(username, role, password, roll_no);
                     f.dispose();
                 } else {
-                    System.out.println("\tGoing back to Instructor Dashboard..");
-                    new InstructorDashboard(username, role, password, roll_no);
-                    f.dispose();
+                    // Show whatever error message the Service returned (Invalid marks, Not enrolled, DB error, etc.)
+                    JOptionPane.showMessageDialog(null, result, "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });

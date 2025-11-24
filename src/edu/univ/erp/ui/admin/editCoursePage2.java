@@ -11,13 +11,12 @@ import javax.swing.UIManager;
 
 import com.formdev.flatlaf.FlatLightLaf;
 
-import edu.univ.erp.data.ErpCommandRunner;
+import edu.univ.erp.service.AdminService;
 import edu.univ.erp.util.BREATHEFONT;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionListener;
-import java.sql.SQLException;
 import java.awt.event.ActionEvent;
 
 import java.awt.BorderLayout;
@@ -161,23 +160,24 @@ public class editCoursePage2 {
         // --- Action Listeners ---
         bAssign.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                int rowsUpdated = -1;
-                try {
-                    rowsUpdated = ErpCommandRunner.courseUpdater(tTitle.getText().trim(), tCredits.getText().trim(), tCourseCode.getText().trim(), tSection.getText().trim());
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(null, "Error: Couldn't update course: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
-                    System.out.println("Error: Couldn't update course." + ex);
-                }
-                if (rowsUpdated == 0) {
-                    JOptionPane.showMessageDialog(null, "Error: Course code and Section dont match.", "Error", JOptionPane.ERROR_MESSAGE);
-                    System.out.println("Error: Course code and Section dont match.");
+                // 1. Gather Data
+                String iTitle = tTitle.getText().trim();
+                String iCredits = tCredits.getText().trim();
+                String iCode = tCourseCode.getText().trim();
+                String iSec = tSection.getText().trim();
+
+                // 2. Call Service
+                AdminService service = new AdminService();
+                String result = service.updateCourse(iTitle, iCredits, iCode, iSec);
+
+                // 3. Handle Result
+                if ("Success".equals(result)) {
+                    JOptionPane.showMessageDialog(null, "Course updated successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    new adminDashboard(roll_no);
+                    f.dispose();
                 } else {
-                    JOptionPane.showMessageDialog(null, "Section updated successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
-                    System.out.println("Update Successful.");
+                    JOptionPane.showMessageDialog(null, result, "Error", JOptionPane.ERROR_MESSAGE);
                 }
-                new adminDashboard(roll_no);
-                f.dispose();
             }
         });
 

@@ -9,9 +9,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -24,7 +21,7 @@ import javax.swing.UIManager;
 
 import com.formdev.flatlaf.FlatLightLaf;
 
-import edu.univ.erp.data.DatabaseConnector;
+import edu.univ.erp.service.AdminService;
 import edu.univ.erp.util.BREATHEFONT;
 
 public class unassignIns {
@@ -90,19 +87,6 @@ public class unassignIns {
         gbc.anchor = GridBagConstraints.WEST;
         p2.add(tSection, gbc);
 
-        // JLabel l3 = new JLabel("Instructor Rollno:");
-        // l3.setFont(gFont.deriveFont(Font.PLAIN, 24));
-        // l3.setForeground(Color.decode("#020A48"));
-        // gbc.gridx = 0; gbc.gridy = 2; gbc.weightx = 0;
-        // gbc.anchor = GridBagConstraints.EAST;
-        // p2.add(l3, gbc);
-
-        // JTextField tInsRollNo = new JTextField(20); 
-        // tInsRollNo.setFont(gFont.deriveFont(Font.PLAIN, 21));
-        // gbc.gridx = 1; gbc.gridy = 2; gbc.weightx = 1;
-        // gbc.anchor = GridBagConstraints.WEST;
-        // p2.add(tInsRollNo, gbc);
-
         // --- LOWS ---
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
         buttonPanel.setOpaque(false);
@@ -115,7 +99,7 @@ public class unassignIns {
         b2.setMargin(new Insets(10, 30, 5, 30));
         buttonPanel.add(b2);
 
-        JButton b1 = new JButton("Assign"); 
+        JButton b1 = new JButton("Unassign"); 
         b1.setBackground(Color.decode("#2f77b1")); 
         b1.setForeground(Color.WHITE); 
         b1.setFont(breatheFont.deriveFont(Font.PLAIN, 35));
@@ -143,29 +127,17 @@ public class unassignIns {
                     JOptionPane.showMessageDialog(null, "All fields must be filled out.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                try (Connection connection = DatabaseConnector.getErpConnection()) {
-                    try (PreparedStatement statement = connection.prepareStatement("""
-                                Update sections set roll_no = 'N/A' where course_code = ? and section = ?;
-                            """)) {
-                        statement.setString(1, tCourseCode.getText().trim());
-                        statement.setString(2, tSection.getText().trim());
-                        // statement.setString(3, tInsRollNo.getText().trim());
-                        int rowsUpdated = statement.executeUpdate();
-                        if (rowsUpdated > 0) {
-                            System.out.println("Unassigned instructor successfully in Auth..");
-                            JOptionPane.showMessageDialog(null, "Unassigned instructor successfully in Auth..", "Success", JOptionPane.ERROR_MESSAGE);
-                        } else {
-                            JOptionPane.showMessageDialog(null, "Failed to add instructor!", "Error", JOptionPane.ERROR_MESSAGE);
-                            System.out.println("Failed to add instructor in Auth");
-                            System.out.println(" to Admin Dashboard..");
-                            new adminDashboard(adminRollNo);
-                            f.dispose();
-                        }
-                    } 
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
+                AdminService service = new AdminService();
+                String result = service.unassignInstructor(tCourseCode.getText().trim(), tSection.getText().trim());
 
+                // 2. Handle Result
+                if ("Success".equals(result)) {
+                    JOptionPane.showMessageDialog(null, "Instructor unassigned successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    new adminDashboard(adminRollNo);
+                    f.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(null, "Failed: " + result, "Error", JOptionPane.ERROR_MESSAGE);
+                }                
                 System.out.println("\tGoing back to Admin Dashboard..");
                 new adminDashboard(adminRollNo);
                 f.dispose();
