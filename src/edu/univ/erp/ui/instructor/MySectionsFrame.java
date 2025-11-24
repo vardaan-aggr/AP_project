@@ -16,7 +16,6 @@ import java.awt.event.ActionListener;
 import java.sql.SQLException;
 
 import edu.univ.erp.data.ErpCommandRunner;
-import edu.univ.erp.ui.student.studentDashboard;
 import edu.univ.erp.util.BREATHEFONT;
 
 public class MySectionsFrame {

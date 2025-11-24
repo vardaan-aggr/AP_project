@@ -1,6 +1,5 @@
 package edu.univ.erp.ui.student;
-import edu.univ.erp.data.ErpCommandRunner;
-import edu.univ.erp.ui.admin.adminDashboard;
+import edu.univ.erp.service.StudentService;
 
 import java.sql.SQLException;
 
@@ -52,8 +51,12 @@ public class timetableFrame {
         p2.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
 
         try {
-            String data[][] = ErpCommandRunner.studentTimeTableHelper(roll_no);
-            if (data == null) {
+            StudentService service = new StudentService();
+            String data[][] = service.timetable(roll_no); 
+
+            if (data == null || data.length == 0) {
+                JOptionPane.showMessageDialog(null, "No active enrollments or section details found.", "Information", JOptionPane.INFORMATION_MESSAGE);
+                System.out.println("\t (no data found)");
                 System.out.println("\tGoing back to Student Dashboard..");
                 new studentDashboard(username, role, in_pass, roll_no);
                 f.dispose();

@@ -1,7 +1,5 @@
 package edu.univ.erp.ui.student;
-import edu.univ.erp.data.ErpCommandRunner;
-
-import java.sql.SQLException;
+import edu.univ.erp.service.StudentService;
 
 import javax.swing.*;
 
@@ -98,7 +96,10 @@ public class dropCourseFrame {
         // --- Action Listeners ---
         bDrop.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                int rowsDeleted = ErpCommandRunner.studentDropCourseHelper(roll_no, tCourseCode.getText().trim());
+
+                StudentService service = new StudentService();
+                int rowsDeleted = service.dropCourse(roll_no, tCourseCode.getText().trim());
+                
                 if (rowsDeleted == 0) {
                     JOptionPane.showMessageDialog(null, "Error: Not enrolled in given course.", "Error", JOptionPane.ERROR_MESSAGE);
                     System.out.println("Error: Not enrolled in given course.");

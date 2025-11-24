@@ -10,6 +10,7 @@ import javax.swing.JOptionPane;
 
 import edu.univ.erp.domain.Grades;
 import edu.univ.erp.domain.Instructor;
+import edu.univ.erp.domain.Sections;
 import edu.univ.erp.domain.Student;
 
 public class ErpCommandRunner {
@@ -114,40 +115,42 @@ public class ErpCommandRunner {
     }
     
     public static String[][] studentGradeHelper(String rollNo) throws SQLException {
-        ArrayList<String[]> data = new ArrayList<>();
+        ArrayList<Grades> gradeList = new ArrayList<>();
         try (Connection connection = DatabaseConnector.getErpConnection()) {
             try (PreparedStatement statement = connection.prepareStatement("""
                         Select course_code, grade FROM grades WHERE roll_no = ?;
                     """)) {
                 statement.setString(1, rollNo);
                 try (ResultSet resultSet = statement.executeQuery()) {
-                    boolean empty = true;
+                    // boolean empty = true;
                     while (resultSet.next()) {
-                        empty = false;
-                        String courseCode = resultSet.getString("course_code");
-                        String grade = resultSet.getString("grade");
-                        data.add(new String[]{courseCode, grade});
+                        // empty = false;
+                        Grades g = new Grades();
+                        g.setCourseCode(resultSet.getString("course_code"));
+                        g.setGrade(resultSet.getString("grade"));
+                        gradeList.add(g);
                     }
-                    if (empty) {
-                        JOptionPane.showMessageDialog(null, "Error: no courses in grade table", "Error", JOptionPane.ERROR_MESSAGE);
-                        System.out.println("\t (no courses in grade table)");
-                        return null;
-                    }
+                    // if (empty) {
+                    //     // JOptionPane.showMessageDialog(null, "Error: no courses in grade table", "Error", JOptionPane.ERROR_MESSAGE);
+                    //     // System.out.println("\t (no courses in grade table)");
+                    //     // return null;
+                    // }
                 }
             }
         } catch (SQLException ex) {
             throw new SQLException(ex);
         }
-        String[][] strArr = new String[data.size()][2];
-        for (int i = 0; i < data.size(); i++) {
-            strArr[i][0] = data.get(i)[0];
-            strArr[i][1] = data.get(i)[1];
+        String[][] strArr = new String[gradeList.size()][2];
+        for (int i = 0; i < gradeList.size(); i++) {
+            Grades g = gradeList.get(i);
+            strArr[i][0] = g.getCourseCode();
+            strArr[i][1] = g.getGrade();
         }
         return strArr;
     }
     
     public static String[][] studentTimeTableHelper(String rollNo) throws SQLException {
-        ArrayList<String[]> timetableList = new ArrayList<>();
+        ArrayList<Sections> sectionList = new ArrayList<>();
         String query = """
             SELECT e.course_code, s.day_time, s.room 
             FROM enrollments e
@@ -159,26 +162,32 @@ public class ErpCommandRunner {
             statement.setString(1, rollNo);
             statement.setString(2, "enrolled");
             try (ResultSet resultSet = statement.executeQuery()) {
-                boolean hasData = false;
+                // boolean hasData = false;
                 while (resultSet.next()) {
-                    hasData = true;
-                    String courseCode = resultSet.getString("course_code");
-                    String dayTime = resultSet.getString("day_time");
-                    String room = resultSet.getString("room");
-                    timetableList.add(new String[]{courseCode, dayTime, room});
+                    // hasData = true;
+                    Sections s = new Sections();
+                    s.setCourseCode(resultSet.getString("course_code"));
+                    s.setDayTime(resultSet.getString("day_time"));
+                    s.setRoom(resultSet.getString("room"));
+                    sectionList.add(s);
                 }
-                if (!hasData) {
-                    JOptionPane.showMessageDialog(null, "No active enrollments or section details found.", "Information", JOptionPane.INFORMATION_MESSAGE);
-                    System.out.println("\t (no data found)");
-                    return null;
-                }
+                // if (!hasData) {
+                //     JOptionPane.showMessageDialog(null, "No active enrollments or section details found.", "Information", JOptionPane.INFORMATION_MESSAGE);
+                //     System.out.println("\t (no data found)");
+                //     return null;
+                // }
             }
         } catch (SQLException ex) {
             throw new SQLException(ex);
         }
 
-        String[][] resultArr = new String[timetableList.size()][3];
-        timetableList.toArray(resultArr);
+        String[][] resultArr = new String[sectionList.size()][3];
+        for (int i = 0; i < sectionList.size(); i++) {
+            Sections s = sectionList.get(i);
+            resultArr[i][0] = s.getCourseCode();
+            resultArr[i][1] = s.getDayTime();
+            resultArr[i][2] = s.getRoom();
+        }
         return resultArr;
     }
     
