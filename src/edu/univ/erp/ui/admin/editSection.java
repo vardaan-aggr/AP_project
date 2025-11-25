@@ -11,7 +11,8 @@ import javax.swing.UIManager;
 
 import com.formdev.flatlaf.FlatLightLaf;
 
-import edu.univ.erp.data.ErpCommandRunner;
+import edu.univ.erp.domain.Sections;
+import edu.univ.erp.service.AdminService;
 import edu.univ.erp.util.BREATHEFONT;
 
 import java.awt.Color;
@@ -125,16 +126,36 @@ public class editSection {
         // --- Action Listeners ---
         bContinue.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                String courseCode = tCourseCode.getText().trim();
+                String section = tSection.getText().trim();
+
+                if (courseCode.isEmpty() || section.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Please enter both Course Code and Section.", "Missing Info", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
                 try {
-                    String[] arr = ErpCommandRunner.SectionInfoGetter(tCourseCode.getText().trim(), tSection.getText().trim());   
-                    new editSectionPage2(roll_no,arr);
-                    f0.dispose();             
+                    AdminService service = new AdminService();
+                    Sections s = service.getSectionDetails(courseCode, section);
+                    
+                    if (s != null) {
+                        String[] arr = new String[8];
+                        arr[0] = s.getCourseCode();
+                        arr[1] = s.getSection();
+                        arr[2] = s.getRollNo();
+                        arr[3] = s.getDayTime();
+                        arr[4] = s.getRoom();
+                        arr[5] = s.getCapacity();
+                        arr[6] = s.getSemester();
+                        arr[7] = s.getYear();
+                        
+                        new editSectionPage2(roll_no, arr);
+                        f0.dispose();             
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Section not found.", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
                 } catch (SQLException ex) {
-                    System.err.println("Error while getting section: " + ex);
                     ex.printStackTrace();
-                    JOptionPane.showMessageDialog(null, "Error while getting section: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
-                    new adminDashboard(roll_no);
-                    f0.dispose();
+                    JOptionPane.showMessageDialog(null, "Database Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });

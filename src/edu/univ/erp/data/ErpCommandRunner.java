@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
+import edu.univ.erp.domain.Course;
 import edu.univ.erp.domain.Grades;
 import edu.univ.erp.domain.Instructor;
 import edu.univ.erp.domain.Sections;
@@ -227,49 +228,49 @@ public class ErpCommandRunner {
     }
 
     public static ArrayList<Grades> studentTranscriptHelper(String rollNo) throws SQLException {
-    ArrayList<Grades> gradeList = new ArrayList<>();
+        ArrayList<Grades> gradeList = new ArrayList<>();
 
-    // Corrected Query: Selects all courses associated with the student, regardless of current status
-    String query = """
-        SELECT e.course_code, e.section, g.grade 
-        FROM enrollments e
-        LEFT JOIN grades g ON e.course_code = g.course_code AND e.roll_no = g.roll_no
-        WHERE e.roll_no = ?;
-    """;
+        // Corrected Query: Selects all courses associated with the student, regardless of current status
+        String query = """
+            SELECT e.course_code, e.section, g.grade 
+            FROM enrollments e
+            LEFT JOIN grades g ON e.course_code = g.course_code AND e.roll_no = g.roll_no
+            WHERE e.roll_no = ?;
+        """;
 
-    try (Connection connection = DatabaseConnector.getErpConnection();
-         PreparedStatement statement = connection.prepareStatement(query)) {
-        
-        statement.setString(1, rollNo);
+        try (Connection connection = DatabaseConnector.getErpConnection();
+            PreparedStatement statement = connection.prepareStatement(query)) {
+            
+            statement.setString(1, rollNo);
 
-        try (ResultSet resultSet = statement.executeQuery()) {
-            boolean hasEnrollments = false;
-            while (resultSet.next()) {
-                Grades g = new Grades();
-                hasEnrollments = true;
-                g.setCourseCode(resultSet.getString("course_code"));
-                g.setSection(resultSet.getString("section"));
-                g.setGrade(resultSet.getString("grade"));
-                
-                if (g.getGrade() == null) {
-                    g.setGrade("N/A"); 
+            try (ResultSet resultSet = statement.executeQuery()) {
+                boolean hasEnrollments = false;
+                while (resultSet.next()) {
+                    Grades g = new Grades();
+                    hasEnrollments = true;
+                    g.setCourseCode(resultSet.getString("course_code"));
+                    g.setSection(resultSet.getString("section"));
+                    g.setGrade(resultSet.getString("grade"));
+                    
+                    if (g.getGrade() == null) {
+                        g.setGrade("N/A"); 
+                    }
+                    gradeList.add(g);
                 }
-                gradeList.add(g);
+                if (!hasEnrollments) {
+                    System.out.println("\t (no courses found for transcript)");
+                }
             }
-            if (!hasEnrollments) {
-                System.out.println("\t (no courses found for transcript)");
-            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            throw new SQLException(ex); 
         }
-    } catch (SQLException ex) {
-        ex.printStackTrace();
-        throw new SQLException(ex); 
+
+        return gradeList;
     }
 
-    return gradeList;
-}
-
-    public static String[][] instructorMySectionsHelper(String roll_no) throws SQLException{
-        ArrayList<String[]> arrList = new ArrayList<>();
+    public static ArrayList<Sections> instructorMySectionsHelper(String roll_no) throws SQLException {
+        ArrayList<Sections> sectionList = new ArrayList<>();
         try (Connection connection = DatabaseConnector.getErpConnection()) {
             try (PreparedStatement statement = connection.prepareStatement("""
                         Select course_code FROM sections WHERE roll_no = ?; 
@@ -277,94 +278,46 @@ public class ErpCommandRunner {
                 statement.setString(1, roll_no); 
 
                 try (ResultSet resultSet = statement.executeQuery()) {
-                    boolean empty = true;
                     while (resultSet.next()) {
-                        empty = false;
-                        String course_code = resultSet.getString("course_code");
-                        arrList.add(new String[]{course_code });
+                        Sections s = new Sections();
+                        s.setCourseCode(resultSet.getString("course_code"));
+                        sectionList.add(s);
                     } 
-                    if (empty) {
-                        JOptionPane.showMessageDialog(null, "Given coursecode doesn't exists from sections: ", "Error", JOptionPane.ERROR_MESSAGE);
-                        System.out.println("\t (no data)");
-                        return null;
-                    }
                 }
             } 
         } catch (SQLException ex) {
             throw new SQLException(ex);
         }
-        String[][] strArr = new String[arrList.size()][1];
-        arrList.toArray(strArr);
-        return strArr;
+        return sectionList;
     }
 
-    public static int instructorGradeComputeHelper(String quizMarks, String midsemField, String endsemField, String rollNo_in, String courseCode_in, String section_in) {
-        try {
-            char finalGrade;
-            
-            // calculate grades
-            try {
-                finalGrade = computeGrade(quizMarks, midsemField, endsemField);
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(null, "Marks cannot exceed 10.", "Input Error", JOptionPane.ERROR_MESSAGE);
-                System.out.println("Marks cannot exceed 10");
-                return -1;
-            }
-
-            // check enrollment existence 
-            try (Connection connection = DatabaseConnector.getErpConnection()) {
-                try (PreparedStatement checkStmt = connection.prepareStatement("""
-                        SELECT 1 FROM grades WHERE roll_no = ? AND course_code = ? AND section = ?;
-                    """)) {
-                    checkStmt.setString(1, rollNo_in);
-                    checkStmt.setString(2, courseCode_in);
-                    checkStmt.setString(3, section_in);
-
-                    try (ResultSet rs = checkStmt.executeQuery()) {
-                        if (!rs.next()) {
-                            JOptionPane.showMessageDialog(null,"Student not enrolled in given course code and section.", "Input Error", JOptionPane.ERROR_MESSAGE);
-                            System.out.println("\t(Student not enrolled in given course code and section)");
-                            return -2;
-                        }
-                    }
-                }
-
-                // insert grades
-                try (PreparedStatement statement = connection.prepareStatement("""
-                    INSERT INTO grades (roll_no, course_code, section, grade) VALUES
-                        (?,?,?,?);     """)) {
-                    statement.setString(1, rollNo_in);
-                    statement.setString(2, courseCode_in);
-                    statement.setString(3, section_in);
-                    statement.setString(4, String.valueOf(finalGrade));
-                    int rows = statement.executeUpdate(); 
-                    return rows;
+    public static boolean isStudentEnrolled(String rollNo, String courseCode, String section) throws SQLException {
+        try (Connection connection = DatabaseConnector.getErpConnection()) {
+            // FIX: Check 'enrollments' table, not 'grades' table
+            try (PreparedStatement stmt = connection.prepareStatement(
+                    "SELECT 1 FROM enrollments WHERE roll_no = ? AND course_code = ? AND section = ? AND status = 'enrolled'")) {
+                stmt.setString(1, rollNo);
+                stmt.setString(2, courseCode);
+                stmt.setString(3, section);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    return rs.next(); // Returns true if student is found
                 }
             }
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, "Marks must be numbers only.", "Input Error", JOptionPane.ERROR_MESSAGE);
-            return -1;
         }
     }
-    private static char computeGrade(String quizMarks, String midsemMarks, String endsemMarks) throws NumberFormatException {
-        int quiz = Integer.parseInt(quizMarks);
-        int midsem = Integer.parseInt(midsemMarks); 
-        int endsem = Integer.parseInt(endsemMarks);
 
-        if (quiz > 10 || midsem > 10 || endsem > 10) {
-            throw new NumberFormatException("Marks cannot exceed 10");
-        }
-
-        int finalGrade = (int)(0.2 * quiz + 0.3 * midsem + 0.5 * endsem); 
-        
-        if (finalGrade >= 8) {
-            return 'A';
-        } else if (finalGrade >= 6) {
-            return 'B';
-        } else if (finalGrade >= 4) {
-            return 'C';
-        } else {
-            return 'F';
+    public static boolean addGrade(String rollNo, String courseCode, String section, String grade) throws SQLException {
+        try (Connection connection = DatabaseConnector.getErpConnection()) {
+            // Using REPLACE INTO or INSERT allows us to update the grade if it already exists
+            // Note: This assumes (roll_no, course_code) is a Unique Key or Primary Key in your DB design
+            try (PreparedStatement stmt = connection.prepareStatement(
+                    "INSERT INTO grades (roll_no, course_code, section, grade) VALUES (?, ?, ?, ?)")) {
+                stmt.setString(1, rollNo);
+                stmt.setString(2, courseCode);
+                stmt.setString(3, section);
+                stmt.setString(4, grade);
+                return stmt.executeUpdate() > 0;
+            }
         }
     }
 
@@ -428,27 +381,28 @@ public class ErpCommandRunner {
         }
     }
 
-    public static int createSectionHelper(String course_code ,String section ,String roll_no ,String day_time ,String room ,String capacity,String semester,String year) throws SQLException {
-        int rowsInsreted = -1;
+    public static int createSectionHelper(String course_code, String section, String roll_no, String day_time, String room, int capacity, String semester, int year) throws SQLException {
+        int rowsInserted = -1;
         try (Connection connection = DatabaseConnector.getErpConnection()) {
             try (PreparedStatement statement = connection.prepareStatement("""
-                        INSERT INTO sections(course_code ,section ,roll_no ,day_time ,room ,capacity,semester,year ) VALUES (?,?, ?,?,?, ?, ?, ?);
+                        INSERT INTO sections(course_code, section, roll_no, day_time, room, capacity, semester, year) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?);
                     """)) {
                 statement.setString(1, course_code);
                 statement.setString(2, section);
                 statement.setString(3, roll_no);
                 statement.setString(4, day_time);
                 statement.setString(5, room);
-                statement.setString(6, capacity);
+                statement.setInt(6, capacity); // Use setInt
                 statement.setString(7, semester);
-                statement.setString(8, year);
+                statement.setInt(8, year);     // Use setInt
 
-                rowsInsreted = statement.executeUpdate();
+                rowsInserted = statement.executeUpdate();
             }
         } catch (SQLException ex) {
             throw new SQLException(ex);
         }
-        return rowsInsreted;
+        return rowsInserted;
     }
 
     public static int deleteSecCourseHelper(String courseCode , String section) {
@@ -538,8 +492,7 @@ public class ErpCommandRunner {
         return rowsUpdated;
     }
 
-    public static String[] SectionInfoGetter(String course_code, String section) throws SQLException {
-        String[] arr = new String[8];
+    public static Sections SectionInfoGetter(String course_code, String section) throws SQLException {
         try (Connection connection = DatabaseConnector.getErpConnection()) {
             try (PreparedStatement statement = connection.prepareStatement("""
                 Select * FROM sections WHERE course_code = ? AND section = ?; 
@@ -549,50 +502,50 @@ public class ErpCommandRunner {
 
                 try (ResultSet resultSet = statement.executeQuery()) {
                     if (resultSet.next()) {
-                    
-                        String course_code2 = resultSet.getString("course_code");
-                        String section2 = resultSet.getString("section");
-                        String roll_no = resultSet.getString("roll_no");
-                        String day_time = resultSet.getString("day_time");
-                        String room = resultSet.getString("room");
-                        String capacity = resultSet.getString("capacity");
-                        String semester = resultSet.getString("semester");
-                        String year = resultSet.getString("year");
-
-                        arr[0] = course_code2;
-                        arr[1] = section2;   
-                        arr[2] = roll_no;
-                        arr[3] = day_time;
-                        arr[4] = room;
-                        arr[5] = capacity;
-                        arr[6] = semester;
-                        arr[7] = year;
+                        Sections s = new Sections();
+                        s.setCourseCode(resultSet.getString("course_code"));
+                        s.setSection(resultSet.getString("section"));
+                        s.setRollNo(resultSet.getString("roll_no"));
+                        s.setDayTime(resultSet.getString("day_time"));
+                        s.setRoom(resultSet.getString("room"));
+                        s.setCapacity(resultSet.getString("capacity"));
+                        s.setSemester(resultSet.getString("semester"));
+                        s.setYear(resultSet.getString("year"));
+                        return s;
                     }
                 }
             }
-        } catch (SQLException e) {
-            throw new SQLException();
         }
-        return arr;
+        return null;
     }
 
     public static int sectionUpdater(String roll_no, String day_time, String room, String capacity, String semester, String year, String course_code, String section) throws SQLException {
         int rowsUpdated = 0;
         try (Connection connection = DatabaseConnector.getErpConnection()) {
+            // CORRECTED SQL: Updates all fields based on Code + Section
             String sql = """
                 UPDATE sections 
-                SET day_time = ?, room = ?, capacity = ?, semester = ?, year = ?
-                WHERE course_code = ? AND section = ? AND semester = ? AND year = ?;
+                SET roll_no = ?, day_time = ?, room = ?, capacity = ?, semester = ?, year = ?
+                WHERE course_code = ? AND section = ?;
                 """;
             
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                // Set parameters in order (1 to 8)
+                statement.setString(1, roll_no); 
                 statement.setString(2, day_time); 
                 statement.setString(3, room); 
-                statement.setString(4, capacity); 
+                statement.setInt(4, Integer.parseInt(capacity)); // Use setInt for capacity if DB is int
                 statement.setString(5, semester); 
-                statement.setString(6, year); 
+                statement.setInt(6, Integer.parseInt(year));     // Use setInt for year if DB is int
+                statement.setString(7, course_code); 
+                statement.setString(8, section); 
+                
                 rowsUpdated = statement.executeUpdate();
             }
+        } catch (NumberFormatException e) {
+            // Handle case where capacity/year are not numbers
+            System.out.println("Error: Capacity and Year must be numbers.");
+            return -1; 
         } catch (SQLException e) {
             throw new SQLException(e);
         }
@@ -613,14 +566,7 @@ public class ErpCommandRunner {
                             s.setProgram(resultSet.getString("program"));
                             s.setYear(resultSet.getString("year"));
                         }
-                        // if (empty) {
-                        //     JOptionPane.showMessageDialog(null, "Error: No student with given inputs exists.", "Error", JOptionPane.ERROR_MESSAGE);
-                        //     System.out.println("\t (no student in erp database with given input)");
-                        //     return null;
                         else {
-                        // Student exists in Auth but not in ERP table. 
-                        // DO NOT return null here, or you lose all other students.
-                        // Just leave it as "N/A" (set in previous function) and continue.
                         System.out.println("Warning: Missing ERP details for roll: " + s.getRollNo());
                         }
                     }
@@ -665,4 +611,104 @@ public class ErpCommandRunner {
         }
         return insList;
     }
+
+    public static int unassignInstructorHelper(String courseCode, String section) throws SQLException {
+        // Set the instructor (roll_no) to 'N/A' effectively unassigning them
+        String query = "UPDATE sections SET roll_no = 'N/A' WHERE course_code = ? AND section = ?";
+        
+        try (Connection connection = DatabaseConnector.getErpConnection();
+            PreparedStatement statement = connection.prepareStatement(query)) {
+            
+            statement.setString(1, courseCode);
+            statement.setString(2, section);
+            
+            return statement.executeUpdate();
+        }
+    }
+
+    public static Course getCourseHelper(String courseCode, String section) throws SQLException {
+        try (Connection connection = DatabaseConnector.getErpConnection()) {
+            try (PreparedStatement statement = connection.prepareStatement("""
+                SELECT * FROM courses WHERE course_code = ? AND section = ?; 
+            """)) {
+                statement.setString(1, courseCode); 
+                statement.setString(2, section); 
+
+                try (ResultSet rs = statement.executeQuery()) {
+                    if (rs.next()) {
+                        Course c = new Course();
+                        c.setCourseCode(rs.getString("course_code"));
+                        c.setTitle(rs.getString("title"));
+                        c.setSection(rs.getString("section"));                            
+                        c.setCredits(rs.getString("credits"));
+                        return c;
+                    }
+                }
+            }
+        }
+        return null; 
+    }
+
+    public static int createCourseHelper(String courseCode, String title, String section, int credits) throws SQLException {
+        String sql = "INSERT INTO courses (course_code, title, section, credits) VALUES (?, ?, ?, ?)";
+        
+        try (Connection connection = DatabaseConnector.getErpConnection();
+            PreparedStatement statement = connection.prepareStatement(sql)) {
+            
+            statement.setString(1, courseCode);
+            statement.setString(2, title);
+            statement.setString(3, section);
+            statement.setInt(4, credits);
+            
+            return statement.executeUpdate();
+        }
+    }
+
+    public static ArrayList<Course> getAllCoursesHelper() throws SQLException {
+        ArrayList<Course> courseList = new ArrayList<>();
+        
+        try (Connection connection = DatabaseConnector.getErpConnection();
+            PreparedStatement statement = connection.prepareStatement(
+                "SELECT course_code, title, section, credits FROM courses")) {
+            
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    Course c = new Course();
+                    c.setCourseCode(rs.getString("course_code"));
+                    c.setTitle(rs.getString("title"));
+                    c.setSection(rs.getString("section"));
+                    c.setCredits(rs.getString("credits"));
+
+                    courseList.add(c);
+                }
+            }
+        }
+        return courseList;
+    }
+
+    public static ArrayList<Sections> getAllSectionsHelper() throws SQLException {
+    ArrayList<Sections> sectionList = new ArrayList<>();
+    
+    try (Connection connection = DatabaseConnector.getErpConnection();
+         PreparedStatement statement = connection.prepareStatement(
+             "SELECT * FROM sections")) {
+        
+        try (ResultSet rs = statement.executeQuery()) {
+            while (rs.next()) {
+                Sections s = new Sections();
+                s.setCourseCode(rs.getString("course_code"));
+                s.setSection(rs.getString("section"));
+                s.setRollNo(rs.getString("roll_no"));
+                s.setDayTime(rs.getString("day_time"));
+                s.setRoom(rs.getString("room"));
+                s.setCapacity(rs.getString("capacity")); 
+                s.setSemester(rs.getString("semester"));
+                s.setYear(rs.getString("year"));
+                
+                sectionList.add(s);
+            }
+        }
+    }
+    return sectionList;
+}
 }

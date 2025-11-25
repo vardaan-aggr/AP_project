@@ -114,6 +114,17 @@ public class studentDashboard {
         p2.add(bDrop, gbc);
         f.add(p2, BorderLayout.CENTER);
 
+        // --- NEW: Notifications Button ---
+        gbc.gridx = 0; gbc.gridy = 3; 
+        gbc.gridwidth = 2; 
+        JButton bNotify = new JButton("Notifications");
+        bNotify.setPreferredSize(buttonSize);
+        bNotify.setMargin(new Insets(10, 30, 5, 30));
+        bNotify.setBackground(Color.decode("#2f77b1")); 
+        bNotify.setForeground(Color.WHITE); 
+        bNotify.setFont(gFont.deriveFont(Font.PLAIN, 21f));
+        p2.add(bNotify, gbc);
+
         // Logout 
         JPanel p3 = new JPanel();
         p3.setBackground(Color.decode("#dbd3c5"));
@@ -195,6 +206,12 @@ public class studentDashboard {
                 } else {
                     JOptionPane.showMessageDialog(null, "Cannot change, Maintenance mode is on.", "FYI", JOptionPane.INFORMATION_MESSAGE);
                 }
+            }
+        });
+
+        bNotify.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                new edu.univ.erp.ui.common.NotificationDialog(f, roll_no);
             }
         });
     }

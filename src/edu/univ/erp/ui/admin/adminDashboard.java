@@ -89,6 +89,12 @@ public class adminDashboard {
         styleButton(b6, btnBg, btnFg, btnFont, buttonSize, btnMargin);
         p2.add(b6, gbc);
 
+        gbc.gridx = 0; gbc.gridy = 3; 
+        gbc.gridwidth = 2; 
+        JButton bNotify = new JButton("Notifications");
+        styleButton(bNotify, btnBg, btnFg, btnFont, buttonSize, btnMargin);
+        p2.add(bNotify, gbc);
+
         f.add(p2, BorderLayout.CENTER);
 
         // ---- LOWS ---- 
@@ -156,6 +162,12 @@ public class adminDashboard {
                 System.out.println("Opening Backup/Restore interface..");
                 new BackupRestorePage(rollNo); 
                 f.dispose();
+            }
+        });
+
+        bNotify.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                new edu.univ.erp.ui.common.NotificationDialog(f, rollNo);
             }
         });
 

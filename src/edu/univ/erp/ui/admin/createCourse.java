@@ -11,7 +11,7 @@ import javax.swing.UIManager;
 
 import com.formdev.flatlaf.FlatLightLaf;
 
-import edu.univ.erp.data.DatabaseConnector;
+import edu.univ.erp.service.AdminService;
 import edu.univ.erp.util.BREATHEFONT;
 
 import java.awt.BorderLayout;
@@ -22,9 +22,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.awt.event.ActionEvent;
 
 public class createCourse {
@@ -155,29 +152,21 @@ public class createCourse {
         // --- Action Listeners ---
         bAssign.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                try (Connection connection = DatabaseConnector.getErpConnection()) {
-                    try (PreparedStatement statement = connection.prepareStatement("""
-                                INSERT INTO courses (course_code ,title,section, credits ) VALUES (?, ?, ?, ?);
-                            """)) {
-                        statement.setString(1, tCourseCode.getText().trim());
-                        statement.setString(2, tTitle.getText().trim());
-                        statement.setString(3, tSection.getText().trim());
-                        statement.setString(4, tCredits.getText().trim());
-                        int rowsInsreted = statement.executeUpdate();
-                        if (rowsInsreted == 0) {
-                            JOptionPane.showMessageDialog(null, "Error: Couldn't register in database.", "Error", JOptionPane.ERROR_MESSAGE);
-                            System.out.println("Error: Couldn't register in database.");
-                        } else {
-                            JOptionPane.showMessageDialog(null, "Registered successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
-                            System.out.println("Registered Successfully.");
-                        }
-                    }
-                } catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(null, "Error registering: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
-                    ex.printStackTrace();
+                String iCode = tCourseCode.getText().trim();
+                String iTitle = tTitle.getText().trim();
+                String iSec = tSection.getText().trim();
+                String iCredits = tCredits.getText().trim();
+
+                AdminService service = new AdminService();
+                String result = service.createCourse(iCode, iTitle, iSec, iCredits);
+
+                if ("Success".equals(result)) {
+                    JOptionPane.showMessageDialog(null, "Course created successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    new adminDashboard(roll_no);
+                    f.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(null, result, "Error", JOptionPane.ERROR_MESSAGE);
                 }
-                new adminDashboard(roll_no);
-                f.dispose();
             }
         });
 

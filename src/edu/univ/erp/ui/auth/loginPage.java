@@ -1,16 +1,13 @@
 package edu.univ.erp.ui.auth;
 
 import edu.univ.erp.util.BREATHEFONT;
-import edu.univ.erp.data.AuthCommandRunner;
-import java.sql.SQLException;
-
 import javax.swing.*;
-import org.mindrot.jbcrypt.BCrypt;
 import com.formdev.flatlaf.FlatLightLaf;
+
+import edu.univ.erp.auth.changePassword;
 import edu.univ.erp.service.LoginService;
-import edu.univ.erp.service.LoginService.LoginStatus;
 import edu.univ.erp.service.LoginService.ServiceLoginResult;
-import edu.univ.erp.data.AuthCommandRunner.loginResult;
+
 import edu.univ.erp.ui.student.studentDashboard;
 import edu.univ.erp.ui.admin.adminDashboard;
 import edu.univ.erp.ui.instructor.InstructorDashboard;
@@ -122,7 +119,6 @@ public class loginPage {
         f.setLocationRelativeTo(null);
         f.setVisible(true);
         
-        // For testing purposes only: remove in production
         tUsername.setText("std1");
         tPassword.setText("mdo1");
 
@@ -132,14 +128,14 @@ public class loginPage {
                 String username_in = tUsername.getText().trim();
                 String password_in = new String(tPassword.getPassword());
 
-                // 1. Call the new Service layer
                 ServiceLoginResult result = loginService.attemptLogin(username_in, password_in);
 
-                // 2. Handle the result from the Service
-                if (result.status == LoginStatus.SUCCESS) {
-                    System.out.println("\nCorrect Password");
-                    roll_no = result.userDetails.rollNo; // Update static roll_no member
+                if (result.status == LoginService.STATUS_SUCCESS) {
+                    // --- SUCCESS ---
+                    System.out.println("\nLogin Successful");
+                    roll_no = result.userDetails.rollNo; 
 
+                    // Open the correct dashboard
                     if (result.userDetails.role.equals("student")) {
                         new studentDashboard(username_in, result.userDetails.role, password_in, roll_no);
                         System.out.println("\tOpening Student Dashboard..");
@@ -154,30 +150,26 @@ public class loginPage {
                     }
                     f.dispose();
 
-                }  else if (result.status == LoginStatus.ACCOUNT_LOCKED) {
+                } 
+                else if (result.status == LoginService.STATUS_LOCKED) {
+                    // --- LOCKED OUT ---
                     long currentTime = System.currentTimeMillis();
                     long endsTime = result.lockoutEndsTimestamp;
                     long timeLeftMs = endsTime - currentTime;
-                    
-                    // Convert ms to seconds, rounding up to ensure the user sees at least 1 second
                     long timeLeftSeconds = Math.max(0, (timeLeftMs / 1000) + 1); 
                     
-                    String message;
-                    if (timeLeftSeconds > 0) {
-                        message = String.format("Account locked due to too many failed attempts. Please try again in approximately %d seconds.", timeLeftSeconds);
-                    } else {
-                        // Edge case: Lockout just expired, but the service still returned ACCOUNT_LOCKED
-                        message = "Account lock expired. You may try logging in again now.";
-                    }
-
                     JOptionPane.showMessageDialog(f,
-                        message,
+                        "Account locked due to too many failed attempts. Try again in " + timeLeftSeconds + " seconds.",
                         "Login Locked", JOptionPane.ERROR_MESSAGE);
 
-                } else if (result.status == LoginStatus.INVALID_CREDENTIALS)  {
+                } 
+                else if (result.status == LoginService.STATUS_INVALID) {
+                    // --- WRONG CREDENTIALS ---
                     JOptionPane.showMessageDialog(f, "Invalid username or password.", "Login Failed", JOptionPane.ERROR_MESSAGE);
 
-                } else if (result.status == LoginStatus.DATABASE_ERROR) {
+                } 
+                else if (result.status == LoginService.STATUS_ERROR) {
+                    // --- DB ERROR ---
                     JOptionPane.showMessageDialog(f, "Database error during login. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
@@ -186,13 +178,11 @@ public class loginPage {
         // --- CHANGE PASSWORD BUTTON LOGIC ---
         b2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // LOGIC FIX: We must check if the user entered a username first
                 String userForChange = tUsername.getText();
                 
                 if(userForChange.isEmpty()) {
                      JOptionPane.showMessageDialog(f, "Please enter your Username in the text box first.", "Missing Information", JOptionPane.WARNING_MESSAGE);
                 } else {
-                    // Pass the entered username as the roll_no context
                     roll_no = userForChange; 
                     new changePassword(roll_no);
                     System.out.println("Change Password clicked for: " + roll_no);

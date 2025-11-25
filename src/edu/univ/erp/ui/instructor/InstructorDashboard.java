@@ -15,7 +15,8 @@ import java.awt.Insets;
 
 import edu.univ.erp.ui.common.catalog;
 import edu.univ.erp.util.BREATHEFONT;
-import edu.univ.erp.util.modeOps;
+import edu.univ.erp.access.modeOps;
+import edu.univ.erp.domain.Settings; 
 
 public class InstructorDashboard {
     
@@ -83,6 +84,11 @@ public class InstructorDashboard {
         styleButton(b4, btnBg, btnFg, btnFont, btnSize);
         p2.add(b4, gbc);
 
+        gbc.gridy = 4;
+        JButton bNotify = new JButton("🔔 Notifications");
+        styleButton(bNotify, btnBg, btnFg, btnFont, btnSize);
+        p2.add(bNotify, gbc);
+
         f.add(p2, BorderLayout.CENTER);
 
         // ---- LOWS ----
@@ -114,11 +120,11 @@ public class InstructorDashboard {
         
         b2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (modeOps.getMaintainMode().equals("true")) {
+                Settings mode = modeOps.getSetting("maintain_mode");
+                
+                if (mode != null && mode.isTrue()) {
                     JOptionPane.showMessageDialog(null, "Cannot change, Maintenance mode is on.", "Info", JOptionPane.INFORMATION_MESSAGE);
                     System.out.println("\tCouldn't open bcz maintenance mode is on.");
-                } else if (modeOps.getMaintainMode().equals("failure")) {
-                    ;
                 } else {
                     System.out.println("Opening Compute Final Grades...");
                     new ComputeFinalFrame(username, role, password, roll_no);
@@ -150,6 +156,13 @@ public class InstructorDashboard {
                 f.dispose();
             }
         });
+
+        bNotify.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                new edu.univ.erp.ui.common.NotificationDialog(f, roll_no);
+            }
+        });
+
     }
 
     void styleButton(JButton button, Color bg, Color fg, Font font, Dimension size) {

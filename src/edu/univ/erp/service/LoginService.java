@@ -1,93 +1,118 @@
 package edu.univ.erp.service;
 
+import edu.univ.erp.auth.HashGenerator;
 import edu.univ.erp.data.AuthCommandRunner;
 import edu.univ.erp.data.AuthCommandRunner.loginResult;
-import org.mindrot.jbcrypt.BCrypt;
+
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class LoginService {
 
-    private static class LoginAttemptInfo {
-        int failedAttemptCount = 0;
-        long lastFailedAttemptTimestamp = 0; // in milliseconds
+    public static final int STATUS_SUCCESS = 0;
+    public static final int STATUS_INVALID = 1;
+    public static final int STATUS_LOCKED = 2;
+    public static final int STATUS_ERROR = 3;
+    public static final int STATUS_MAINTENANCE = 4; // NEW STATUS
 
-        public void increment() {
-            failedAttemptCount++;
-            lastFailedAttemptTimestamp = System.currentTimeMillis();
+    public static class UserDetails {
+        public String role;
+        public String rollNo;
+        public UserDetails(String role, String rollNo) {
+            this.role = role;
+            this.rollNo = rollNo;
         }
-
-        public void reset() {
-            failedAttemptCount = 0;
-            lastFailedAttemptTimestamp = 0;
-        }
-    }
-
-    private static final Map<String, LoginAttemptInfo> loginAttempts = new HashMap<>();
-    private static final int MAX_ATTEMPTS = 5;
-    private static final long LOCKOUT_TIME_MS = 30000; // 30 seconds
-
-    public enum LoginStatus {
-        SUCCESS,
-        INVALID_CREDENTIALS,
-        ACCOUNT_LOCKED,
-        DATABASE_ERROR
     }
 
     public static class ServiceLoginResult {
-        public LoginStatus status;
-        public loginResult userDetails;
-        public long lockoutEndsTimestamp = 0; 
+        public int status; 
+        public UserDetails userDetails;
+        public long lockoutEndsTimestamp;
 
-        public ServiceLoginResult(LoginStatus status, loginResult userDetails, long lockoutEndsTimestamp) {
+        public ServiceLoginResult(int status, UserDetails userDetails) {
             this.status = status;
             this.userDetails = userDetails;
-            this.lockoutEndsTimestamp = lockoutEndsTimestamp;
+        }
+
+        public ServiceLoginResult(int status) {
+            this.status = status;
         }
         
-        public ServiceLoginResult(LoginStatus status, loginResult userDetails) {
-            this(status, userDetails, 0); 
+        public ServiceLoginResult(int status, long lockoutEndsTimestamp) {
+            this.status = status;
+            this.lockoutEndsTimestamp = lockoutEndsTimestamp;
         }
     }
 
-    public ServiceLoginResult attemptLogin(String username_in, String password_in) {
+    // --- 2. Settings ---
+    private static final int MAX_ATTEMPTS = 3;
+    private static final long LOCK_TIME_MS = 30 * 1000; 
+    
+    private static final Map<String, Integer> failedAttempts = new HashMap<>();
+    private static final Map<String, Long> activeLockouts = new HashMap<>();
+
+    // --- 3. The Logic ---
+    public ServiceLoginResult attemptLogin(String username, String rawPassword) {
         
-        LoginAttemptInfo attemptInfo = loginAttempts.getOrDefault(username_in, new LoginAttemptInfo());
-        loginAttempts.put(username_in, attemptInfo);
-
-        // 1. Check for lockout
-        if (attemptInfo.failedAttemptCount >= MAX_ATTEMPTS) {
-            long timeElapsed = System.currentTimeMillis() - attemptInfo.lastFailedAttemptTimestamp;
-            if (timeElapsed < LOCKOUT_TIME_MS) {
-                long endsTimestamp = attemptInfo.lastFailedAttemptTimestamp + LOCKOUT_TIME_MS;
-                // Return the calculated end timestamp
-                return new ServiceLoginResult(LoginStatus.ACCOUNT_LOCKED, null, endsTimestamp);
-            } else {
-                attemptInfo.reset();
-            }
+        // Check Lockout
+        if (isLocked(username)) {
+            return new ServiceLoginResult(STATUS_LOCKED, activeLockouts.get(username));
         }
-
-        loginResult lr = null;
-        boolean loginSuccessful = false;
 
         try {
-            lr = AuthCommandRunner.fetchUser(username_in);
+            // Fetch User
+            loginResult dbUser = AuthCommandRunner.fetchUser(username);
 
-            if (lr != null && BCrypt.checkpw(password_in, lr.hashPass)) {
-                loginSuccessful = true;
+            // Check if user exists
+            if (dbUser == null) {
+                recordFailure(username);
+                return new ServiceLoginResult(STATUS_INVALID);
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            return new ServiceLoginResult(LoginStatus.DATABASE_ERROR, null);
-        }
 
-        if (loginSuccessful) {
-            attemptInfo.reset();
-            return new ServiceLoginResult(LoginStatus.SUCCESS, lr);
-        } else {
-            attemptInfo.increment();
-            return new ServiceLoginResult(LoginStatus.INVALID_CREDENTIALS, null);
+            // D. Check Password
+            if (HashGenerator.verifyHash(rawPassword, dbUser.hashPass)) {
+                resetFailure(username); 
+
+                AuthCommandRunner.updateLastLogin(dbUser.rollNo);
+                
+                return new ServiceLoginResult( STATUS_SUCCESS, new UserDetails(dbUser.role, dbUser.rollNo));
+            } else {
+                recordFailure(username);
+                return new ServiceLoginResult(STATUS_INVALID);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return new ServiceLoginResult(STATUS_ERROR);
         }
+    }
+
+    // --- 4. Helper Methods ---
+    private boolean isLocked(String username) {
+        if (activeLockouts.containsKey(username)) {
+            long unlockTime = activeLockouts.get(username);
+            if (System.currentTimeMillis() > unlockTime) {
+                activeLockouts.remove(username);
+                failedAttempts.remove(username);
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private void recordFailure(String username) {
+        int attempts = failedAttempts.getOrDefault(username, 0) + 1;
+        failedAttempts.put(username, attempts);
+
+        if (attempts >= MAX_ATTEMPTS) {
+            activeLockouts.put(username, System.currentTimeMillis() + LOCK_TIME_MS);
+        }
+    }
+
+    private void resetFailure(String username) {
+        failedAttempts.remove(username);
+        activeLockouts.remove(username);
     }
 }

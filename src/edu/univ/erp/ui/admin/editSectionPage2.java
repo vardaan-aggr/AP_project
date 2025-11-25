@@ -11,16 +11,12 @@ import javax.swing.UIManager;
 
 import com.formdev.flatlaf.FlatLightLaf;
 
-import edu.univ.erp.data.DatabaseConnector;
-import edu.univ.erp.data.ErpCommandRunner;
+import edu.univ.erp.service.AdminService;
 import edu.univ.erp.util.BREATHEFONT;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.awt.event.ActionEvent;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -144,60 +140,25 @@ public class editSectionPage2 {
         // --- Action Listeners ---
         bAssign.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                int rowsUpdated = -1;
-                try {
-                    rowsUpdated = ErpCommandRunner.sectionUpdater(tInsRollNo.getText().trim(), tDayTime.getText().trim(), tRoom.getText().trim(), tCapacity.getText().trim(), tSemester.getText().trim(), tYear.getText().trim(), tCourseCode.getText().trim(), tSection.getText().trim());
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(null, "Error: Couldn't update course: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
-                }
-                if (rowsUpdated == 0) {
-                    JOptionPane.showMessageDialog(null, "Error: Course code and Section dont match.", "Error", JOptionPane.ERROR_MESSAGE);
-                    System.out.println("Error: Course code and Section dont match.");
-                } else {
+                String iRoll = tInsRollNo.getText().trim();
+                String iDay = tDayTime.getText().trim();
+                String iRoom = tRoom.getText().trim();
+                String iCap = tCapacity.getText().trim();
+                String iSem = tSemester.getText().trim();
+                String iYear = tYear.getText().trim();
+                String iCode = tCourseCode.getText().trim();
+                String iSec = tSection.getText().trim();
+
+                AdminService service = new AdminService();
+                String result = service.updateSection(iRoll, iDay, iRoom, iCap, iSem, iYear, iCode, iSec);
+
+                if ("Success".equals(result)) {
                     JOptionPane.showMessageDialog(null, "Section updated successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
-                    System.out.println("Update Successful.");
+                    new adminDashboard(roll_no);
+                    f.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(null, result, "Error", JOptionPane.ERROR_MESSAGE);
                 }
-                new adminDashboard(roll_no);
-                f.dispose();
-                try (Connection connection = DatabaseConnector.getErpConnection()) {
-                // Use an UPDATE statement
-                try (PreparedStatement statement = connection.prepareStatement(
-                        """
-                        UPDATE sections 
-                        SET roll_no = ?, day_time = ?, room = ?, capacity = ?, semester = ?, year = ?
-                        WHERE course_code = ? AND section = ?;
-                        """)) {
-                    
-                    // Set the new values
-                    statement.setString(1, tInsRollNo.getText().trim()); // roll_no
-                    statement.setString(2, tDayTime.getText().trim()); // day_time
-                    statement.setString(3, tRoom.getText().trim()); // room
-                    statement.setString(4, tCapacity.getText().trim()); // capacity
-                    statement.setString(5, tSemester.getText().trim()); // semester
-                    statement.setString(6, tYear.getText().trim()); // year
-
-                    // Use the original course_code and section from the text fields for the WHERE clause
-                    // Note: It's better to make tCourseCode (course_code) and tSection (section) non-editable
-                    // to prevent users from changing the primary key during an edit.
-                    statement.setString(7, tCourseCode.getText().trim()); // WHERE course_code
-                    statement.setString(8, tSection.getText().trim()); // WHERE section
-
-                    rowsUpdated = statement.executeUpdate();
-                    if (rowsUpdated == 0) {
-                        JOptionPane.showMessageDialog(null, "Error: Couldn't update section.", "Error", JOptionPane.ERROR_MESSAGE);
-                        System.out.println("Error: Couldn't update section.");
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Section updated successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
-                        System.out.println("Update Successful.");
-                    }
-                }
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(null, "Error updating: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
-                ex.printStackTrace();
-            }
-                new adminDashboard(roll_no);
-                f.dispose();
             }   
         });
 
@@ -228,4 +189,3 @@ public class editSectionPage2 {
         return t;
     }
 }
-

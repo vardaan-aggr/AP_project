@@ -14,8 +14,10 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;   
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
-import edu.univ.erp.data.ErpCommandRunner;
+import edu.univ.erp.domain.Sections;
+import edu.univ.erp.service.InstructorService;
 import edu.univ.erp.util.BREATHEFONT;
 
 public class MySectionsFrame {
@@ -54,12 +56,22 @@ public class MySectionsFrame {
         p2.setBorder(new EmptyBorder(20, 50, 20, 50));
 
         try {
-            String data[][] = ErpCommandRunner.instructorMySectionsHelper(roll_no);
-            if (data == null) {
-                System.out.println("\tGoing back to Student Dashboard..");
+            InstructorService service = new InstructorService();
+            ArrayList<Sections> sectionList = service.getMySections(roll_no);
+
+            // 2. Check for Data
+            if (sectionList == null || sectionList.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "You have not been assigned any sections yet.", "Info", JOptionPane.INFORMATION_MESSAGE);
+                System.out.println("\tGoing back to Dashboard..");
                 new InstructorDashboard(username, role, password, roll_no);
                 f.dispose();
                 return;
+            }
+            String[][] data = new String[sectionList.size()][2];
+            for (int i = 0; i < sectionList.size(); i++) {
+                Sections s = sectionList.get(i);
+                data[i][0] = s.getCourseCode();
+                data[i][1] = s.getSection();
             }
             String columName[] = {"Course Code"};
             

@@ -112,10 +112,8 @@ public class CreateEdit {
         gbc.gridwidth = 2;
         p2.add(bBack, gbc);
 
-        // Add padding panel to center
         JPanel container = new JPanel(new BorderLayout());
         container.add(p2, BorderLayout.CENTER);
-        // Add margins to prevent buttons from touching edges
         p2.setBorder(BorderFactory.createEmptyBorder(50, 100, 50, 100)); 
 
         f.add(container, BorderLayout.CENTER);

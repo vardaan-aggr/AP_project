@@ -1,5 +1,6 @@
 package edu.univ.erp.ui.admin;
 
+import edu.univ.erp.auth.HashGenerator;
 import edu.univ.erp.service.AdminService;
 
 import java.awt.event.ActionListener;
@@ -24,7 +25,6 @@ import javax.swing.UIManager;
 import com.formdev.flatlaf.FlatLightLaf;
 
 import edu.univ.erp.util.BREATHEFONT;
-import edu.univ.erp.util.HashGenerator;
 
 public class addIns {
     public addIns(String rollNo) {
@@ -141,7 +141,6 @@ public class addIns {
         // ---- Action Listeners ----
         b2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // Validate inputs
                 if (tUsername.getText().isEmpty() || tPassword.getText().trim().isEmpty() || tDepartment.getText().trim().isEmpty()) {
                     JOptionPane.showMessageDialog(null, "All fields must be filled out.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;

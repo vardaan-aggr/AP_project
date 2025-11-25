@@ -46,3 +46,8 @@ Create table if not exists settings (
     settings_key varchar(50) PRIMARY KEY,
     settings_value varchar(50)
 );
+CREATE TABLE IF NOT EXISTS notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    message VARCHAR(255)
+);

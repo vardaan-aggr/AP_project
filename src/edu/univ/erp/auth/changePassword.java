@@ -1,4 +1,4 @@
-package edu.univ.erp.ui.auth;
+package edu.univ.erp.auth;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -26,7 +26,8 @@ import com.formdev.flatlaf.FlatLightLaf;
 
 import edu.univ.erp.data.DatabaseConnector;
 import edu.univ.erp.util.BREATHEFONT;
-import edu.univ.erp.util.HashGenerator;
+
+import edu.univ.erp.ui.auth.loginPage;
 
 public class changePassword {
     public changePassword(String rollNo) {

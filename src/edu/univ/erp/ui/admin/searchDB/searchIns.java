@@ -16,9 +16,8 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Insets;
 
-import edu.univ.erp.data.AuthCommandRunner;
-import edu.univ.erp.data.ErpCommandRunner;
 import edu.univ.erp.domain.Instructor;
+import edu.univ.erp.service.AdminService;
 import edu.univ.erp.ui.admin.adminDashboard;
 import edu.univ.erp.util.BREATHEFONT;
 
@@ -52,12 +51,13 @@ public class searchIns {
 
         // ---- MIDDLE ----
         String[][] data = dataPull();
-        if (dataPull() == null) {
+        if (data == null || data.length == 0) {
+            JOptionPane.showMessageDialog(null, "No instructors found.", "Info", JOptionPane.INFORMATION_MESSAGE);
             System.out.println("\tGoing back to admin dashboard..");
             new adminDashboard(roll_no_inp);
             f.dispose();
             return;
-        } 
+        }
         String[] columName = {"RollNo", "Username", "Department"};
         
         JTable t = new JTable(data, columName);
@@ -108,21 +108,25 @@ public class searchIns {
     }
 
     private String[][] dataPull() {
-        ArrayList<Instructor> insList = new ArrayList<>();
         try {
-            insList = AuthCommandRunner.searchInstructorAuth();
-            insList = ErpCommandRunner.searchInstructorErp(insList);
+            AdminService service = new AdminService();
+            ArrayList<Instructor> insList = service.getAllInstructors();
+
+            if (insList.isEmpty()) return null;
+
+            String[][] strArr = new String[insList.size()][3];
+            for(int i = 0; i < insList.size(); i++) {
+                Instructor ins = insList.get(i);
+                strArr[i][0] = ins.getRollNo();
+                strArr[i][1] = ins.getUsername();
+                strArr[i][2] = ins.getDepartment();
+            } 
+            return strArr;
+
         } catch (SQLException e) {
+            System.err.println("SQL Error: " + e.getMessage());
             return null;
         }
-        String[][] strArr = new String[insList.size()][4];
-        for(int i = 0; i < insList.size(); i++) {
-            Instructor ins = insList.get(i);
-            strArr[i][0] = ins.getRollNo();
-            strArr[i][1] = ins.getUsername();
-            strArr[i][2] = ins.getDepartment();
-        } 
-        return strArr;
     }
 
 }

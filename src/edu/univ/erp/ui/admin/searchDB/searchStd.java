@@ -16,12 +16,11 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Insets;
 
-import edu.univ.erp.data.AuthCommandRunner;
-import edu.univ.erp.data.ErpCommandRunner;
 import edu.univ.erp.ui.admin.adminDashboard;
 import edu.univ.erp.util.BREATHEFONT;
 
 import edu.univ.erp.domain.Student;
+import edu.univ.erp.service.AdminService;
 
 public class searchStd {
     public searchStd(String roll_no_inp) {
@@ -53,11 +52,12 @@ public class searchStd {
         // ---- MIDDLE ----
         String[][] data = dataPull();
         if (data == null || data.length == 0) {
+            JOptionPane.showMessageDialog(null, "No students found in database.", "Info", JOptionPane.INFORMATION_MESSAGE);
             System.out.println("\tGoing back to admin dashboard..");
             new adminDashboard(roll_no_inp);
             f.dispose();
             return;
-        } 
+        }
         String[] columName = {"Roll No", "Username", "Program", "Year"};
         
         JTable t = new JTable(data, columName);
@@ -108,23 +108,25 @@ public class searchStd {
     }
 
     private String[][] dataPull() {
-        ArrayList<Student> stdList = new ArrayList<>();
         try {
-            stdList = AuthCommandRunner.searchStudentAuth();
-            if (stdList == null) { return null; }
-            stdList = ErpCommandRunner.searchStudentErp(stdList);
+            AdminService service = new AdminService();
+            ArrayList<Student> stdList = service.getAllStudents();
+
+            if (stdList.isEmpty()) return null;
+
+            String[][] strArr = new String[stdList.size()][4];
+            for (int i = 0; i < stdList.size(); i++) {
+                Student s = stdList.get(i);
+                strArr[i][0] = s.getRollNo();
+                strArr[i][1] = s.getUsername();
+                strArr[i][2] = s.getProgram();
+                strArr[i][3] = s.getYear();
+            }
+            return strArr;
+
         } catch (SQLException e) {
             System.err.println("SQL Error in dataPull: " + e.getMessage());
             return null;
         }
-        String[][] strArr = new String[stdList.size()][4];
-        for (int i = 0; i < stdList.size(); i++) {
-            Student s = stdList.get(i);
-            strArr[i][0] = s.getRollNo();
-            strArr[i][1] = s.getUsername();
-            strArr[i][2] = s.getProgram();
-            strArr[i][3] = s.getYear();
-        }
-        return strArr;
     }
 }

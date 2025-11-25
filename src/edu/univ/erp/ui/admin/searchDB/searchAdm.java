@@ -16,7 +16,8 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Insets;
 
-import edu.univ.erp.data.AuthCommandRunner;
+import edu.univ.erp.domain.Admin;
+import edu.univ.erp.service.AdminService;
 import edu.univ.erp.ui.admin.adminDashboard;
 import edu.univ.erp.util.BREATHEFONT;
 
@@ -59,9 +60,9 @@ public class searchAdm {
         String[] columName = {"Username", "Admin ID"}; 
         
         JTable t = new JTable(data, columName);
-        if (data == null) {
-            JOptionPane.showMessageDialog(null, "Error: No admin in database", "Error", JOptionPane.ERROR_MESSAGE);
-            System.out.println("\t (No admin in database)");
+        if (data == null || data.length == 0) {
+            JOptionPane.showMessageDialog(null, "No admins found (Active list is empty).", "Info", JOptionPane.INFORMATION_MESSAGE);
+            System.out.println("\tGoing back to admin dashboard..");
             new adminDashboard(roll_no_inp);
             f.dispose();
             return;
@@ -114,15 +115,23 @@ public class searchAdm {
     }
 
     private String[][] dataPull() {
-        ArrayList<String[]> data = new ArrayList<>();
         try {
-            data = AuthCommandRunner.searchAuthAuth();
+            AdminService service = new AdminService();
+            ArrayList<Admin> adminList = service.getAllAdmins();
+
+            if (adminList.isEmpty()) return null;
+
+            String[][] strArr = new String[adminList.size()][2];
+            for (int i = 0; i < adminList.size(); i++) {
+                Admin a = adminList.get(i);
+                strArr[i][0] = a.getUsername();
+                strArr[i][1] = a.getRollNo();
+            }
+            return strArr;
+
         } catch (SQLException e) {
+            System.err.println("SQL Error: " + e.getMessage());
             return null;
         }
-
-        String[][] strArr = new String[data.size()][2];
-        data.toArray(strArr);
-        return strArr;
     }
 }
