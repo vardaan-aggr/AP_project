@@ -96,17 +96,27 @@ public class dropCourseFrame {
         // --- Action Listeners ---
         bDrop.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-
                 StudentService service = new StudentService();
-                int rowsDeleted = service.dropCourse(roll_no, tCourseCode.getText().trim());
+                String courseCode = tCourseCode.getText().trim();
                 
-                if (rowsDeleted == 0) {
-                    JOptionPane.showMessageDialog(null, "Error: Not enrolled in given course.", "Error", JOptionPane.ERROR_MESSAGE);
-                    System.out.println("Error: Not enrolled in given course.");
-                } else {
+                // Call the service (which now checks the deadline)
+                int result = service.dropCourse(roll_no, courseCode);
+                
+                if (result > 0) {
                     JOptionPane.showMessageDialog(null, "Course dropped successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
-                    System.out.println("Course droped successfully.");
+                    System.out.println("Course dropped successfully.");
+                } 
+                else if (result == -2) {
+                    // New Case: Deadline Passed
+                    JOptionPane.showMessageDialog(null, "Failed: The drop deadline has passed.", "Error", JOptionPane.ERROR_MESSAGE);
+                    System.out.println("Error: Deadline passed.");
+                } 
+                else {
+                    // Result is 0 or -1 (Not enrolled or DB error)
+                    JOptionPane.showMessageDialog(null, "Error: Not enrolled or course invalid.", "Error", JOptionPane.ERROR_MESSAGE);
+                    System.out.println("Error: Not enrolled in given course.");
                 }
+                
                 new studentDashboard(username, role, in_pass, roll_no);
                 f.dispose();
             }

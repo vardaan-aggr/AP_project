@@ -11,7 +11,8 @@ import javax.swing.UIManager;
 
 import com.formdev.flatlaf.FlatLightLaf;
 
-import edu.univ.erp.data.ErpCommandRunner;
+import edu.univ.erp.domain.Course;
+import edu.univ.erp.service.AdminService;
 import edu.univ.erp.util.BREATHEFONT;
 
 import java.awt.BorderLayout;
@@ -124,16 +125,31 @@ public class editCourse {
         // --- Action Listeners ---
         bContinue.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                String code = tCourseCode.getText().trim();
+                String sec = tSection.getText().trim();
+                if (code.isEmpty() || sec.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Please enter both Course Code and Section.", "Missing Info", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
                 try {
-                    String[] arr = ErpCommandRunner.courseSectionEditHelper(tCourseCode.getText().trim(), tSection.getText().trim());   
-                    new editCoursePage2(roll_no,arr);
-                    f0.dispose();             
+                    AdminService service = new AdminService();
+                    Course courseObj = service.getCourseDetails(code, sec);
+                    if (courseObj != null) {
+                        String[] arr = new String[4];
+                        arr[0] = courseObj.getCourseCode();
+                        arr[1] = courseObj.getTitle();
+                        arr[2] = courseObj.getSection();
+                        arr[3] = String.valueOf(courseObj.getCredits());
+                        
+                        new editCoursePage2(roll_no, arr);
+                        f0.dispose();             
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Course not found.", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
                 } catch (SQLException ex) {
-                    System.err.println("Error while getting sections and courses: " + ex);
                     ex.printStackTrace();
-                    JOptionPane.showMessageDialog(null, "Error while getting sections and courses: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
-                    new adminDashboard(roll_no);
-                    f0.dispose();
+                    JOptionPane.showMessageDialog(null, "Database Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });

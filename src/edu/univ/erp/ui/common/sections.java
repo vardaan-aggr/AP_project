@@ -7,13 +7,10 @@ import javax.swing.table.JTableHeader;
 import com.formdev.flatlaf.FlatLightLaf;
 
 import edu.univ.erp.ui.instructor.InstructorDashboard;
-import edu.univ.erp.data.DatabaseConnector;
 import edu.univ.erp.domain.Sections;
+import edu.univ.erp.service.CatalogService;
 import edu.univ.erp.util.BREATHEFONT;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.awt.BorderLayout;
@@ -123,7 +120,7 @@ public class sections {
         // --- Action Listeners ---
         bSearch.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String input = tSearchCode.getText().trim().trim();
+                String input = tSearchCode.getText().trim();
                 if(input.isEmpty()) return;
 
                 boolean found = false;
@@ -162,48 +159,32 @@ public class sections {
     }
 
     private String[][] dataPull() {
-        ArrayList<Sections> sectionList = new ArrayList<>();
-        try (Connection connection = DatabaseConnector.getErpConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement("""
-                        Select course_code, section, roll_no, day_time, room, capacity, semester, year FROM sections   ; 
-                    """)) {
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    boolean empty = true;
-                    while (resultSet.next()) {
-                        Sections s = new Sections();
-                        empty = false;
-                        s.setCourseCode(resultSet.getString("course_code"));
-                        s.setSection(resultSet.getString("section"));
-                        s.setRollNo(resultSet.getString("roll_no"));
-                        s.setDayTime(resultSet.getString("day_time"));
-                        s.setRoom(resultSet.getString("room"));
-                        s.setCapacity(resultSet.getString("capacity"));
-                        s.setSemester(resultSet.getString("semester"));
-                        s.setYear(resultSet.getString("year"));
-             
-                        sectionList.add(s);
-                    } 
-                    if (empty) {
-                        System.out.println("\t (no data)");
-                    }
-                }
-            } 
+        try {
+            CatalogService service = new CatalogService();
+            ArrayList<Sections> sectionList = service.getAllSections();
+
+            if (sectionList == null || sectionList.isEmpty()) {
+                return new String[0][0];
+            }
+
+            String[][] strArr = new String[sectionList.size()][8];
+            for (int i = 0; i < sectionList.size(); i++) {
+                Sections s = sectionList.get(i);
+                strArr[i][0] = s.getCourseCode();
+                strArr[i][1] = s.getSection();
+                strArr[i][2] = s.getRollNo();
+                strArr[i][3] = s.getDayTime();
+                strArr[i][4] = s.getRoom();
+                strArr[i][5] = s.getCapacity(); 
+                strArr[i][6] = s.getSemester();
+                strArr[i][7] = s.getYear();     
+            }
+            return strArr;
+
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, "Database Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
+            return new String[0][0];
         }
-        String[][] strArr = new String[sectionList.size()][8];
-        for (int i = 0; i < sectionList.size(); i++) {
-            Sections s = sectionList.get(i);
-            strArr[i][0] = s.getCourseCode();
-            strArr[i][1] = s.getSection();
-            strArr[i][2] = s.getRollNo();
-            strArr[i][3] = s.getDayTime();
-            strArr[i][4] = s.getRoom();
-            strArr[i][5] = s.getCapacity();
-            strArr[i][6] = s.getSemester();
-            strArr[i][7] = s.getYear();
-        }
-        return strArr;
-    }    
+    }  
 }

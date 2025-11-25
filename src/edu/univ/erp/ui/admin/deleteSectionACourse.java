@@ -11,7 +11,7 @@ import javax.swing.UIManager;
 
 import com.formdev.flatlaf.FlatLightLaf;
 
-import edu.univ.erp.data.ErpCommandRunner;
+import edu.univ.erp.service.AdminService;
 import edu.univ.erp.util.BREATHEFONT;
 
 import java.awt.BorderLayout;
@@ -124,7 +124,6 @@ public class deleteSectionACourse {
         // --- Action Listeners ---
         bDelete.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                int rowsAffected = -1;
                 String courseCode = tCourseCode.getText().trim();
                 String section = tSection.getText().trim();
 
@@ -139,40 +138,22 @@ public class deleteSectionACourse {
                     JOptionPane.YES_NO_OPTION);
 
                 if (confirm == JOptionPane.YES_OPTION) {
-                    rowsAffected = ErpCommandRunner.deleteSecCourseHelper(courseCode, section); 
-                    switch (rowsAffected) {
-                        case -3: {
-                            JOptionPane.showMessageDialog(null, "Error: Couldn't connect to database.", "Error", JOptionPane.WARNING_MESSAGE);
-                            System.out.println("Error: Couldn't connect to database.");
-                        }
-                        case -1: {
-                            JOptionPane.showMessageDialog(null, "Error: Couldn't delete section.", "Error", JOptionPane.WARNING_MESSAGE);
-                            System.out.println("Error: Couldn't delete section");
-                        }
-                        case -2: {
-                            JOptionPane.showMessageDialog(null, "Error: Section didn't existed, but course existed so delted.", "Error", JOptionPane.WARNING_MESSAGE);
-                            System.out.println("Error: Section didn't existed, but course existed so delted.");
-                        }
-                        case 2: {
-                            JOptionPane.showMessageDialog(null, "Error: Section deleted, but Course not found in 'courses' table.", "Error", JOptionPane.WARNING_MESSAGE);
-                            System.out.println("Error: Section deleted, but Course not found in 'courses' table.");
-                        }
-                        case 3: {
-                            JOptionPane.showMessageDialog(null, "Error: Course didn't existed, but section existed so delted.", "Error", JOptionPane.WARNING_MESSAGE);
-                            System.out.println("Error: Course deleted (if existed), but section not found in 'courses' table.");
-                        }
-                        case 4: {
-                            JOptionPane.showMessageDialog(null, "Error: None of the section and course exist.", "Error", JOptionPane.WARNING_MESSAGE);
-                            System.out.println("Error: None of the section and course exist.");
-                   
-                        }
-                        default: {
-                            JOptionPane.showMessageDialog(null, "Course and Section deleted successfully.", "Error", JOptionPane.WARNING_MESSAGE);
-                            System.out.println("Course and Section deleted successfully.");
-                        }
+                    // 1. Call Service
+                    AdminService service = new AdminService();
+                    String message = service.deleteCourseAndSection(courseCode, section);
+                    
+                    // 2. Show Result
+                    if (message.startsWith("Success")) {
+                        JOptionPane.showMessageDialog(null, message, "Success", JOptionPane.INFORMATION_MESSAGE);
+                        new adminDashboard(roll_no);
+                        f.dispose();
+                    } else if (message.startsWith("Warning")) {
+                        JOptionPane.showMessageDialog(null, message, "Warning", JOptionPane.WARNING_MESSAGE);
+                        new adminDashboard(roll_no);
+                        f.dispose();
+                    } else {
+                        JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
                     }
-                    new adminDashboard(roll_no);
-                    f.dispose();
                 }
             }
         });

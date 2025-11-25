@@ -3,26 +3,16 @@ package edu.univ.erp.ui.admin;
 import javax.swing.*;
 import com.formdev.flatlaf.FlatLightLaf;
 import edu.univ.erp.util.BREATHEFONT;
+import edu.univ.erp.service.AdminService; 
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
 
 public class BackupRestorePage {
 
-    private String dbName;
-    private String dbUser;
-    private String dbPass;
-
     public BackupRestorePage(String rollNo) {
-        if (!loadConfig()) {
-            JOptionPane.showMessageDialog(null, "Error: Could not load database config.");
-            new adminDashboard(rollNo); 
-            return;
-        }
 
         Font breatheFont = BREATHEFONT.fontGen();
         Font gFont = BREATHEFONT.gFontGen();
@@ -44,7 +34,7 @@ public class BackupRestorePage {
         
         JLabel l0 = new JLabel("BACKUP & RESTORE"); 
         l0.setForeground(Color.decode("#dbd3c5"));
-        l0.setFont(breatheFont.deriveFont(Font.BOLD, 60f)); 
+        l0.setFont(breatheFont.deriveFont(Font.BOLD, 80f)); 
         l0.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0));
         p1.add(l0);
         f.add(p1, BorderLayout.NORTH);
@@ -98,17 +88,19 @@ public class BackupRestorePage {
 
         f.add(container, BorderLayout.CENTER);
 
-
         // --- ACTIONS  ---
-
+        // Hardcoded path for now
         String fixedPath = "AP_project/src/edu/univ/erp/BackupRestore/erp_backup.sql"; 
 
         btnBackup.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (performBackup(fixedPath)) {
+                AdminService service = new AdminService();
+                String result = service.performBackup(fixedPath);
+                
+                if ("Success".equals(result)) {
                     JOptionPane.showMessageDialog(f, "Backup Success!\nSaved to: " + fixedPath);
                 } else {
-                    JOptionPane.showMessageDialog(f, "Backup Failed.\nCheck console for errors.");
+                    JOptionPane.showMessageDialog(f, result, "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -126,10 +118,13 @@ public class BackupRestorePage {
                         return;
                     }
 
-                    if (performRestore(fixedPath)) {
-                        JOptionPane.showMessageDialog(f, "Restore Success!\n");
+                    AdminService service = new AdminService();
+                    String result = service.performRestore(fixedPath);
+
+                    if ("Success".equals(result)) {
+                        JOptionPane.showMessageDialog(f, "Restore Success!");
                     } else {
-                        JOptionPane.showMessageDialog(f, "Restore Failed.\nCheck console for errors.");
+                        JOptionPane.showMessageDialog(f, result, "Error", JOptionPane.ERROR_MESSAGE);
                     }
                 }
             }
@@ -137,13 +132,7 @@ public class BackupRestorePage {
        
         btnBack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // Converting String rollNo to int for Dashboard compatibility
-                try {
-                    new adminDashboard(rollNo);
-                } catch (NumberFormatException ex) {
-                    // Fallback if rollNo isn't a number
-                    System.err.println("Invalid admin ID"); 
-                }
+                new adminDashboard(rollNo);
                 f.dispose();
             }
         });
@@ -151,81 +140,5 @@ public class BackupRestorePage {
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.setLocationRelativeTo(null);
         f.setVisible(true);
-    }
-
-    // --- CONFIG LOADER ---
-    private boolean loadConfig() {
-        Properties prop = new Properties();
-        
-        String hardcodedPath = "AP_project/src/resources/Erpdatabase.properties"; 
-
-        try (java.io.FileInputStream input = new java.io.FileInputStream(hardcodedPath)) {
-            prop.load(input);
-            
-            this.dbUser = prop.getProperty("username");
-            this.dbPass = prop.getProperty("password");
-            String url = prop.getProperty("jdbcUrl");
-            
-            if (url != null) {
-                this.dbName = url.substring(url.lastIndexOf("/") + 1);
-                if (this.dbName.contains("?")) {
-                    this.dbName = this.dbName.substring(0, this.dbName.indexOf("?"));
-                }
-            } else {
-                System.out.println("Error: jdbcUrl missing in properties.");
-                return false;
-            }
-            return true;
-        } catch (Exception e) {
-            System.out.println("Error loading config from: " + hardcodedPath);
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    // --- BACKUP LOGIC ---
-    private boolean performBackup(String savePath) {
-        // Ensure "mariadb-dump" is in your Windows/Mac PATH environment variable
-        List<String> command = Arrays.asList(
-            "mariadb-dump", 
-            "-u" + dbUser, 
-            "-p" + dbPass, 
-            "--add-drop-table", 
-            dbName
-        );
-
-        ProcessBuilder pb = new ProcessBuilder(command);
-        pb.redirectOutput(new File(savePath));
-
-        try {
-            Process p = pb.start();
-            int exitCode = p.waitFor();
-            return exitCode == 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    // --- RESTORE LOGIC ---
-    private boolean performRestore(String filePath) {
-        List<String> command = Arrays.asList(
-            "mariadb", 
-            "-u" + dbUser, 
-            "-p" + dbPass, 
-            dbName
-        );
-
-        ProcessBuilder pb = new ProcessBuilder(command);
-        pb.redirectInput(new File(filePath));
-
-        try {
-            Process p = pb.start();
-            int exitCode = p.waitFor();
-            return exitCode == 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
     }
 }
