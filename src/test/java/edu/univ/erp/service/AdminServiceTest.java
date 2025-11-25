@@ -1,9 +1,10 @@
 package test.java.edu.univ.erp.service;
 
+import edu.univ.erp.access.modeOps;
 import edu.univ.erp.data.AuthCommandRunner;
 import edu.univ.erp.data.ErpCommandRunner;
 import edu.univ.erp.service.AdminService;
-import edu.univ.erp.util.modeOps;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;

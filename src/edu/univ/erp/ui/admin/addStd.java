@@ -5,7 +5,7 @@ import javax.swing.*;
 import com.formdev.flatlaf.FlatLightLaf;
 
 import edu.univ.erp.util.BREATHEFONT;
-import edu.univ.erp.util.HashGenerator;
+import edu.univ.erp.auth.HashGenerator;
 import edu.univ.erp.service.AdminService;
 
 import java.awt.BorderLayout;

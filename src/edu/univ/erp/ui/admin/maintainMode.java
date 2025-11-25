@@ -15,8 +15,9 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 
+import edu.univ.erp.access.modeOps;
+import edu.univ.erp.domain.Settings;
 import edu.univ.erp.util.BREATHEFONT;
-import edu.univ.erp.util.modeOps;
 
 
 public class maintainMode {
@@ -86,24 +87,30 @@ public class maintainMode {
         f.setVisible(true);
 
         // ---- Action Listeners ----
-        b1.addActionListener((ActionListener) new ActionListener() {
+        b1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (modeOps.setMaintainMode("true").equals("failure")) {
-                    JOptionPane.showMessageDialog(null, "Error: Database Error occured.", "Failure", JOptionPane.INFORMATION_MESSAGE);
+                // Create a generic settings object
+                Settings s = new Settings("maintain_mode", "true");
+                
+                // Pass the object to the util
+                if (modeOps.updateSetting(s)) {
+                    JOptionPane.showMessageDialog(null, "Maintenance Mode On.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    System.out.println("Maintenance Mode On..");
                 } else {
-                    JOptionPane.showMessageDialog(null, "Maintainance Mode On..", "Success", JOptionPane.INFORMATION_MESSAGE);
-                    System.out.println("Maintainance Mode On..");
+                    JOptionPane.showMessageDialog(null, "Error: Database Error occurred.", "Failure", JOptionPane.ERROR_MESSAGE);
                 }
             }
-        }) ;
+        });
 
         b2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (modeOps.setMaintainMode("false").equals("failure")) {
-                    JOptionPane.showMessageDialog(null, "Error: Database Error occured.", "Failure", JOptionPane.INFORMATION_MESSAGE);
+                Settings s = new Settings("maintain_mode", "false");
+                
+                if (modeOps.updateSetting(s)) {
+                    JOptionPane.showMessageDialog(null, "Maintenance Mode Off.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    System.out.println("Maintenance Mode Off..");
                 } else {
-                    JOptionPane.showMessageDialog(null, "Maintainance Mode Off..", "Success", JOptionPane.INFORMATION_MESSAGE);
-                    System.out.println("Maintainance Mode Off..");
+                    JOptionPane.showMessageDialog(null, "Error: Database Error occurred.", "Failure", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });

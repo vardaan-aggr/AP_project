@@ -1,5 +1,6 @@
 package edu.univ.erp.ui.admin;
 
+import edu.univ.erp.auth.HashGenerator;
 import edu.univ.erp.service.AdminService;
 
 import java.awt.event.ActionListener;
@@ -24,7 +25,6 @@ import javax.swing.UIManager;
 import com.formdev.flatlaf.FlatLightLaf;
 
 import edu.univ.erp.util.BREATHEFONT;
-import edu.univ.erp.util.HashGenerator;
 
 public class addIns {
     public addIns(String rollNo) {

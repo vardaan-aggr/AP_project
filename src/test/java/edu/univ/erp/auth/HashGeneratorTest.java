@@ -3,8 +3,9 @@ package test.java.edu.univ.erp.auth;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-import edu.univ.erp.util.HashGenerator;
-import org.mindrot.jbcrypt.BCrypt; 
+import org.mindrot.jbcrypt.BCrypt;
+
+import edu.univ.erp.auth.HashGenerator; 
 
 public class HashGeneratorTest {
 

@@ -4,6 +4,7 @@ import edu.univ.erp.util.BREATHEFONT;
 import javax.swing.*;
 import com.formdev.flatlaf.FlatLightLaf;
 
+import edu.univ.erp.auth.changePassword;
 import edu.univ.erp.service.LoginService;
 import edu.univ.erp.service.LoginService.ServiceLoginResult;
 

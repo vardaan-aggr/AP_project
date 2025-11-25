@@ -153,29 +153,38 @@ public class AuthCommandRunner {
     }
 
     public static ArrayList<Admin> searchAuthAuth() throws SQLException {
-    ArrayList<Admin> adminList = new ArrayList<>();
-    
-    try (Connection connection = DatabaseConnector.getAuthConnection()) {
-        try (PreparedStatement statement = connection.prepareStatement("""
-                    SELECT roll_no, username FROM auth_table WHERE role = ?;
-                """)) {
-            statement.setString(1, "admin");
-            
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    Admin a = new Admin(
-                        resultSet.getString("roll_no"),
-                        resultSet.getString("username")
-                    );
-                    adminList.add(a);
+        ArrayList<Admin> adminList = new ArrayList<>();
+        
+        try (Connection connection = DatabaseConnector.getAuthConnection()) {
+            try (PreparedStatement statement = connection.prepareStatement("""
+                        SELECT roll_no, username FROM auth_table WHERE role = ?;
+                    """)) {
+                statement.setString(1, "admin");
+                
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    while (resultSet.next()) {
+                        Admin a = new Admin(
+                            resultSet.getString("roll_no"),
+                            resultSet.getString("username")
+                        );
+                        adminList.add(a);
+                    }
                 }
             }
+        } catch (SQLException e) {
+            throw new SQLException(e);
         }
-    } catch (SQLException e) {
-        throw new SQLException(e);
+        return adminList;
     }
-    return adminList;
-}
 
-    
+    public static void updateLastLogin(String rollNo) throws SQLException {
+        String query = "UPDATE auth_table SET last_login = NOW() WHERE roll_no = ?";
+        
+        try (Connection connection = DatabaseConnector.getAuthConnection();
+            PreparedStatement statement = connection.prepareStatement(query)) {
+            
+            statement.setString(1, rollNo);
+            statement.executeUpdate();
+        }
+    }
 }
