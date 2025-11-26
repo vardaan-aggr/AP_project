@@ -113,12 +113,23 @@ public class registerFrame {
         b1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 StudentService service = new StudentService();
-
                 int rowsInserted = service.registerCourse(roll_no, tCourseCode.getText().trim(), tSection.getText().trim()); 
 
                 if (rowsInserted > 0) {
                     JOptionPane.showMessageDialog(null, "Registered successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
                     System.out.println("Registered Successfully.");
+                } else if (rowsInserted == -3) {
+                    JOptionPane.showMessageDialog(null, "Drop failed: Maintenance Mode is ON.", "Info", JOptionPane.INFORMATION_MESSAGE);
+                    System.out.println("Drop failed: Maintenance Mode is ON.");
+                } else if (rowsInserted == -11) {
+                    JOptionPane.showMessageDialog(null, "Failed: Maximum course capcity reached.", "Info", JOptionPane.INFORMATION_MESSAGE);
+                    System.out.println("Failed: Maximum course capcity reached");
+                } else if (rowsInserted == 0 || rowsInserted == -1) {
+                    // Result is 0 or -1 (Not enrolled or DB error)
+                    JOptionPane.showMessageDialog(null, "Error: Not enrolled or course invalid.", "Error", JOptionPane.ERROR_MESSAGE);
+                    System.out.println("Error: Not enrolled or course invalid.");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Error: Database Error.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
                 return;
             }

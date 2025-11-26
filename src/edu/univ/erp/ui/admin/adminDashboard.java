@@ -1,10 +1,9 @@
 package edu.univ.erp.ui.admin;
 
 import javax.swing.*;
-
 import com.formdev.flatlaf.FlatLightLaf;
-
 import edu.univ.erp.util.BREATHEFONT;
+import edu.univ.erp.service.AdminService;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -28,7 +27,7 @@ public class adminDashboard {
             e.printStackTrace();
         }
 
-        JFrame f = new JFrame();
+        JFrame f = new JFrame("Admin Dashboard");
         f.setSize(800, 600);
         f.setLayout(new BorderLayout());
 
@@ -51,64 +50,74 @@ public class adminDashboard {
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10); 
-        gbc.fill = GridBagConstraints.BOTH;      
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1.0; 
+        gbc.weighty = 1.0;      
         
+        // Consistent Button Styling Variables
         Dimension buttonSize = new Dimension(280, 80);
-        Color btnBg = Color.decode("#2f77b1");
+        Color btnBg = Color.decode("#2f77b1"); // Primary button color (Dark Blue)
         Color btnFg = Color.WHITE;
         Font btnFont = gFont.deriveFont(Font.PLAIN, 21f);
         Insets btnMargin = new Insets(10, 30, 5, 30);
+        
+        // Secondary/Lighter button color (Light Blue)
+        Color btnBgLight = Color.decode("#87c3fa"); 
 
+        // Row 0
         gbc.gridx = 0; gbc.gridy = 0;
-        JButton b1 = new JButton("Add Users");
-        styleButton(b1, btnBg, btnFg, btnFont, buttonSize, btnMargin);
-        p2.add(b1, gbc);
+        JButton bAddUsers = new JButton("Add Users");
+        styleButton(bAddUsers, btnBg, btnFg, btnFont, buttonSize, btnMargin);
+        p2.add(bAddUsers, gbc);
 
         gbc.gridx = 1; gbc.gridy = 0;
-        JButton b2 = new JButton("Edit course/section");
-        styleButton(b2, btnBg, btnFg, btnFont, buttonSize, btnMargin);
-        p2.add(b2, gbc);
+        JButton bEditCourse = new JButton("Edit Course/Section");
+        styleButton(bEditCourse, btnBg, btnFg, btnFont, buttonSize, btnMargin);
+        p2.add(bEditCourse, gbc);
 
+        // Row 1
         gbc.gridx = 0; gbc.gridy = 1;
-        JButton b3 = new JButton("Unassign Instructor");
-        styleButton(b3, btnBg, btnFg, btnFont, buttonSize, btnMargin);
-        p2.add(b3, gbc);
+        JButton bUnassign = new JButton("Unassign Instructor");
+        styleButton(bUnassign, btnBg, btnFg, btnFont, buttonSize, btnMargin);
+        p2.add(bUnassign, gbc);
 
         gbc.gridx = 1; gbc.gridy = 1;
-        JButton b4 = new JButton("Maintenance Mode");
-        styleButton(b4, btnBg, btnFg, btnFont, buttonSize, btnMargin);
-        p2.add(b4, gbc);
+        JButton bMaintenance = new JButton("Maintenance Mode");
+        styleButton(bMaintenance, btnBg, btnFg, btnFont, buttonSize, btnMargin);
+        p2.add(bMaintenance, gbc);
 
+        // Row 2
         gbc.gridx = 0; gbc.gridy = 2;
-        JButton b5 = new JButton("Search Database");
-        styleButton(b5, btnBg, btnFg, btnFont, buttonSize, btnMargin);
-        p2.add(b5, gbc);
+        JButton bSearch = new JButton("Search Database");
+        styleButton(bSearch, btnBg, btnFg, btnFont, buttonSize, btnMargin);
+        p2.add(bSearch, gbc);
 
         gbc.gridx = 1; gbc.gridy = 2;
-        JButton b6 = new JButton("Backup / Restore");
-        styleButton(b6, btnBg, btnFg, btnFont, buttonSize, btnMargin);
-        p2.add(b6, gbc);
-
-        gbc.gridx = 0; gbc.gridy = 3; 
-        gbc.gridwidth = 2; 
-        JButton bNotify = new JButton("Notifications");
-        styleButton(bNotify, btnBg, btnFg, btnFont, buttonSize, btnMargin);
-        p2.add(bNotify, gbc);
+        JButton bBackup = new JButton("Backup / Restore");
+        styleButton(bBackup, btnBg, btnFg, btnFont, buttonSize, btnMargin);
+        p2.add(bBackup, gbc);
 
         f.add(p2, BorderLayout.CENTER);
 
-        // ---- LOWS ---- 
-        JPanel p3 = new JPanel();
+        // ---- BOTTOM ---- 
+        // Reverting p3 to use FlowLayout to match the loginPage's structure
+        JPanel p3 = new JPanel(); 
         p3.setBackground(Color.decode("#dbd3c5"));
-        p3.setBorder(BorderFactory.createEmptyBorder(0, 0, 30, 0));
+        p3.setBorder(BorderFactory.createEmptyBorder(0, 0, 50, 0));
 
+        // Logout Button (Primary color and font/size of the LOGIN button)
         JButton bLogout = new JButton("Logout");
-        bLogout.setBackground(Color.decode("#2f77b1"));
-        bLogout.setForeground(Color.WHITE);
-        bLogout.setFont(breatheFont.deriveFont(Font.PLAIN, 35f));
-        bLogout.setMargin(new Insets(10, 30, 5, 30));
+        styleButton(bLogout, btnBg, btnFg, breatheFont.deriveFont(Font.PLAIN, 35f), null, btnMargin); // Use original Logout styling
 
+        // Set Drop Deadline Button (Secondary color and font/size of the Change Password button)
+        JButton bDeadline = new JButton("Set Drop Deadline");
+        styleButton(bDeadline, btnBgLight, btnFg, breatheFont.deriveFont(Font.PLAIN, 30f), null, btnMargin); 
+        
+        // Positioning: Logout (Primary) on Left, Spacer, Deadline (Secondary) on Right
         p3.add(bLogout);
+        p3.add(Box.createHorizontalStrut(20)); // Spacer
+        p3.add(bDeadline);
+        
         f.add(p3, BorderLayout.SOUTH);
 
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -117,7 +126,7 @@ public class adminDashboard {
 
 
         // ---- Action Listeners ----
-        b1.addActionListener(new ActionListener() {
+        bAddUsers.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Opening users adding interface..");
                 new AddUsers(rollNo);
@@ -125,7 +134,7 @@ public class adminDashboard {
             }
         }) ;
 
-        b2.addActionListener(new ActionListener() {
+        bEditCourse.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Opening courses/sections adding/editing interface..");
                 new CreateEdit(rollNo);
@@ -133,7 +142,7 @@ public class adminDashboard {
             }
         });
 
-        b3.addActionListener(new ActionListener() {
+        bUnassign.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Opening assign instructor interface..");
                 new unassignIns(rollNo);
@@ -141,7 +150,7 @@ public class adminDashboard {
             }
         });
 
-        b4.addActionListener(new ActionListener() {
+        bMaintenance.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Opening toggle maintainence interface..");
                 new maintainMode(rollNo);
@@ -149,7 +158,7 @@ public class adminDashboard {
             }
         });
 
-        b5.addActionListener(new ActionListener() {
+        bSearch.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Opening Search Database interface..");
                 new searchDb(rollNo);
@@ -157,7 +166,7 @@ public class adminDashboard {
             }
         });
 
-        b6.addActionListener(new ActionListener() {
+        bBackup.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Opening Backup/Restore interface..");
                 new BackupRestorePage(rollNo); 
@@ -165,9 +174,20 @@ public class adminDashboard {
             }
         });
 
-        bNotify.addActionListener(new ActionListener() {
+        bDeadline.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new edu.univ.erp.ui.common.NotificationDialog(f, rollNo);
+                String dateInput = JOptionPane.showInputDialog(f, "Enter Drop Deadline (YYYY-MM-DD):", "Set Deadline", JOptionPane.QUESTION_MESSAGE);
+
+                if (dateInput != null) {
+                    AdminService service = new AdminService();
+                    String result = service.setDropDeadline(dateInput);
+
+                    if ("Success".equals(result)) {
+                        JOptionPane.showMessageDialog(f, "Drop Deadline updated to: " + dateInput, "Success", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(f, result, "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
             }
         });
 
@@ -181,7 +201,7 @@ public class adminDashboard {
     }
 
     private static void styleButton(JButton btn, Color bg, Color fg, Font font, Dimension dim, Insets margin) {
-        btn.setPreferredSize(dim);
+        if(dim != null) btn.setPreferredSize(dim);
         btn.setBackground(bg);
         btn.setForeground(fg);
         btn.setFont(font);

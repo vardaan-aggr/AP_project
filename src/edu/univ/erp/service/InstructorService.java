@@ -3,11 +3,16 @@ package edu.univ.erp.service;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import edu.univ.erp.access.modeOps;
 import edu.univ.erp.data.ErpCommandRunner;
 import edu.univ.erp.data.NotificationCommandRunner;
 import edu.univ.erp.domain.Sections;
+import edu.univ.erp.domain.Settings;
 
 public class InstructorService {
+
+    // Define error codes for clarity
+    public static final int STATUS_MAINTENANCE = -3;
     
     public double computeStats(String courseCode, String section) throws SQLException {
         String[] grades = ErpCommandRunner.instructorStatsHelper(courseCode, section);
@@ -25,12 +30,11 @@ public class InstructorService {
         return (double) totalPoints / grades.length;
     }
 
-    public String computeAndAssignGrade(String rollNo, String courseCode, String section, String quizStr, String midStr, String endStr) {
-
+    public String computeAndAssignGrade(String insRollno, String stdRollno, String courseCode, String section, String quizMarks, String midMarks, String endMarks) throws SQLException {
         try {
-            int quiz = Integer.parseInt(quizStr);
-            int mid = Integer.parseInt(midStr);
-            int end = Integer.parseInt(endStr);
+            int quiz = Integer.parseInt(quizMarks);
+            int mid = Integer.parseInt(midMarks);
+            int end = Integer.parseInt(endMarks);
 
             // Marks Validation
             if (quiz > 10 || mid > 10 || end > 10) {
@@ -40,42 +44,44 @@ public class InstructorService {
             // Calculate Grade
             int total = (int) (0.2 * quiz + 0.3 * mid + 0.5 * end);
             String finalGrade;
-            
             if (total >= 8) finalGrade = "A";
             else if (total >= 6) finalGrade = "B";
             else if (total >= 4) finalGrade = "C";
             else finalGrade = "F";
+            // ------------------------
 
-            // Check Enrollment 
-            boolean isEnrolled = ErpCommandRunner.isStudentEnrolled(rollNo, courseCode, section);
-            if (!isEnrolled) {
-                return "Error: Student is not enrolled in this course/section.";
-            }
+            boolean isEnrolled = ErpCommandRunner.isStudentEnrolled(stdRollno, courseCode, section);
+            if (!isEnrolled) return "Error: Student is not enrolled.";
 
-            // Save to DB 
-            boolean saved = ErpCommandRunner.addGrade(rollNo, courseCode, section, finalGrade);
+            boolean saved = ErpCommandRunner.addGrade(stdRollno, courseCode, section, finalGrade);
             if (saved) {
-                try {
-                    int studentId = Integer.parseInt(rollNo);
-                    NotificationCommandRunner.sendNotification(studentId, "Grade posted for: " + courseCode);
-                } catch (NumberFormatException e) {
-                    System.out.println("Notification failed: Invalid student ID format.");
-                }
-                
-                return "Success";
-            } else {
-                return "Error: Failed to save grade to database.";
+            try {
+                NotificationCommandRunner.sendNotification(Integer.parseInt(stdRollno), "Grades assigned for course code: " + courseCode);
+            } catch (Exception e) { 
+                System.out.println("Notification Error"); 
             }
+            return "Success";
+            }
+            else
+                return "Error: Failed to save the results in grades.";
 
         } catch (NumberFormatException e) {
             return "Error: Marks must be valid integers.";
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return "Database Error: " + e.getMessage();
         }
     }
+    
+    public boolean isSystemActive() {
+        Settings mode = modeOps.getSetting("maintain_mode");
+        // If mode is found and is "true", system is NOT active
+        if (mode != null && mode.isTrue()) {
+            return false; 
+        }
+        return true; 
+    }
+
 
     public ArrayList<Sections> getMySections(String rollNo) throws SQLException {
         return ErpCommandRunner.instructorMySectionsHelper(rollNo);
     }
+    
 }
