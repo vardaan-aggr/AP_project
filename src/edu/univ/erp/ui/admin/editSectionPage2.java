@@ -140,17 +140,17 @@ public class editSectionPage2 {
         // --- Action Listeners ---
         bAssign.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String iRoll = tInsRollNo.getText().trim();
-                String iDay = tDayTime.getText().trim();
-                String iRoom = tRoom.getText().trim();
-                String iCap = tCapacity.getText().trim();
-                String iSem = tSemester.getText().trim();
-                String iYear = tYear.getText().trim();
-                String iCode = tCourseCode.getText().trim();
-                String iSec = tSection.getText().trim();
+                String insRoll = tInsRollNo.getText().trim();
+                String insDay = tDayTime.getText().trim();
+                String insRoom = tRoom.getText().trim();
+                String insCap = tCapacity.getText().trim();
+                String insSem = tSemester.getText().trim();
+                String insYear = tYear.getText().trim();
+                String insCode = tCourseCode.getText().trim();
+                String insSec = tSection.getText().trim();
 
                 AdminService service = new AdminService();
-                String result = service.updateSection(iRoll, iDay, iRoom, iCap, iSem, iYear, iCode, iSec);
+                String result = service.updateSection(insRoll, insDay, insRoom, insCap, insSem, insYear, insCode, insSec);
 
                 if ("Success".equals(result)) {
                     JOptionPane.showMessageDialog(null, "Section updated successfully", "Success", JOptionPane.INFORMATION_MESSAGE);

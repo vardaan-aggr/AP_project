@@ -49,7 +49,7 @@ public class editCoursePage2 {
         
         JLabel l0 = new JLabel("EDIT COURSE"); 
         l0.setForeground(Color.decode("#dbd3c5"));
-        l0.setFont(breatheFont.deriveFont(Font.BOLD, 60f)); 
+        l0.setFont(breatheFont.deriveFont(Font.BOLD, 80f)); 
         l0.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0));
         p1.add(l0);
         f.add(p1, BorderLayout.NORTH);

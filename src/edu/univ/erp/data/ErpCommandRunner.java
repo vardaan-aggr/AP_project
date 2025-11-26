@@ -6,8 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import javax.swing.JOptionPane;
-
 import edu.univ.erp.domain.Course;
 import edu.univ.erp.domain.Grades;
 import edu.univ.erp.domain.Instructor;
@@ -31,11 +29,14 @@ public class ErpCommandRunner {
                     return rowsInsreted;
                 }
             } catch (SQLException ex) {
+                if (ex.getErrorCode() == 1062) {
+                    return -5; 
+                }
                 ex.printStackTrace();
-                JOptionPane.showMessageDialog(null, "Error: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
+                resultCode = - 4; // Database error: Couldn't insert in enrollments database.
             }
         } 
-        return -1;
+        return resultCode;  // success
     }
     private static int studentEnrollmentsCapacityHandler(String courseCode, String section) {
         int capacity = -1;
@@ -43,9 +44,7 @@ public class ErpCommandRunner {
 
         try (Connection connection = DatabaseConnector.getErpConnection()) {
             try (PreparedStatement statement = connection.prepareStatement("""
-                    SELECT capacity 
-                    FROM sections 
-                    WHERE course_code = ? AND section = ?;
+                    SELECT capacity FROM sections WHERE course_code = ? AND section = ?;
             """)) {
                 statement.setString(1, courseCode);
                 statement.setString(2, section);
@@ -53,17 +52,14 @@ public class ErpCommandRunner {
                     if (rs.next()) {
                         capacity = rs.getInt("capacity");
                     } else {
-                        JOptionPane.showMessageDialog(null, "Section not found.", "Info", JOptionPane.INFORMATION_MESSAGE);
-                        return -1;
+                        return -1; // -1 Section not found
                     }
                 }
             }
 
             // 2. Get count of enrolled students
             try (PreparedStatement statement = connection.prepareStatement("""
-                    SELECT COUNT(*) AS enrolled_count
-                    FROM enrollments
-                    WHERE course_code = ? AND section = ? AND status = 'enrolled';
+                    SELECT COUNT(*) AS enrolled_count FROM enrollments WHERE course_code = ? AND section = ? AND status = 'enrolled';
             """)) {
 
                 statement.setString(1, courseCode);
@@ -78,14 +74,13 @@ public class ErpCommandRunner {
 
         } catch (SQLException ex) {
             ex.printStackTrace();
-            return -4;
+            return -4;  // Database error.
         }
 
         if (enrolled < capacity) {
-            return 1; 
+            return 1; // 1 success
         } else {
-            JOptionPane.showMessageDialog(null, "Course Capacity Full.", "Info", JOptionPane.INFORMATION_MESSAGE);
-            return 0; 
+            return -11; // -11 code for overflow enrollments 
         }
     }
 
@@ -110,7 +105,6 @@ public class ErpCommandRunner {
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Error: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
             return -1;
         }
     }
@@ -123,19 +117,12 @@ public class ErpCommandRunner {
                     """)) {
                 statement.setString(1, rollNo);
                 try (ResultSet resultSet = statement.executeQuery()) {
-                    // boolean empty = true;
                     while (resultSet.next()) {
-                        // empty = false;
                         Grades g = new Grades();
                         g.setCourseCode(resultSet.getString("course_code"));
                         g.setGrade(resultSet.getString("grade"));
                         gradeList.add(g);
                     }
-                    // if (empty) {
-                    //     // JOptionPane.showMessageDialog(null, "Error: no courses in grade table", "Error", JOptionPane.ERROR_MESSAGE);
-                    //     // System.out.println("\t (no courses in grade table)");
-                    //     // return null;
-                    // }
                 }
             }
         } catch (SQLException ex) {
@@ -163,20 +150,13 @@ public class ErpCommandRunner {
             statement.setString(1, rollNo);
             statement.setString(2, "enrolled");
             try (ResultSet resultSet = statement.executeQuery()) {
-                // boolean hasData = false;
                 while (resultSet.next()) {
-                    // hasData = true;
                     Sections s = new Sections();
                     s.setCourseCode(resultSet.getString("course_code"));
                     s.setDayTime(resultSet.getString("day_time"));
                     s.setRoom(resultSet.getString("room"));
                     sectionList.add(s);
                 }
-                // if (!hasData) {
-                //     JOptionPane.showMessageDialog(null, "No active enrollments or section details found.", "Information", JOptionPane.INFORMATION_MESSAGE);
-                //     System.out.println("\t (no data found)");
-                //     return null;
-                // }
             }
         } catch (SQLException ex) {
             throw new SQLException(ex);
@@ -244,10 +224,10 @@ public class ErpCommandRunner {
             statement.setString(1, rollNo);
 
             try (ResultSet resultSet = statement.executeQuery()) {
-                boolean hasEnrollments = false;
+                // boolean hasEnrollments = false;
                 while (resultSet.next()) {
                     Grades g = new Grades();
-                    hasEnrollments = true;
+                    // hasEnrollments = true;
                     g.setCourseCode(resultSet.getString("course_code"));
                     g.setSection(resultSet.getString("section"));
                     g.setGrade(resultSet.getString("grade"));
@@ -257,9 +237,9 @@ public class ErpCommandRunner {
                     }
                     gradeList.add(g);
                 }
-                if (!hasEnrollments) {
-                    System.out.println("\t (no courses found for transcript)");
-                }
+                // if (!hasEnrollments) {
+                //     System.out.println("\t (no courses found for transcript)");
+                // }
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -273,7 +253,7 @@ public class ErpCommandRunner {
         ArrayList<Sections> sectionList = new ArrayList<>();
         try (Connection connection = DatabaseConnector.getErpConnection()) {
             try (PreparedStatement statement = connection.prepareStatement("""
-                        Select course_code FROM sections WHERE roll_no = ?; 
+                        Select course_code, section FROM sections WHERE roll_no = ?; 
                     """)) {
                 statement.setString(1, roll_no); 
 
@@ -281,6 +261,7 @@ public class ErpCommandRunner {
                     while (resultSet.next()) {
                         Sections s = new Sections();
                         s.setCourseCode(resultSet.getString("course_code"));
+                        s.setSection(resultSet.getString("section"));
                         sectionList.add(s);
                     } 
                 }
@@ -293,14 +274,13 @@ public class ErpCommandRunner {
 
     public static boolean isStudentEnrolled(String rollNo, String courseCode, String section) throws SQLException {
         try (Connection connection = DatabaseConnector.getErpConnection()) {
-            // FIX: Check 'enrollments' table, not 'grades' table
             try (PreparedStatement stmt = connection.prepareStatement(
                     "SELECT 1 FROM enrollments WHERE roll_no = ? AND course_code = ? AND section = ? AND status = 'enrolled'")) {
                 stmt.setString(1, rollNo);
                 stmt.setString(2, courseCode);
                 stmt.setString(3, section);
                 try (ResultSet rs = stmt.executeQuery()) {
-                    return rs.next(); // Returns true if student is found
+                    return rs.next(); 
                 }
             }
         }
@@ -308,8 +288,6 @@ public class ErpCommandRunner {
 
     public static boolean addGrade(String rollNo, String courseCode, String section, String grade) throws SQLException {
         try (Connection connection = DatabaseConnector.getErpConnection()) {
-            // Using REPLACE INTO or INSERT allows us to update the grade if it already exists
-            // Note: This assumes (roll_no, course_code) is a Unique Key or Primary Key in your DB design
             try (PreparedStatement stmt = connection.prepareStatement(
                     "INSERT INTO grades (roll_no, course_code, section, grade) VALUES (?, ?, ?, ?)")) {
                 stmt.setString(1, rollNo);
@@ -340,7 +318,6 @@ public class ErpCommandRunner {
                     } 
                     if (empty) {
                         System.out.println("\t (no grades found)");
-                        JOptionPane.showMessageDialog(null, "No grades found for this course/section.", "Info", JOptionPane.INFORMATION_MESSAGE);
                         return null;
                     }
                 }
@@ -522,7 +499,6 @@ public class ErpCommandRunner {
     public static int sectionUpdater(String roll_no, String day_time, String room, String capacity, String semester, String year, String course_code, String section) throws SQLException {
         int rowsUpdated = 0;
         try (Connection connection = DatabaseConnector.getErpConnection()) {
-            // CORRECTED SQL: Updates all fields based on Code + Section
             String sql = """
                 UPDATE sections 
                 SET roll_no = ?, day_time = ?, room = ?, capacity = ?, semester = ?, year = ?
@@ -530,13 +506,12 @@ public class ErpCommandRunner {
                 """;
             
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                // Set parameters in order (1 to 8)
                 statement.setString(1, roll_no); 
                 statement.setString(2, day_time); 
                 statement.setString(3, room); 
-                statement.setInt(4, Integer.parseInt(capacity)); // Use setInt for capacity if DB is int
+                statement.setInt(4, Integer.parseInt(capacity)); 
                 statement.setString(5, semester); 
-                statement.setInt(6, Integer.parseInt(year));     // Use setInt for year if DB is int
+                statement.setInt(6, Integer.parseInt(year));
                 statement.setString(7, course_code); 
                 statement.setString(8, section); 
                 
@@ -571,12 +546,7 @@ public class ErpCommandRunner {
                         }
                     }
                 }
-            }
-            
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "Error: Couldn't fetch student details: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace();
-            throw new SQLException(ex);
+            }            
         }
         return stdList;
     }
@@ -589,26 +559,15 @@ public class ErpCommandRunner {
                         """)) {
                         statement.setString(1, i.getRollNo());
                     try (ResultSet resultSet = statement.executeQuery()) {
-                        // boolean empty = true;
                         if (resultSet.next()) {
-                            // empty = false;
                             i.setDepartment(resultSet.getString("department"));
                         } else {
                             System.out.println("Warning: Missing ERP details for roll: " + i.getRollNo());
                         }
-                        // if (empty) {
-                        //     JOptionPane.showMessageDialog(null, "Error: No instructor with given inputs exists.", "Error", JOptionPane.ERROR_MESSAGE);
-                        //     System.out.println("\t (no instructor in auth database with given input)");
-                        //     return null;
-                        // }
                     }
                 }
             }
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "Error: Couldn't fetch instructor details: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace();
-            throw new SQLException(ex);
-        }
+        } 
         return insList;
     }
 
@@ -664,7 +623,7 @@ public class ErpCommandRunner {
         }
     }
 
-    public static ArrayList<Course> getAllCoursesHelper() throws SQLException {
+    public static ArrayList<Course> getAllCourses() throws SQLException {
         ArrayList<Course> courseList = new ArrayList<>();
         
         try (Connection connection = DatabaseConnector.getErpConnection();
@@ -686,29 +645,45 @@ public class ErpCommandRunner {
         return courseList;
     }
 
-    public static ArrayList<Sections> getAllSectionsHelper() throws SQLException {
-    ArrayList<Sections> sectionList = new ArrayList<>();
-    
-    try (Connection connection = DatabaseConnector.getErpConnection();
-         PreparedStatement statement = connection.prepareStatement(
-             "SELECT * FROM sections")) {
+    public static ArrayList<Sections> getAllSections() throws SQLException {
+        ArrayList<Sections> sectionList = new ArrayList<>();
         
-        try (ResultSet rs = statement.executeQuery()) {
-            while (rs.next()) {
-                Sections s = new Sections();
-                s.setCourseCode(rs.getString("course_code"));
-                s.setSection(rs.getString("section"));
-                s.setRollNo(rs.getString("roll_no"));
-                s.setDayTime(rs.getString("day_time"));
-                s.setRoom(rs.getString("room"));
-                s.setCapacity(rs.getString("capacity")); 
-                s.setSemester(rs.getString("semester"));
-                s.setYear(rs.getString("year"));
-                
-                sectionList.add(s);
+        try (Connection connection = DatabaseConnector.getErpConnection();
+            PreparedStatement statement = connection.prepareStatement(
+                "SELECT * FROM sections")) {
+            
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    Sections s = new Sections();
+                    s.setCourseCode(rs.getString("course_code"));
+                    s.setSection(rs.getString("section"));
+                    s.setRollNo(rs.getString("roll_no"));
+                    s.setDayTime(rs.getString("day_time"));
+                    s.setRoom(rs.getString("room"));
+                    s.setCapacity(rs.getString("capacity")); 
+                    s.setSemester(rs.getString("semester"));
+                    s.setYear(rs.getString("year"));
+                    
+                    sectionList.add(s);
+                }
+            }
+        }
+        return sectionList;
+    }
+
+    public static boolean checkInstructorSection(String insRollno, String courseCode, String section) throws SQLException {
+        String query = "SELECT 1 FROM sections WHERE course_code = ? AND section = ? AND roll_no = ?";
+        
+        try (Connection connection = DatabaseConnector.getErpConnection();
+            PreparedStatement statement = connection.prepareStatement(query)) {
+            
+            statement.setString(1, courseCode);
+            statement.setString(2, section);
+            statement.setString(3, insRollno); 
+            
+            try (ResultSet rs = statement.executeQuery()) {
+                return rs.next(); 
             }
         }
     }
-    return sectionList;
-}
 }

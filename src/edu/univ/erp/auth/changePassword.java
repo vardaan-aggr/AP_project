@@ -8,9 +8,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -24,13 +21,13 @@ import javax.swing.UIManager;
 
 import com.formdev.flatlaf.FlatLightLaf;
 
-import edu.univ.erp.data.DatabaseConnector;
+import edu.univ.erp.service.LoginService;
+import edu.univ.erp.ui.auth.loginPage;
 import edu.univ.erp.util.BREATHEFONT;
 
-import edu.univ.erp.ui.auth.loginPage;
-
 public class changePassword {
-    public changePassword(String rollNo) {
+    
+    public changePassword(String usernameIn) {
 
         Font breatheFont = BREATHEFONT.fontGen();
         Font gFont = BREATHEFONT.gFontGen();
@@ -41,7 +38,7 @@ public class changePassword {
             e.printStackTrace();
         }
 
-        JFrame f = new JFrame();
+        JFrame f = new JFrame("Change Password");
         f.setSize(800, 600);
         f.setLayout(new BorderLayout());
 
@@ -64,33 +61,35 @@ public class changePassword {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10); 
         
-        JLabel l1 = new JLabel("Roll No:");
+        // Label 1
+        JLabel l1 = new JLabel("Username:");
         l1.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l1.setForeground(Color.decode("#020A48"));
-        gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
+        gbc.gridx = 0; gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.EAST;
         p2.add(l1, gbc);
 
-        JTextField tRollNo = new JTextField(50);
-        tRollNo.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        // Text Field 1 (Pre-filled)
+        JTextField tUsername = new JTextField(usernameIn, 50);
+        tUsername.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        tUsername.setEditable(false); // Lock it so they can't change someone else's pass
         gbc.gridx = 1; gbc.gridy = 0; gbc.weightx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.anchor = GridBagConstraints.CENTER;
-        p2.add(tRollNo, gbc);
+        p2.add(tUsername, gbc);
 
+        // Label 2
         JLabel l2 = new JLabel("New Password:");
         l2.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l2.setForeground(Color.decode("#020A48"));
-        gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0;
+        gbc.gridx = 0; gbc.gridy = 1;
         gbc.fill = GridBagConstraints.NONE;
-        gbc.anchor = GridBagConstraints.EAST;
         p2.add(l2, gbc);
 
+        // Text Field 2
         JTextField tNewPassword = new JTextField(50); 
         tNewPassword.setFont(gFont.deriveFont(Font.PLAIN, 22));
         gbc.gridx = 1; gbc.gridy = 1; gbc.weightx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.anchor = GridBagConstraints.CENTER;
         p2.add(tNewPassword, gbc);
 
         f.add(p2, BorderLayout.CENTER);
@@ -100,21 +99,15 @@ public class changePassword {
         p3.setBackground(Color.decode("#dbd3c5"));
         p3.setBorder(BorderFactory.createEmptyBorder(0, 0, 50, 0));
   
-        JButton b1 = new JButton("Change Password");
-        b1.setBackground(Color.decode("#2f77b1")); 
-        b1.setForeground(Color.WHITE); 
-        b1.setFont(breatheFont.deriveFont(Font.PLAIN, 35));
-        b1.setMargin(new Insets(10, 30, 5, 30));
+        JButton bChange = new JButton("Change Password");
+        styleButton(bChange, breatheFont);
         
-        JButton b2 = new JButton("Back");
-        b2.setBackground(Color.decode("#2f77b1")); 
-        b2.setForeground(Color.WHITE); 
-        b2.setFont(breatheFont.deriveFont(Font.PLAIN, 35));
-        b2.setMargin(new Insets(10, 30, 5, 30));
+        JButton bBack = new JButton("Back");
+        styleButton(bBack, breatheFont);
 
-        p3.add(b1);
+        p3.add(bChange);
         p3.add(Box.createHorizontalStrut(20));
-        p3.add(b2);
+        p3.add(bBack);
 
         f.add(p3, BorderLayout.SOUTH);
 
@@ -124,39 +117,37 @@ public class changePassword {
 
         // ---- Action Listeners ----
 
-        b1.addActionListener(new ActionListener() {
+        bChange.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                try (Connection connection = DatabaseConnector.getAuthConnection()) {
-                    try (PreparedStatement statement = connection.prepareStatement("""
-                                update auth_table set hash_password = ? where roll_no = ?;
-                            """)) {
-                        statement.setString(2, tRollNo.getText().trim());
-                        String hashedPass = HashGenerator.makeHash(tNewPassword.getText().trim());
-                        statement.setString(1, hashedPass);
-                        int rowsUpdated = statement.executeUpdate();
-                        if (rowsUpdated == 0) {
-                            JOptionPane.showMessageDialog(null, "Error: Couldn't Change Password in database.", "Error", JOptionPane.ERROR_MESSAGE);
-                            System.out.println("Error: Couldn't Change Password in database.");
-                        } else {
-                            JOptionPane.showMessageDialog(null, "Successfully changed password.", "Success", JOptionPane.INFORMATION_MESSAGE);
-                            System.out.println("Successfully changed password.");
-                        }
-                    }
-                } catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(null, "Error while changing passsword: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
-                    System.out.println("Error while changing passsword: " + ex);
-                    ex.printStackTrace();
+                String user = tUsername.getText().trim();
+                String newPass = tNewPassword.getText().trim();
+                
+                // Call Service
+                LoginService service = new LoginService();
+                String result = service.changeUserPassword(user, newPass);
+
+                if ("Success".equals(result)) {
+                    JOptionPane.showMessageDialog(f, "Password changed successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    new loginPage();
+                    f.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(f, result, "Error", JOptionPane.ERROR_MESSAGE);
                 }
-                new loginPage();
-                f.dispose();
             }
         });
 
-        b2.addActionListener(new ActionListener() {
+        bBack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 new loginPage();
                 f.dispose();
             }
         });
+    }
+
+    private void styleButton(JButton b, Font font) {
+        b.setBackground(Color.decode("#2f77b1")); 
+        b.setForeground(Color.WHITE); 
+        b.setFont(font.deriveFont(Font.PLAIN, 35));
+        b.setMargin(new Insets(10, 30, 5, 30));
     }
 }

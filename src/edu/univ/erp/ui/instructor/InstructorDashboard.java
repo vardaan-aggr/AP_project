@@ -5,18 +5,11 @@ import com.formdev.flatlaf.FlatLightLaf;
 
 import java.awt.event.ActionEvent;   
 import java.awt.event.ActionListener;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
 
 import edu.univ.erp.ui.common.catalog;
 import edu.univ.erp.util.BREATHEFONT;
-import edu.univ.erp.access.modeOps;
-import edu.univ.erp.domain.Settings; 
+import edu.univ.erp.service.InstructorService;
 
 public class InstructorDashboard {
     
@@ -50,59 +43,82 @@ public class InstructorDashboard {
         // ---- MIDDLE ----
         JPanel p2 = new JPanel(new GridBagLayout());
         p2.setBackground(Color.decode("#dbd3c5")); 
-        p2.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
+        p2.setBorder(BorderFactory.createEmptyBorder(75, 75, 75, 75));
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10); 
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.anchor = GridBagConstraints.CENTER;
-        gbc.weightx = 1.0;
-        gbc.gridx = 0;
-
-        Color btnBg = Color.decode("#2f77b1");
-        Color btnFg = Color.WHITE;
-        Font btnFont = gFont.deriveFont(Font.PLAIN, 20f); 
-        Dimension btnSize = new Dimension(440, 60); 
-
-        gbc.gridy = 0;
-        JButton b1 = new JButton("My Sections");
-        styleButton(b1, btnBg, btnFg, btnFont, btnSize);
-        p2.add(b1, gbc);
-
-        gbc.gridy = 1;
-        JButton b2 = new JButton("Compute Final Grades");
-        styleButton(b2, btnBg, btnFg, btnFont, btnSize);
-        p2.add(b2, gbc);
-    
-        gbc.gridy = 2;
-        JButton b3 = new JButton("Class Statistics");
-        styleButton(b3, btnBg, btnFg, btnFont, btnSize);
-        p2.add(b3, gbc);
+        gbc.fill = GridBagConstraints.BOTH; 
+        gbc.weightx = 1.0; 
+        gbc.weighty = 1.0; 
         
-        gbc.gridy = 3;
-        JButton b4 = new JButton("Courses/Sections");
-        styleButton(b4, btnBg, btnFg, btnFont, btnSize);
-        p2.add(b4, gbc);
+        // Match button size to Student Dashboard
+        Dimension buttonSize = new Dimension(280, 80);
 
-        gbc.gridy = 4;
-        JButton bNotify = new JButton("🔔 Notifications");
-        styleButton(bNotify, btnBg, btnFg, btnFont, btnSize);
-        p2.add(bNotify, gbc);
+        // 1. My Sections (Row 0, Col 0)
+        gbc.gridx = 0; gbc.gridy = 0;
+        JButton bMySections = new JButton("My Sections");
+        bMySections.setPreferredSize(buttonSize);
+        bMySections.setMargin(new Insets(10, 30, 5, 30));
+        bMySections.setBackground(Color.decode("#2f77b1")); 
+        bMySections.setForeground(Color.WHITE); 
+        bMySections.setFont(gFont.deriveFont(Font.PLAIN, 21f));
+        p2.add(bMySections, gbc);
+
+        // 2. Compute Grades (Row 0, Col 1)
+        gbc.gridx = 1; gbc.gridy = 0;
+        JButton bComputeGrade = new JButton("Compute Final Grades");
+        bComputeGrade.setPreferredSize(buttonSize);
+        bComputeGrade.setMargin(new Insets(10, 30, 5, 30));
+        bComputeGrade.setBackground(Color.decode("#2f77b1")); 
+        bComputeGrade.setForeground(Color.WHITE); 
+        bComputeGrade.setFont(gFont.deriveFont(Font.PLAIN, 21f));
+        p2.add(bComputeGrade, gbc);
+    
+        // 3. Class Statistics (Row 1, Col 0)
+        gbc.gridx = 0; gbc.gridy = 1;
+        JButton bClassStats = new JButton("Class Statistics");
+        bClassStats.setPreferredSize(buttonSize);
+        bClassStats.setMargin(new Insets(10, 30, 5, 30));
+        bClassStats.setBackground(Color.decode("#2f77b1")); 
+        bClassStats.setForeground(Color.WHITE); 
+        bClassStats.setFont(gFont.deriveFont(Font.PLAIN, 21f));
+        p2.add(bClassStats, gbc);
+        
+        // 4. Catalog (Row 1, Col 1)
+        gbc.gridx = 1; gbc.gridy = 1;
+        JButton bCatalog = new JButton("Courses/Sections");
+        bCatalog.setPreferredSize(buttonSize);
+        bCatalog.setMargin(new Insets(10, 30, 5, 30));
+        bCatalog.setBackground(Color.decode("#2f77b1")); 
+        bCatalog.setForeground(Color.WHITE); 
+        bCatalog.setFont(gFont.deriveFont(Font.PLAIN, 21f));
+        p2.add(bCatalog, gbc);
 
         f.add(p2, BorderLayout.CENTER);
 
-        // ---- LOWS ----
+        // ---- BOTTOM ----
         JPanel p3 = new JPanel();
         p3.setBackground(Color.decode("#dbd3c5"));
-        p3.setBorder(BorderFactory.createEmptyBorder(0, 0, 30, 0));
+        p3.setBorder(BorderFactory.createEmptyBorder(0, 0, 50, 0));
 
-        JButton logoutBtn = new JButton("Logout");
-        logoutBtn.setBackground(Color.decode("#2f77b1"));
-        logoutBtn.setForeground(Color.WHITE);
-        logoutBtn.setFont(breatheFont.deriveFont(Font.PLAIN, 35f)); 
-        logoutBtn.setMargin(new Insets(10, 30, 5, 30));
+        // Notifications Button (Moved to bottom to match Student Dashboard)
+        JButton bNotify = new JButton("Notifications");
+        bNotify.setBackground(Color.decode("#87c3fa")); 
+        bNotify.setForeground(Color.WHITE);
+        bNotify.setFont(breatheFont.deriveFont(Font.PLAIN, 30f)); 
+        bNotify.setMargin(new Insets(10, 30, 5, 30));
+
+        // Logout Button
+        JButton bLogout = new JButton("Logout");
+        bLogout.setBackground(Color.decode("#2f77b1"));
+        bLogout.setForeground(Color.WHITE);
+        bLogout.setFont(breatheFont.deriveFont(Font.PLAIN, 35f)); 
+        bLogout.setMargin(new Insets(10, 30, 5, 30));
         
-        p3.add(logoutBtn);
+        p3.add(bLogout);
+        p3.add(Box.createHorizontalStrut(20)); // Spacer
+        p3.add(bNotify);
+        
         f.add(p3, BorderLayout.SOUTH);
 
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
@@ -110,7 +126,7 @@ public class InstructorDashboard {
         f.setVisible(true);
 
         // --- ACTION LISTENERS ---
-        b1.addActionListener(new ActionListener() {
+        bMySections.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Opening My Sections...");
                 new MySectionsFrame(username, role, password, roll_no);
@@ -118,22 +134,21 @@ public class InstructorDashboard {
             }
         });
         
-        b2.addActionListener(new ActionListener() {
+        bComputeGrade.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Settings mode = modeOps.getSetting("maintain_mode");
+                InstructorService service = new InstructorService();
                 
-                if (mode != null && mode.isTrue()) {
-                    JOptionPane.showMessageDialog(null, "Cannot change, Maintenance mode is on.", "Info", JOptionPane.INFORMATION_MESSAGE);
-                    System.out.println("\tCouldn't open bcz maintenance mode is on.");
-                } else {
+                if (service.isSystemActive()) {
                     System.out.println("Opening Compute Final Grades...");
                     new ComputeFinalFrame(username, role, password, roll_no);
                     f.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(null, "Cannot change, Maintenance mode is on.", "Info", JOptionPane.INFORMATION_MESSAGE);
                 }
             }
         });
         
-        b3.addActionListener(new ActionListener() {
+        bClassStats.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Opening Class Statistics...");
                 new ClassStatisticsFrame(username, role, password, roll_no);
@@ -141,18 +156,10 @@ public class InstructorDashboard {
             }
         });
 
-        b4.addActionListener(new ActionListener() {
+        bCatalog.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Opening Course Catalog...");
                 new catalog(username, role, password, roll_no);
-                f.dispose();
-            }
-        });
-
-        logoutBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(f, "Logged out.");
-                System.out.println("Logged out.");
                 f.dispose();
             }
         });
@@ -163,14 +170,12 @@ public class InstructorDashboard {
             }
         });
 
-    }
-
-    void styleButton(JButton button, Color bg, Color fg, Font font, Dimension size) {
-        button.setBackground(bg);
-        button.setForeground(fg);
-        button.setFont(font);
-        button.setPreferredSize(size);
-        button.setMinimumSize(size);
-        button.setMaximumSize(size);
+        bLogout.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(f, "Logged out.");
+                System.out.println("Logged out.");
+                f.dispose();
+            }
+        });
     }
 }

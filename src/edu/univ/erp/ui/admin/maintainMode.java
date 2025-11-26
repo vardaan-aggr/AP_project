@@ -66,14 +66,14 @@ public class maintainMode {
         Dimension btnSize = new Dimension(280, 60); 
 
         gbc.gridy = 0;
-        JButton b1 = new JButton("Turn On");
-        styleButton(b1, btnBg, btnFg, btnFont, btnSize);
-        p2.add(b1, gbc);
+        JButton bOn = new JButton("Turn On");
+        styleButton(bOn, btnBg, btnFg, btnFont, btnSize);
+        p2.add(bOn, gbc);
 
         gbc.gridy = 1;
-        JButton b2 = new JButton("Turn Off");
-        styleButton(b2, btnBg, btnFg, btnFont, btnSize);
-        p2.add(b2, gbc);
+        JButton bOff = new JButton("Turn Off");
+        styleButton(bOff, btnBg, btnFg, btnFont, btnSize);
+        p2.add(bOff, gbc);
 
         gbc.gridy = 2;
         JButton b3 = new JButton("Back");
@@ -87,7 +87,7 @@ public class maintainMode {
         f.setVisible(true);
 
         // ---- Action Listeners ----
-        b1.addActionListener(new ActionListener() {
+        bOn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // Create a generic settings object
                 Settings s = new Settings("maintain_mode", "true");
@@ -102,7 +102,7 @@ public class maintainMode {
             }
         });
 
-        b2.addActionListener(new ActionListener() {
+        bOff.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Settings s = new Settings("maintain_mode", "false");
                 

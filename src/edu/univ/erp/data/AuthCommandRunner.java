@@ -35,9 +35,7 @@ public class AuthCommandRunner {
                     }
                 }
             }
-        } catch (SQLException ex) {
-            throw new SQLException(ex);
-        }
+        } 
         return null;
     }
 
@@ -185,6 +183,34 @@ public class AuthCommandRunner {
             
             statement.setString(1, rollNo);
             statement.executeUpdate();
+        }
+    }
+
+    public static void deleteUser(String rollNo, String role) {
+        try (Connection connection = DatabaseConnector.getAuthConnection()) {
+            try (PreparedStatement statement = connection.prepareStatement("""
+                        delete FROM auth_table WHERE role = ? and roll_no = ?;
+                    """)) {
+                statement.setString(1, role);
+                statement.setString(2, rollNo);
+                statement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static int updatePasswordHelper(String username, String newHashPass) throws SQLException {
+        // Changed "roll_no" to "username" to match the input from Login Page
+        String query = "UPDATE auth_table SET hash_password = ? WHERE username = ?";
+        
+        try (Connection connection = DatabaseConnector.getAuthConnection();
+            PreparedStatement statement = connection.prepareStatement(query)) {
+            
+            statement.setString(1, newHashPass);
+            statement.setString(2, username);
+            
+            return statement.executeUpdate();
         }
     }
 }
