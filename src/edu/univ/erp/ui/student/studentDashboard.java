@@ -1,18 +1,10 @@
 package edu.univ.erp.ui.student;
 
 import javax.swing.*;
-
 import com.formdev.flatlaf.FlatLightLaf;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
 
 import edu.univ.erp.service.StudentService;
 import edu.univ.erp.ui.common.catalog;
@@ -27,7 +19,6 @@ public class studentDashboard {
         try {
             UIManager.setLookAndFeel(new FlatLightLaf());
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Failed to make FlatLaf", "Error", JOptionPane.ERROR_MESSAGE);
             System.err.println("Failed to make FlatLaf");
         }
         JFrame f = new JFrame();
@@ -44,14 +35,17 @@ public class studentDashboard {
         f.add(p1, BorderLayout.NORTH);
 
         // ---- MIDDLE ----
-        JPanel p2 = new JPanel();
-        p2.setLayout(new GridBagLayout());
+        JPanel p2 = new JPanel(new GridBagLayout());
         p2.setBackground(Color.decode("#dbd3c5")); 
         p2.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
+        
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.BOTH; 
+        gbc.weightx = 1.0; 
+        gbc.weighty = 1.0; 
+        
         Dimension buttonSize = new Dimension(280, 80);
-        gbc.fill = GridBagConstraints.BOTH;
 
         // Register
         gbc.gridx = 0; gbc.gridy = 0;
@@ -112,29 +106,38 @@ public class studentDashboard {
         bDrop.setForeground(Color.WHITE); 
         bDrop.setFont(gFont.deriveFont(Font.PLAIN, 21f));
         p2.add(bDrop, gbc);
+        
         f.add(p2, BorderLayout.CENTER);
 
-        // --- NEW: Notifications Button ---
-        gbc.gridx = 0; gbc.gridy = 3; 
-        gbc.gridwidth = 2; 
-        JButton bNotify = new JButton("Notifications");
-        bNotify.setPreferredSize(buttonSize);
-        bNotify.setMargin(new Insets(10, 30, 5, 30));
-        bNotify.setBackground(Color.decode("#2f77b1")); 
-        bNotify.setForeground(Color.WHITE); 
-        bNotify.setFont(gFont.deriveFont(Font.PLAIN, 21f));
-        p2.add(bNotify, gbc);
-
-        // Logout 
+        // ---- BOTTOM ----
         JPanel p3 = new JPanel();
         p3.setBackground(Color.decode("#dbd3c5"));
         p3.setBorder(BorderFactory.createEmptyBorder(0, 0, 50, 0));
+        
+        // Notifications Button (West)
+        JButton bNotify = new JButton("Notifications");
+        bNotify.setBackground(Color.decode("#87c3fa")); 
+        bNotify.setForeground(Color.WHITE);
+        bNotify.setFont(breatheFont.deriveFont(Font.PLAIN, 30f)); 
+        bNotify.setMargin(new Insets(10, 30, 5, 30));
+
+        // Logout Button
         JButton bLogout = new JButton("Logout");
         bLogout.setBackground(Color.decode("#2f77b1")); 
         bLogout.setForeground(Color.WHITE); 
-        bLogout.setFont(breatheFont.deriveFont(Font.BOLD, 35f));
+        bLogout.setFont(breatheFont.deriveFont(Font.PLAIN, 35f));
         bLogout.setMargin(new Insets(10, 30, 5, 30));
+        
+        // Wrapper Panel for Logout to prevent it from filling the screen
+        // JPanel pLogoutWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        // pLogoutWrapper.setOpaque(false); // Make it transparent to match background
+        // pLogoutWrapper.add(bLogout);
         p3.add(bLogout);
+        p3.add(Box.createHorizontalStrut(20)); 
+        p3.add(bNotify);
+        // p3.add(bNotify, BorderLayout.WEST);
+        // p3.add(pLogoutWrapper, BorderLayout.CENTER);
+        
         f.add(p3, BorderLayout.SOUTH);
 
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
@@ -179,14 +182,6 @@ public class studentDashboard {
             }
         });
 
-        bLogout.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(null, "Logging out..");
-                System.out.println("\nLogged out successfully...");
-                f.dispose();
-            }
-        });
-
         bCatalog.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Opening Course Catalog...");
@@ -198,7 +193,6 @@ public class studentDashboard {
         bDrop.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 StudentService service = new StudentService();
-
                 if (service.isSystemActive()) {
                     System.out.println("\tOpening Drop Course Portal..");
                     new dropCourseFrame(username, role, in_pass, roll_no);
@@ -208,10 +202,18 @@ public class studentDashboard {
                 }
             }
         });
-
+        
         bNotify.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 new edu.univ.erp.ui.common.NotificationDialog(f, roll_no);
+            }
+        });
+
+        bLogout.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(null, "Logging out..");
+                System.out.println("\nLogged out successfully...");
+                f.dispose();
             }
         });
     }

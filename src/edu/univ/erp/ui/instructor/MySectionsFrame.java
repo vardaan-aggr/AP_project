@@ -21,7 +21,7 @@ import edu.univ.erp.service.InstructorService;
 import edu.univ.erp.util.BREATHEFONT;
 
 public class MySectionsFrame {
-    public MySectionsFrame(String username, String role, String password, String roll_no) {
+    public MySectionsFrame(String username, String role, String password, String instructorRollNo) {
 
         Font breatheFont = BREATHEFONT.fontGen();
         Font gFont = BREATHEFONT.gFontGen();
@@ -57,13 +57,13 @@ public class MySectionsFrame {
 
         try {
             InstructorService service = new InstructorService();
-            ArrayList<Sections> sectionList = service.getMySections(roll_no);
+            ArrayList<Sections> sectionList = service.getMySections(instructorRollNo);
 
             // 2. Check for Data
             if (sectionList == null || sectionList.isEmpty()) {
                 JOptionPane.showMessageDialog(null, "You have not been assigned any sections yet.", "Info", JOptionPane.INFORMATION_MESSAGE);
                 System.out.println("\tGoing back to Dashboard..");
-                new InstructorDashboard(username, role, password, roll_no);
+                new InstructorDashboard(username, role, password, instructorRollNo);
                 f.dispose();
                 return;
             }
@@ -73,7 +73,7 @@ public class MySectionsFrame {
                 data[i][0] = s.getCourseCode();
                 data[i][1] = s.getSection();
             }
-            String columName[] = {"Course Code"};
+            String columName[] = {"Course Code", "Section"};
             
             JTable t = new JTable(data, columName);
             t.setFillsViewportHeight(true);
@@ -98,9 +98,10 @@ public class MySectionsFrame {
             f.add(p2, BorderLayout.CENTER);
             
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "Error getting your sections: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
-            System.out.println("Error getting your sections: " + ex);
+            JOptionPane.showMessageDialog(null, "Error: Database error.", "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
+            new InstructorDashboard(username, role, password, instructorRollNo);
+            f.dispose();
         }
 
         // ---- LOWS ----
@@ -121,7 +122,7 @@ public class MySectionsFrame {
 
         b1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new InstructorDashboard(username, role, password, roll_no);
+                new InstructorDashboard(username, role, password, instructorRollNo);
                 f.dispose();
             }
         });

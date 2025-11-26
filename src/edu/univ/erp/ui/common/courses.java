@@ -7,12 +7,10 @@ import javax.swing.table.JTableHeader;
 import com.formdev.flatlaf.FlatLightLaf;
 
 import edu.univ.erp.ui.instructor.InstructorDashboard;
-import edu.univ.erp.domain.Course;
 import edu.univ.erp.service.CatalogService;
 import edu.univ.erp.util.BREATHEFONT;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -78,7 +76,23 @@ public class courses {
         
         centerPanel.add(searchPanel, BorderLayout.NORTH);
 
-        String data[][] = dataPull();
+        String data[][] = new String[0][0];
+        try {
+            CatalogService service = new CatalogService();
+            String[][] fetchedData = service.getCatalogTableData(); 
+
+            if (fetchedData != null) {
+                data = fetchedData;
+            }
+
+            if (data.length == 0) {
+                JOptionPane.showMessageDialog(null, "No active courses found.", "Information", JOptionPane.INFORMATION_MESSAGE);
+                System.out.println("\t (no courses found)");
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Database Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
+        }
         String columName[] = {"Code", "Title", "Section", "Credits"};
         
         JTable t = new JTable(data, columName);
@@ -157,30 +171,4 @@ public class courses {
             }
         });
     }
-
-    private String[][] dataPull() {
-        try {
-            CatalogService service = new CatalogService();
-            ArrayList<Course> courseList = service.getAllCourses();
-
-            if (courseList == null || courseList.isEmpty()) {
-                return new String[0][0];
-            }
-
-            String[][] strArr = new String[courseList.size()][4];
-            for (int i = 0; i < courseList.size(); i++) {
-                Course c = courseList.get(i);
-                strArr[i][0] = c.getCourseCode();
-                strArr[i][1] = c.getTitle();
-                strArr[i][2] = c.getSection();
-                strArr[i][3] = c.getCredits(); 
-            }
-            return strArr;
-
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "Database Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace();
-            return new String[0][0];
-        }
-    }  
 }

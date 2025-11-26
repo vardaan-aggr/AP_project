@@ -1,5 +1,6 @@
 package edu.univ.erp.service;
 
+import edu.univ.erp.access.modeOps;
 import edu.univ.erp.data.AuthCommandRunner;
 import edu.univ.erp.data.ErpCommandRunner;
 import edu.univ.erp.data.NotificationCommandRunner;
@@ -7,6 +8,7 @@ import edu.univ.erp.domain.Admin;
 import edu.univ.erp.domain.Course;
 import edu.univ.erp.domain.Instructor;
 import edu.univ.erp.domain.Sections;
+import edu.univ.erp.domain.Settings;
 import edu.univ.erp.domain.Student;
 
 import java.io.File;
@@ -25,7 +27,10 @@ public class AdminService {
             if (rollNo == -1) return "Failed to create student in auth.";
 
             boolean erpSuccess = ErpCommandRunner.registerStudentErp(rollNo, program, year);
-            if (!erpSuccess) return "Created Auth user but failed to create ERP student.";
+            if (!erpSuccess) {
+                AuthCommandRunner.deleteUser(String.valueOf(rollNo),"student");
+                return "Created Auth user but failed to create ERP student.";
+            }
 
             NotificationCommandRunner.sendNotification(rollNo, "Student added in ERP!");
 
@@ -68,12 +73,21 @@ public class AdminService {
     }
 
     public String unassignInstructor(String courseCode, String section) {
-        try {
-             // 1. Find out who is currently assigned
-            Sections s = ErpCommandRunner.SectionInfoGetter(courseCode, section);
-            String oldInstructor = (s != null) ? s.getRollNo() : "N/A";
+        if (courseCode.isEmpty() || section.isEmpty()) {
+            return "All fields must be filled out.";
+        }
 
-            // 2. Perform the unassign action
+        try {
+            // 1. Find out who is currently assigned
+            Sections s = ErpCommandRunner.SectionInfoGetter(courseCode, section);
+            String oldInstructor;
+            if (s == null) {
+                oldInstructor = "N/A";
+            } else {
+                oldInstructor = s.getRollNo();
+            }
+
+            // 2. Unassign action
             int rows = ErpCommandRunner.unassignInstructorHelper(courseCode, section);
             
             if (rows > 0) {
@@ -99,7 +113,7 @@ public class AdminService {
             int result = ErpCommandRunner.sectionUpdater(rollNo, dayTime, room, capacity, semester, year, courseCode, section);
             if (result > 0) {
                 if (!rollNo.equals("N/A")) {
-                     try {
+                    try {
                         int insId = Integer.parseInt(rollNo);
                         NotificationCommandRunner.sendNotification(insId, "Update: You are assigned to " + courseCode + " (" + section + ")");
                     } catch (NumberFormatException ignored) {}
@@ -281,5 +295,25 @@ public class AdminService {
 
     public ArrayList<Admin> getAllAdmins() throws SQLException {
         return AuthCommandRunner.searchAuthAuth();
+    }
+
+    public String setDropDeadline(String dateInput) {
+        // 1. Validate Input (Business Logic)
+        if (dateInput == null || dateInput.trim().isEmpty()) {
+             return "Error: Date cannot be empty.";
+        }
+        
+        // The regex check is now here, not in the UI
+        if (!dateInput.matches("\\d{4}-\\d{2}-\\d{2}")) {
+            return "Error: Invalid format. Use YYYY-MM-DD.";
+        }
+        
+        // 2. Perform Action
+        Settings s = new Settings("drop_deadline", dateInput.trim());
+        if (modeOps.updateSetting(s)) {
+            return "Success";
+        } else {
+            return "Error: Failed to update database.";
+        }
     }
 }

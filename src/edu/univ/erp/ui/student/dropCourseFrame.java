@@ -111,6 +111,10 @@ public class dropCourseFrame {
                     JOptionPane.showMessageDialog(null, "Failed: The drop deadline has passed.", "Error", JOptionPane.ERROR_MESSAGE);
                     System.out.println("Error: Deadline passed.");
                 } 
+                else if (result == -3) {
+                    JOptionPane.showMessageDialog(null, "Drop failed: Maintenance Mode is ON.", "Info", JOptionPane.INFORMATION_MESSAGE);
+                    System.out.println("Drop failed: Maintenance Mode is ON.");
+                }
                 else {
                     // Result is 0 or -1 (Not enrolled or DB error)
                     JOptionPane.showMessageDialog(null, "Error: Not enrolled or course invalid.", "Error", JOptionPane.ERROR_MESSAGE);

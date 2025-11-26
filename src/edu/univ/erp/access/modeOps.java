@@ -23,7 +23,6 @@ public class modeOps {
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     String val = resultSet.getString("settings_value");
-                    // Create the Domain Object
                     setting = new Settings(key, val);
                 }
             }
@@ -39,13 +38,14 @@ public class modeOps {
         String query = "UPDATE settings SET settings_value = ? WHERE settings_key = ?";
         
         try (Connection connection = DatabaseConnector.getErpConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+            PreparedStatement statement = connection.prepareStatement(query)) {
             
             statement.setString(1, setting.getValue());
             statement.setString(2, setting.getKey());
             
             int rowsAffected = statement.executeUpdate();
-            return rowsAffected > 0;
+            if (rowsAffected > 0) { return true; }
+            else { return false; }  
 
         } catch (SQLException ex) {
             System.out.println("Error updating setting [" + setting.getKey() + "]: " + ex.getMessage());

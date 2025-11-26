@@ -119,7 +119,7 @@ public class ClassStatisticsFrame {
                     stats = service.computeStats(courseCode_in, section_in);
                 } catch (SQLException ex) {
                     ex.printStackTrace();
-                    JOptionPane.showMessageDialog(null, "Database Error: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Database Error." , "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 if (stats == -1.0) {

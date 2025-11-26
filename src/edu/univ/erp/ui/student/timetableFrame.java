@@ -85,8 +85,11 @@ public class timetableFrame {
 
             f.add(p2, BorderLayout.CENTER);
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "Error fetching timetable: " + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Database Error.", "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
+            System.out.println("\tGoing back to Student Dashboard..");
+            new studentDashboard(username, role, in_pass, roll_no);
+            f.dispose();
         }
         
         // ---- LOWS ----

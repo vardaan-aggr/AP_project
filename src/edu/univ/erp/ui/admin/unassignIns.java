@@ -123,10 +123,6 @@ public class unassignIns {
         // ---- Action Listeners ----
         b1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (tCourseCode.getText().trim().isEmpty() || tSection.getText().trim().isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "All fields must be filled out.", "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
                 AdminService service = new AdminService();
                 String result = service.unassignInstructor(tCourseCode.getText().trim(), tSection.getText().trim());
 

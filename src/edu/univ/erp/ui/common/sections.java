@@ -7,12 +7,10 @@ import javax.swing.table.JTableHeader;
 import com.formdev.flatlaf.FlatLightLaf;
 
 import edu.univ.erp.ui.instructor.InstructorDashboard;
-import edu.univ.erp.domain.Sections;
 import edu.univ.erp.service.CatalogService;
 import edu.univ.erp.util.BREATHEFONT;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -78,7 +76,23 @@ public class sections {
         
         centerPanel.add(searchPanel, BorderLayout.NORTH);
 
-        String data[][] = dataPull();
+        String data[][] = new String[0][0];
+        try {
+            CatalogService service = new CatalogService();
+            String[][] fetchedData = service.getSectionsTableData(); 
+
+            if (fetchedData != null) {
+                data = fetchedData;
+            }
+
+            if (data.length == 0) {
+                JOptionPane.showMessageDialog(null, "No sectioons found.", "Information", JOptionPane.INFORMATION_MESSAGE);
+                System.out.println("\t (no sections found)");
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Database Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
+        }
         String columName[] = {"Course Code", "Section", "Instructor Rollno", "Day_Time", "Room", "Capacity", "Semester", "Year"};
         
         JTable t = new JTable(data, columName);
@@ -157,34 +171,4 @@ public class sections {
             }
         });
     }
-
-    private String[][] dataPull() {
-        try {
-            CatalogService service = new CatalogService();
-            ArrayList<Sections> sectionList = service.getAllSections();
-
-            if (sectionList == null || sectionList.isEmpty()) {
-                return new String[0][0];
-            }
-
-            String[][] strArr = new String[sectionList.size()][8];
-            for (int i = 0; i < sectionList.size(); i++) {
-                Sections s = sectionList.get(i);
-                strArr[i][0] = s.getCourseCode();
-                strArr[i][1] = s.getSection();
-                strArr[i][2] = s.getRollNo();
-                strArr[i][3] = s.getDayTime();
-                strArr[i][4] = s.getRoom();
-                strArr[i][5] = s.getCapacity(); 
-                strArr[i][6] = s.getSemester();
-                strArr[i][7] = s.getYear();     
-            }
-            return strArr;
-
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "Database Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace();
-            return new String[0][0];
-        }
-    }  
 }

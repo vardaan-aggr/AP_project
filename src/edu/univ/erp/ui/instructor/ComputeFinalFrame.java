@@ -20,13 +20,15 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;   
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
+
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import edu.univ.erp.util.BREATHEFONT;
 
 public class ComputeFinalFrame {
-    public ComputeFinalFrame(String username, String role, String password, String roll_no) {
+    public ComputeFinalFrame(String username, String role, String password, String insRollno) {
 
         Font breatheFont = BREATHEFONT.fontGen();
         Font gFont = BREATHEFONT.gFontGen();
@@ -74,10 +76,10 @@ public class ComputeFinalFrame {
         gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
         p2.add(student_no, gbc);
 
-        JTextField num = new JTextField(15);
-        num.setFont(fieldFont);
+        JTextField studentRollNo_in = new JTextField(15);
+        studentRollNo_in.setFont(fieldFont);
         gbc.gridx = 1; gbc.gridy = 0; gbc.weightx = 1;
-        p2.add(num, gbc);
+        p2.add(studentRollNo_in, gbc);
 
         JLabel course_code = new JLabel("Course Code:");
         course_code.setFont(labelFont);
@@ -178,36 +180,37 @@ public class ComputeFinalFrame {
         // ---- Action Listeners ----
         add.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // 1. Basic UI Validation (Empty Fields)
-                if (num.getText().trim().isEmpty() || code.getText().trim().isEmpty() || 
-                    sectionField.getText().trim().isEmpty() || tquizMarks.getText().trim().isEmpty() || 
-                    tmidsem.getText().trim().isEmpty() || tendsem.getText().trim().isEmpty()) {
+                if (studentRollNo_in.getText().trim().isEmpty() || code.getText().trim().isEmpty() || sectionField.getText().trim().isEmpty() || tquizMarks.getText().trim().isEmpty() || tmidsem.getText().trim().isEmpty() || tendsem.getText().trim().isEmpty()) {
                     JOptionPane.showMessageDialog(null, "Please fill all fields.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
-                String rollNo_in = num.getText().trim();
+                String stdRollNo_in = studentRollNo_in.getText().trim();
                 String courseCode_in = code.getText().trim();
                 String section_in = sectionField.getText().trim();
-                
-                // 2. Call Service
-                InstructorService service = new InstructorService();
-                String result = service.computeAndAssignGrade(
-                    rollNo_in, 
-                    courseCode_in, 
-                    section_in, 
-                    tquizMarks.getText().trim(), 
-                    tmidsem.getText().trim(), 
-                    tendsem.getText().trim()
-                );
+                String quizMarks = tquizMarks.getText().trim();
+                String midsemMarks = tmidsem.getText().trim();
+                String endsemMarks = tendsem.getText().trim();
 
-                // 3. Handle Result
-                if ("Success".equals(result)) {
-                    JOptionPane.showMessageDialog(null, "Grade computed and updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                    new InstructorDashboard(username, role, password, roll_no);
+                InstructorService service = new InstructorService();
+                String result = null;
+                try {
+                    result = service.computeAndAssignGrade(insRollno, stdRollNo_in, courseCode_in, section_in, quizMarks, midsemMarks, endsemMarks);
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "Database error." + ex, "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                if (result.equals("-3")) {
+                    System.out.println("Registration Failed: Maintenance Mode is ON.");
+                    JOptionPane.showMessageDialog(null, "Registration Failed: Maintenance Mode is ON.", "Info", JOptionPane.INFORMATION_MESSAGE);
+                }
+                else if ("Success".equals(result)) {
+                    JOptionPane.showMessageDialog(null, "Graded successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    new InstructorDashboard(username, role, password, insRollno);
                     f.dispose();
                 } else {
-                    // Show whatever error message the Service returned (Invalid marks, Not enrolled, DB error, etc.)
                     JOptionPane.showMessageDialog(null, result, "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
@@ -215,11 +218,9 @@ public class ComputeFinalFrame {
         
         bBack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new InstructorDashboard(username, role, password, roll_no);
+                new InstructorDashboard(username, role, password, insRollno);
                 f.dispose();
             }
         });
     }
-
-    
 }

@@ -13,7 +13,19 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 public class StudentService {
-   public int dropCourse(String rollNo, String courseCode) {
+
+    // Define error codes for clarity
+    public static final int STATUS_MAINTENANCE = -3;
+    public static final int STATUS_DEADLINE_PASSED = -2;
+
+    public int dropCourse(String rollNo, String courseCode) {
+        // 1. Check Maintenance Mode
+        if (!isSystemActive()) {
+            System.out.println("Drop failed: Maintenance Mode is ON.");
+            return STATUS_MAINTENANCE; 
+        }
+
+        // 2. Check Deadline
         Settings deadlineSetting = modeOps.getSetting("drop_deadline");
         
         if (deadlineSetting != null && deadlineSetting.getValue() != null) {
@@ -23,14 +35,14 @@ public class StudentService {
 
                 if (today.isAfter(deadline)) {
                     System.out.println("Drop failed: Deadline passed (" + deadline + ")");
-                    return -2; // Return a specific error code for "Deadline Passed"
+                    return STATUS_DEADLINE_PASSED; 
                 }
             } catch (DateTimeParseException e) {
                 System.err.println("Error: Invalid deadline date format in DB. Expected YYYY-MM-DD.");
             }
         }
 
-        // 2. Proceed with Drop if deadline is okay
+        // 3. Proceed with Drop if allowed
         int rowsDeleted = ErpCommandRunner.studentDropCourseHelper(rollNo, courseCode);
         
         if (rowsDeleted > 0) {
@@ -43,15 +55,14 @@ public class StudentService {
         return rowsDeleted;
     }
 
-    public String[][] gradeData (String rollNo) throws SQLException {
-        try {
-            return ErpCommandRunner.studentGradeHelper(rollNo);
-        }  catch (SQLException e) {
-            throw new SQLException(e);
-        }
-    }
-
     public int registerCourse (String rollNo, String courseCode, String section) {
+        // 1. Check Maintenance Mode
+        if (!isSystemActive()) {
+            System.out.println("Registration failed: Maintenance Mode is ON.");
+            return STATUS_MAINTENANCE;
+        }
+
+        // 2. Proceed with Registration
         int rowsInserted = ErpCommandRunner.studentRegisterHelper(rollNo, courseCode, section, "enrolled");
         if (rowsInserted > 0) {
             NotificationCommandRunner.sendNotification(Integer.parseInt(rollNo), "Registered for: " + courseCode);
@@ -61,10 +72,19 @@ public class StudentService {
 
     public boolean isSystemActive() {
         Settings mode = modeOps.getSetting("maintain_mode");
+        // If mode is found and is "true", system is NOT active
         if (mode != null && mode.isTrue()) {
             return false; 
         }
         return true; 
+    }
+
+    public String[][] gradeData (String rollNo) throws SQLException {
+        try {
+            return ErpCommandRunner.studentGradeHelper(rollNo);
+        }  catch (SQLException e) {
+            throw new SQLException(e);
+        }
     }
 
     public String[][] timetable (String rollNo) throws SQLException {
@@ -74,6 +94,7 @@ public class StudentService {
             throw new SQLException(e);
         }
     }
+    
     public ArrayList<Grades> getTranscript(String rollNo) throws SQLException {
         return ErpCommandRunner.studentTranscriptHelper(rollNo);
     }
