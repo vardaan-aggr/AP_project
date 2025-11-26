@@ -1,7 +1,6 @@
 package edu.univ.erp.ui.admin.searchDB;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 import javax.swing.*;
 import javax.swing.table.JTableHeader;
@@ -19,7 +18,6 @@ import java.awt.Insets;
 import edu.univ.erp.ui.admin.adminDashboard;
 import edu.univ.erp.util.BREATHEFONT;
 
-import edu.univ.erp.domain.Student;
 import edu.univ.erp.service.AdminService;
 
 public class searchStd {
@@ -50,13 +48,22 @@ public class searchStd {
         f.add(p1, BorderLayout.NORTH);
 
         // ---- MIDDLE ----
-        String[][] data = dataPull();
-        if (data == null || data.length == 0) {
-            JOptionPane.showMessageDialog(null, "No students found in database.", "Info", JOptionPane.INFORMATION_MESSAGE);
-            System.out.println("\tGoing back to admin dashboard..");
-            new adminDashboard(roll_no_inp);
-            f.dispose();
-            return;
+        String data[][] = new String[0][0];
+        try {
+            AdminService service = new AdminService();
+            String[][] fetchedData = service.SearchStudentData(); 
+
+            if (fetchedData != null) {
+                data = fetchedData;
+            }
+
+            if (data.length == 0) {
+                JOptionPane.showMessageDialog(null, "No active courses found.", "Information", JOptionPane.INFORMATION_MESSAGE);
+                System.out.println("\t (no courses found)");
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Database Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
         }
         String[] columName = {"Roll No", "Username", "Program", "Year"};
         
@@ -105,28 +112,5 @@ public class searchStd {
                 f.dispose();
             }
         });
-    }
-
-    private String[][] dataPull() {
-        try {
-            AdminService service = new AdminService();
-            ArrayList<Student> stdList = service.getAllStudents();
-
-            if (stdList.isEmpty()) return null;
-
-            String[][] strArr = new String[stdList.size()][4];
-            for (int i = 0; i < stdList.size(); i++) {
-                Student s = stdList.get(i);
-                strArr[i][0] = s.getRollNo();
-                strArr[i][1] = s.getUsername();
-                strArr[i][2] = s.getProgram();
-                strArr[i][3] = s.getYear();
-            }
-            return strArr;
-
-        } catch (SQLException e) {
-            System.err.println("SQL Error in dataPull: " + e.getMessage());
-            return null;
-        }
     }
 }

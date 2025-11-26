@@ -1,7 +1,6 @@
 package edu.univ.erp.ui.admin.searchDB;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 import javax.swing.*;
 import javax.swing.table.JTableHeader;
@@ -16,7 +15,6 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Insets;
 
-import edu.univ.erp.domain.Admin;
 import edu.univ.erp.service.AdminService;
 import edu.univ.erp.ui.admin.adminDashboard;
 import edu.univ.erp.util.BREATHEFONT;
@@ -50,12 +48,22 @@ public class searchAdm {
         f.add(p1, BorderLayout.NORTH);
 
         // ---- MIDDLE ----
-        String[][] data = dataPull();
-        if (dataPull() == null) {
-            System.out.println("\tGoing back to admin dashboard..");
-            new adminDashboard(roll_no_inp);
-            f.dispose();
-            return;
+        String data[][] = new String[0][0];
+        try {
+            AdminService service = new AdminService();
+            String[][] fetchedData = service.SearchAdminData(); 
+
+            if (fetchedData != null) {
+                data = fetchedData;
+            }
+
+            if (data.length == 0) {
+                JOptionPane.showMessageDialog(null, "No active admin found.", "Information", JOptionPane.INFORMATION_MESSAGE);
+                System.out.println("\t (no admin found)");
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Database Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
         } 
         String[] columName = {"Username", "Admin ID"}; 
         
@@ -112,26 +120,5 @@ public class searchAdm {
                 f.dispose();
             }
         });
-    }
-
-    private String[][] dataPull() {
-        try {
-            AdminService service = new AdminService();
-            ArrayList<Admin> adminList = service.getAllAdmins();
-
-            if (adminList.isEmpty()) return null;
-
-            String[][] strArr = new String[adminList.size()][2];
-            for (int i = 0; i < adminList.size(); i++) {
-                Admin a = adminList.get(i);
-                strArr[i][0] = a.getUsername();
-                strArr[i][1] = a.getRollNo();
-            }
-            return strArr;
-
-        } catch (SQLException e) {
-            System.err.println("SQL Error: " + e.getMessage());
-            return null;
-        }
     }
 }

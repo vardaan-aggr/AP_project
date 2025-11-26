@@ -6,8 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import javax.swing.JOptionPane;
-
 import edu.univ.erp.domain.Course;
 import edu.univ.erp.domain.Grades;
 import edu.univ.erp.domain.Instructor;
@@ -31,8 +29,10 @@ public class ErpCommandRunner {
                     return rowsInsreted;
                 }
             } catch (SQLException ex) {
+                if (ex.getErrorCode() == 1062) {
+                    return -5; 
+                }
                 ex.printStackTrace();
-                JOptionPane.showMessageDialog(null, "Error: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
                 resultCode = - 4; // Database error: Couldn't insert in enrollments database.
             }
         } 
@@ -52,7 +52,6 @@ public class ErpCommandRunner {
                     if (rs.next()) {
                         capacity = rs.getInt("capacity");
                     } else {
-                        JOptionPane.showMessageDialog(null, "Section not found.", "Info", JOptionPane.INFORMATION_MESSAGE);
                         return -1; // -1 Section not found
                     }
                 }
@@ -81,7 +80,6 @@ public class ErpCommandRunner {
         if (enrolled < capacity) {
             return 1; // 1 success
         } else {
-            JOptionPane.showMessageDialog(null, "Course Capacity Full.", "Info", JOptionPane.INFORMATION_MESSAGE);
             return -11; // -11 code for overflow enrollments 
         }
     }
@@ -107,7 +105,6 @@ public class ErpCommandRunner {
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Error: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
             return -1;
         }
     }
@@ -321,7 +318,6 @@ public class ErpCommandRunner {
                     } 
                     if (empty) {
                         System.out.println("\t (no grades found)");
-                        JOptionPane.showMessageDialog(null, "No grades found for this course/section.", "Info", JOptionPane.INFORMATION_MESSAGE);
                         return null;
                     }
                 }
@@ -550,12 +546,7 @@ public class ErpCommandRunner {
                         }
                     }
                 }
-            }
-            
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "Error: Couldn't fetch student details: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace();
-            throw new SQLException(ex);
+            }            
         }
         return stdList;
     }
@@ -568,9 +559,7 @@ public class ErpCommandRunner {
                         """)) {
                         statement.setString(1, i.getRollNo());
                     try (ResultSet resultSet = statement.executeQuery()) {
-                        // boolean empty = true;
                         if (resultSet.next()) {
-                            // empty = false;
                             i.setDepartment(resultSet.getString("department"));
                         } else {
                             System.out.println("Warning: Missing ERP details for roll: " + i.getRollNo());
@@ -578,11 +567,7 @@ public class ErpCommandRunner {
                     }
                 }
             }
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "Error: Couldn't fetch instructor details: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace();
-            throw new SQLException(ex);
-        }
+        } 
         return insList;
     }
 

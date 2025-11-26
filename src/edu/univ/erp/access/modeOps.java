@@ -33,7 +33,7 @@ public class modeOps {
         return setting;
     }
     
-    //Updates a setting in the database using a Settings object.
+    //Updates a setting
     public static boolean updateSetting(Settings setting) {
         String query = "UPDATE settings SET settings_value = ? WHERE settings_key = ?";
         

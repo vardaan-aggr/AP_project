@@ -1,7 +1,6 @@
 package edu.univ.erp.ui.admin.searchDB;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 import javax.swing.*;
 import javax.swing.table.JTableHeader;
@@ -16,7 +15,6 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Insets;
 
-import edu.univ.erp.domain.Instructor;
 import edu.univ.erp.service.AdminService;
 import edu.univ.erp.ui.admin.adminDashboard;
 import edu.univ.erp.util.BREATHEFONT;
@@ -50,14 +48,24 @@ public class searchIns {
         f.add(p1, BorderLayout.NORTH);
 
         // ---- MIDDLE ----
-        String[][] data = dataPull();
-        if (data == null || data.length == 0) {
-            JOptionPane.showMessageDialog(null, "No instructors found.", "Info", JOptionPane.INFORMATION_MESSAGE);
-            System.out.println("\tGoing back to admin dashboard..");
-            new adminDashboard(roll_no_inp);
-            f.dispose();
-            return;
+        String data[][] = new String[0][0];
+        try {
+            AdminService service = new AdminService();
+            String[][] fetchedData = service.SearchInstructorData(); 
+
+            if (fetchedData != null) {
+                data = fetchedData;
+            }
+
+            if (data.length == 0) {
+                JOptionPane.showMessageDialog(null, "No instructor found.", "Information", JOptionPane.INFORMATION_MESSAGE);
+                System.out.println("\t (no instructor found)");
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Database Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
         }
+    
         String[] columName = {"RollNo", "Username", "Department"};
         
         JTable t = new JTable(data, columName);
@@ -106,27 +114,4 @@ public class searchIns {
             }
         });
     }
-
-    private String[][] dataPull() {
-        try {
-            AdminService service = new AdminService();
-            ArrayList<Instructor> insList = service.getAllInstructors();
-
-            if (insList.isEmpty()) return null;
-
-            String[][] strArr = new String[insList.size()][3];
-            for(int i = 0; i < insList.size(); i++) {
-                Instructor ins = insList.get(i);
-                strArr[i][0] = ins.getRollNo();
-                strArr[i][1] = ins.getUsername();
-                strArr[i][2] = ins.getDepartment();
-            } 
-            return strArr;
-
-        } catch (SQLException e) {
-            System.err.println("SQL Error: " + e.getMessage());
-            return null;
-        }
-    }
-
 }

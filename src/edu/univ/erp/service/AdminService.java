@@ -316,4 +316,52 @@ public class AdminService {
             return "Error: Failed to update database.";
         }
     }
+
+    public String[][] SearchInstructorData() throws SQLException {
+        AdminService service = new AdminService();
+        ArrayList<Instructor> insList = service.getAllInstructors();
+
+        if (insList.isEmpty()) return null;
+
+        String[][] strArr = new String[insList.size()][3];
+        for(int i = 0; i < insList.size(); i++) {
+            Instructor ins = insList.get(i);
+            strArr[i][0] = ins.getRollNo();
+            strArr[i][1] = ins.getUsername();
+            strArr[i][2] = ins.getDepartment();
+        } 
+        return strArr;
+    }
+
+    public String[][] SearchAdminData() throws SQLException {
+        AdminService service = new AdminService();
+        ArrayList<Admin> adminList = service.getAllAdmins();
+
+        if (adminList.isEmpty()) return null;
+
+        String[][] strArr = new String[adminList.size()][2];
+        for (int i = 0; i < adminList.size(); i++) {
+            Admin a = adminList.get(i);
+            strArr[i][0] = a.getUsername();
+            strArr[i][1] = a.getRollNo();
+        }
+        return strArr;
+    }
+
+    public String[][] SearchStudentData() throws SQLException {
+        AdminService service = new AdminService();
+        ArrayList<Student> stdList = service.getAllStudents();
+
+        if (stdList.isEmpty()) return null;
+
+        String[][] strArr = new String[stdList.size()][4];
+        for (int i = 0; i < stdList.size(); i++) {
+            Student s = stdList.get(i);
+            strArr[i][0] = s.getRollNo();
+            strArr[i][1] = s.getUsername();
+            strArr[i][2] = s.getProgram();
+            strArr[i][3] = s.getYear();
+        }
+        return strArr;
+    }
 }

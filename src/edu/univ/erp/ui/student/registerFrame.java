@@ -122,9 +122,13 @@ public class registerFrame {
                     JOptionPane.showMessageDialog(null, "Drop failed: Maintenance Mode is ON.", "Info", JOptionPane.INFORMATION_MESSAGE);
                     System.out.println("Drop failed: Maintenance Mode is ON.");
                 } else if (rowsInserted == -11) {
-                    JOptionPane.showMessageDialog(null, "Failed: Maximum course capcity reached.", "Info", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Failed: Course capacity is full.", "Info", JOptionPane.INFORMATION_MESSAGE);
                     System.out.println("Failed: Maximum course capcity reached");
-                } else if (rowsInserted == 0 || rowsInserted == -1) {
+                } else if (rowsInserted == -5) {
+                    JOptionPane.showMessageDialog(null, "You are already registered for this course/section!","Duplicate Registration", JOptionPane.WARNING_MESSAGE);
+                    System.out.println("Failed: Maximum course capcity reached");
+                }
+                 else if (rowsInserted == 0 || rowsInserted == -1) {
                     // Result is 0 or -1 (Not enrolled or DB error)
                     JOptionPane.showMessageDialog(null, "Error: Not enrolled or course invalid.", "Error", JOptionPane.ERROR_MESSAGE);
                     System.out.println("Error: Not enrolled or course invalid.");
