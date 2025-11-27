@@ -40,6 +40,9 @@ Create table IF NOT EXISTS grades (
     course_code varchar(50),
     section varchar(50),
     grade varchar(50),
+    quizMarks varchar(50),
+    midsemMarks varchar(50),
+    endsemMarks varchar(50),
     PRIMARY KEY (roll_no, course_code, section)
 );
 Create table if not exists settings (

@@ -4,6 +4,9 @@ import javax.swing.*;
 
 import com.formdev.flatlaf.FlatLightLaf;
 
+import edu.univ.erp.ui.admin.manageUsers.addAdm;
+import edu.univ.erp.ui.admin.manageUsers.addIns;
+import edu.univ.erp.ui.admin.manageUsers.addStd;
 import edu.univ.erp.util.BREATHEFONT;
 
 import java.awt.BorderLayout;

@@ -1,4 +1,4 @@
-package edu.univ.erp.ui.admin;
+package edu.univ.erp.ui.admin.manageCourseSection;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -12,6 +12,7 @@ import javax.swing.UIManager;
 import com.formdev.flatlaf.FlatLightLaf;
 
 import edu.univ.erp.service.AdminService;
+import edu.univ.erp.ui.admin.adminDashboard;
 import edu.univ.erp.util.BREATHEFONT;
 
 import java.awt.BorderLayout;

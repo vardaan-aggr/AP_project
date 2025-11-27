@@ -63,7 +63,7 @@ public class gradeFrame {
                 return;
             }
 
-            String columName[] = {"Course code", "Grade"};
+            String columName[] = {"Course code", "Quiz", "Midterm", "Endsem", "Grade"};
             JTable t = new JTable(data, columName);
 
             JTableHeader header = t.getTableHeader();
@@ -86,10 +86,8 @@ public class gradeFrame {
             f.add(p2, BorderLayout.CENTER);
 
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "Error registering: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Error: Database error.", "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
-            new studentDashboard(username, role, in_pass, roll_no);
-            f.dispose();
         }
 
         // ---- LOWS ----

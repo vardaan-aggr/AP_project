@@ -155,7 +155,15 @@ public class AdminService {
             Sections s = ErpCommandRunner.SectionInfoGetter(courseCode, section);
             if (s != null) assignedInstructor = s.getRollNo();
         } catch (SQLException e) {
-            e.printStackTrace(); // Just log, don't stop deletion
+            e.printStackTrace(); 
+            return "Error: Couldnt fetch instructor rollNo.";
+        }
+
+        try {
+            if (ErpCommandRunner.HasStudents(courseCode, section)) return "Error: Students enrolled, cannot delete.";
+        } catch (SQLException e) {
+            e.printStackTrace(); 
+            return "Error: Couldnt fetch rollNo from enrollments.";
         }
 
         int result = ErpCommandRunner.deleteSecCourseHelper(courseCode, section);

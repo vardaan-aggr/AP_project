@@ -128,15 +128,9 @@ public class studentDashboard {
         bLogout.setFont(breatheFont.deriveFont(Font.PLAIN, 35f));
         bLogout.setMargin(new Insets(10, 30, 5, 30));
         
-        // Wrapper Panel for Logout to prevent it from filling the screen
-        // JPanel pLogoutWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        // pLogoutWrapper.setOpaque(false); // Make it transparent to match background
-        // pLogoutWrapper.add(bLogout);
         p3.add(bLogout);
         p3.add(Box.createHorizontalStrut(20)); 
         p3.add(bNotify);
-        // p3.add(bNotify, BorderLayout.WEST);
-        // p3.add(pLogoutWrapper, BorderLayout.CENTER);
         
         f.add(p3, BorderLayout.SOUTH);
 
