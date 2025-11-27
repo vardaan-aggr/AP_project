@@ -186,7 +186,7 @@ public class AuthCommandRunner {
         }
     }
 
-    public static void deleteUser(String rollNo, String role) {
+    public static void deleteUser(String rollNo, String role) throws SQLException {
         try (Connection connection = DatabaseConnector.getAuthConnection()) {
             try (PreparedStatement statement = connection.prepareStatement("""
                         delete FROM auth_table WHERE role = ? and roll_no = ?;
@@ -195,9 +195,7 @@ public class AuthCommandRunner {
                 statement.setString(2, rollNo);
                 statement.executeUpdate();
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        } 
     }
 
     public static int updatePasswordHelper(String username, String newHashPass) throws SQLException {
