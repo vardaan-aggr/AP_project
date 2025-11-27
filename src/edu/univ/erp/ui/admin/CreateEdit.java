@@ -9,6 +9,11 @@ import javax.swing.UIManager;
 
 import com.formdev.flatlaf.FlatLightLaf;
 
+import edu.univ.erp.ui.admin.manageCourseSection.createCourse;
+import edu.univ.erp.ui.admin.manageCourseSection.createSection;
+import edu.univ.erp.ui.admin.manageCourseSection.deleteSectionACourse;
+import edu.univ.erp.ui.admin.manageCourseSection.editCourse;
+import edu.univ.erp.ui.admin.manageCourseSection.editSection;
 import edu.univ.erp.util.BREATHEFONT;
 
 import java.awt.BorderLayout;

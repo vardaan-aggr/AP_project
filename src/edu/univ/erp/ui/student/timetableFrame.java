@@ -87,9 +87,6 @@ public class timetableFrame {
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, "Database Error.", "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
-            System.out.println("\tGoing back to Student Dashboard..");
-            new studentDashboard(username, role, in_pass, roll_no);
-            f.dispose();
         }
         
         // ---- LOWS ----

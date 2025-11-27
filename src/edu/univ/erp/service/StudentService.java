@@ -1,12 +1,10 @@
 package edu.univ.erp.service;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 import edu.univ.erp.access.modeOps;
 import edu.univ.erp.data.ErpCommandRunner;
 import edu.univ.erp.data.NotificationCommandRunner;
-import edu.univ.erp.domain.Grades;
 import edu.univ.erp.domain.Settings;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -80,22 +78,14 @@ public class StudentService {
     }
 
     public String[][] gradeData (String rollNo) throws SQLException {
-        try {
-            return ErpCommandRunner.studentGradeHelper(rollNo);
-        }  catch (SQLException e) {
-            throw new SQLException(e);
-        }
+        return ErpCommandRunner.studentGradeHelper(rollNo);
     }
 
     public String[][] timetable (String rollNo) throws SQLException {
-        try {
-            return ErpCommandRunner.studentTimeTableHelper(rollNo);
-        }  catch (SQLException e) {
-            throw new SQLException(e);
-        }
+        return ErpCommandRunner.studentTimeTableHelper(rollNo);
     }
     
-    public ArrayList<Grades> getTranscript(String rollNo) throws SQLException {
-        return ErpCommandRunner.studentTranscriptHelper(rollNo);
+    public String[] getTranscript(String stdRollNo) throws SQLException {
+        return ErpCommandRunner.studentTranscriptHelper(stdRollNo);
     }
 }

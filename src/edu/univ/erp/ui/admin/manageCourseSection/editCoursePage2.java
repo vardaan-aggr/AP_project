@@ -1,28 +1,37 @@
-package edu.univ.erp.ui.admin;
+package edu.univ.erp.ui.admin.manageCourseSection;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.UIManager;
 
 import com.formdev.flatlaf.FlatLightLaf;
 
-import edu.univ.erp.util.BREATHEFONT;
-import edu.univ.erp.auth.HashGenerator;
 import edu.univ.erp.service.AdminService;
+import edu.univ.erp.ui.admin.adminDashboard;
+import edu.univ.erp.util.BREATHEFONT;
+
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-public class addStd {
-    public addStd(String rollNo) {
+public class editCoursePage2 {
+
+    public editCoursePage2(String roll_no,String arrgs[]) {
 
         Font breatheFont = BREATHEFONT.fontGen();
-        Font gFont = BREATHEFONT.gFontGen();
+        Font gFont = BREATHEFONT.gFontGen(); 
 
         try {
             UIManager.setLookAndFeel(new FlatLightLaf());
@@ -30,8 +39,8 @@ public class addStd {
             e.printStackTrace();
         }
 
-        JFrame f = new JFrame();
-        f.setSize(800, 600);
+        JFrame f = new JFrame("Edit Course Details");
+        f.setSize(800, 600); 
         f.setLayout(new BorderLayout());
 
         // ---- TOP ----
@@ -39,7 +48,7 @@ public class addStd {
         p1.setBackground(Color.decode("#051072")); 
         p1.setOpaque(true); 
         
-        JLabel l0 = new JLabel("ADD STUDENT");
+        JLabel l0 = new JLabel("EDIT COURSE"); 
         l0.setForeground(Color.decode("#dbd3c5"));
         l0.setFont(breatheFont.deriveFont(Font.BOLD, 80f)); 
         l0.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0));
@@ -52,64 +61,81 @@ public class addStd {
         p2.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10); // Spacing between fields
+        gbc.insets = new Insets(10, 10, 10, 10); 
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        JLabel l1 = new JLabel("Username:");
+        // Row 0: Course Code (Non-Editable)
+        JLabel l1 = new JLabel("Course Code:");
         l1.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l1.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
         p2.add(l1, gbc);
 
-        JTextField tUsername = new JTextField(20);
-        tUsername.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        JTextField tCourseCode = new JTextField(20);
+        tCourseCode.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        tCourseCode.setText(arrgs[0]); // Pre-fill
+        tCourseCode.setEditable(false); // Read-only
         gbc.gridx = 1; gbc.gridy = 0; gbc.weightx = 1;
         gbc.anchor = GridBagConstraints.WEST;
-        p2.add(tUsername, gbc);
+        p2.add(tCourseCode, gbc);
 
-        JLabel l2 = new JLabel("Password:");
+        // Row 1: Section (Non-Editable)
+        JLabel l2 = new JLabel("Section:");
         l2.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l2.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
         p2.add(l2, gbc);
 
-        JTextField tPassword = new JTextField(20); 
-        tPassword.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        JTextField tSection = new JTextField(20);
+        tSection.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        tSection.setText(arrgs[2]); // Pre-fill
+        tSection.setEditable(false); // Read-only
         gbc.gridx = 1; gbc.gridy = 1; gbc.weightx = 1;
         gbc.anchor = GridBagConstraints.WEST;
-        p2.add(tPassword, gbc);
+        p2.add(tSection, gbc);
 
-        JLabel l3 = new JLabel("Program:");
+        // Row 2: Title (Editable)
+        JLabel l3 = new JLabel("Title:");
         l3.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l3.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 2; gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
         p2.add(l3, gbc);
 
-        JTextField tProgram = new JTextField(20);
-        tProgram.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        JTextField tTitle = new JTextField(20);
+        tTitle.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        tTitle.setText(arrgs[1]); // Pre-fill
         gbc.gridx = 1; gbc.gridy = 2; gbc.weightx = 1;
         gbc.anchor = GridBagConstraints.WEST;
-        p2.add(tProgram, gbc);
+        p2.add(tTitle, gbc);
 
-        JLabel l4 = new JLabel("Year:");
+        // Row 3: Credits (Editable)
+        JLabel l4 = new JLabel("Credits:");
         l4.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l4.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 3; gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.EAST;
         p2.add(l4, gbc);
 
-        JTextField tYear = new JTextField(20);
-        tYear.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        JTextField tCredits = new JTextField(20);
+        tCredits.setFont(gFont.deriveFont(Font.PLAIN, 21));
+        tCredits.setText(arrgs[3]); // Pre-fill
         gbc.gridx = 1; gbc.gridy = 3; gbc.weightx = 1;
         gbc.anchor = GridBagConstraints.WEST;
-        p2.add(tYear, gbc);
+        p2.add(tCredits, gbc);
 
-        // --- LOWS ---
+        // --- BUTTONS ---
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
         buttonPanel.setOpaque(false);
+
+        JButton bAssign = new JButton("Save"); 
+        bAssign.setBackground(Color.decode("#2f77b1")); 
+        bAssign.setForeground(Color.WHITE); 
+        bAssign.setFont(breatheFont.deriveFont(Font.PLAIN, 35));
+        bAssign.setMargin(new Insets(10, 30, 5, 30));
+        buttonPanel.add(bAssign);
 
         JButton bBack = new JButton("Back");
         bBack.setBackground(Color.decode("#2f77b1")); 
@@ -118,18 +144,12 @@ public class addStd {
         bBack.setMargin(new Insets(10, 30, 5, 30));
         buttonPanel.add(bBack);
 
-        JButton bRegister = new JButton("Register");
-        bRegister.setBackground(Color.decode("#2f77b1")); 
-        bRegister.setForeground(Color.WHITE); 
-        bRegister.setFont(breatheFont.deriveFont(Font.PLAIN, 35));
-        bRegister.setMargin(new Insets(10, 30, 5, 30));
-        buttonPanel.add(bRegister);
-
+        // Place buttons
         gbc.gridx = 0; gbc.gridy = 4; 
         gbc.gridwidth = 2; 
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.fill = GridBagConstraints.NONE;
-        gbc.insets = new Insets(60, 10, 10, 10); 
+        gbc.insets = new Insets(50, 10, 10, 10); 
         p2.add(buttonPanel, gbc);
 
         f.add(p2, BorderLayout.CENTER);
@@ -138,39 +158,36 @@ public class addStd {
         f.setLocationRelativeTo(null);
         f.setVisible(true);
 
-        // ---- Action Listeners ----
-        bRegister.addActionListener(new ActionListener() {
+        // --- Action Listeners ---
+        bAssign.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (tUsername.getText().isEmpty() || tPassword.getText().trim().isEmpty() || 
-                    tProgram.getText().trim().isEmpty() || tYear.getText().trim().isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "All fields must be filled out.", "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
+                // 1. Gather Data
+                String iTitle = tTitle.getText().trim();
+                String iCredits = tCredits.getText().trim();
+                String iCode = tCourseCode.getText().trim();
+                String iSec = tSection.getText().trim();
 
-                String username = tUsername.getText();
-                String hashPass = HashGenerator.makeHash(tPassword.getText().trim()); 
-                String program = tProgram.getText().trim();     
-                String year = tYear.getText().trim();                        
+                // 2. Call Service
+                AdminService service = new AdminService();
+                String result = service.updateCourse(iTitle, iCredits, iCode, iSec);
 
-                AdminService service = new AdminService();  
-                String result = service.registerStudent(username, hashPass, program, year);
-
-                if (result.startsWith("Success")) {
-                    JOptionPane.showMessageDialog(null, result, "Success", JOptionPane.INFORMATION_MESSAGE);
+                // 3. Handle Result
+                if ("Success".equals(result)) {
+                    JOptionPane.showMessageDialog(null, "Course updated successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    new adminDashboard(roll_no);
                     f.dispose();
                 } else {
                     JOptionPane.showMessageDialog(null, result, "Error", JOptionPane.ERROR_MESSAGE);
+                    new adminDashboard(roll_no);
+                    f.dispose();
                 }
-                System.out.println("\tGoing back to Admin Dashboard..");
-                new adminDashboard(rollNo);
-                f.dispose();
             }
         });
 
         bBack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                System.out.println(" to Admin Dashboard..");
-                new adminDashboard(rollNo);
+                System.out.println("Going back to Admin Dashboard..");
+                new adminDashboard(roll_no);
                 f.dispose();
             }
         });
