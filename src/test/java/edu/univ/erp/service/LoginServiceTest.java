@@ -11,11 +11,12 @@ import org.mockito.Mockito;
 
 import java.lang.reflect.Field;
 import java.sql.SQLException;
+import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+// import static org.mockito.Mockito.*;
 
 class LoginServiceTest {
 
@@ -23,6 +24,7 @@ class LoginServiceTest {
     private Field badAttemptsField;
     private Field lockTimeField;
 
+    
     @BeforeEach
     void setup() throws Exception {
         service = new LoginService();
@@ -30,17 +32,26 @@ class LoginServiceTest {
         // Reset static maps using reflection
         badAttemptsField = LoginService.class.getDeclaredField("badAttempts");
         badAttemptsField.setAccessible(true);
-        ((java.util.HashMap<?, ?>) badAttemptsField.get(null)).clear();
+        @SuppressWarnings("unchecked")  // Suppress unchecked cast warning here
+        var badMap = (HashMap<String, Integer>) badAttemptsField.get(null);
+        badMap.clear();
 
         lockTimeField = LoginService.class.getDeclaredField("lockTime");
         lockTimeField.setAccessible(true);
-        ((java.util.HashMap<?, ?>) lockTimeField.get(null)).clear();
+        @SuppressWarnings("unchecked")  // Suppress unchecked cast warning here
+        var lockMap = (HashMap<String, Long>) lockTimeField.get(null);
+        lockMap.clear();
     }
+
 
     @AfterEach
     void tearDown() throws Exception {
-        if (badAttemptsField != null) badAttemptsField.set(null, new java.util.HashMap<>());
-        if (lockTimeField != null) lockTimeField.set(null, new java.util.HashMap<>());
+        if (badAttemptsField != null) {
+            badAttemptsField.set(null, new HashMap<String, Integer>());
+        }
+        if (lockTimeField != null) {
+            lockTimeField.set(null, new HashMap<String, Long>());
+        }
     }
 
     // ───────────────────────────────────────────────
@@ -50,30 +61,34 @@ class LoginServiceTest {
     void testLoginLockedStillLocked() throws Exception {
         String username = "testuser";
         // Set lock time to future
-        ((java.util.HashMap<String, Long>) lockTimeField.get(null)).put(username, System.currentTimeMillis() + 10000);
+        @SuppressWarnings("unchecked")
+        var lockMap = (HashMap<String, Long>) lockTimeField.get(null);
+        lockMap.put(username, System.currentTimeMillis() + 10000);
 
         try (MockedStatic<AuthCommandRunner> mockAuth = Mockito.mockStatic(AuthCommandRunner.class)) {
             mockAuth.when(() -> AuthCommandRunner.fetchUser(username)).thenReturn(null);
 
             int result = service.login(username, "wrongpass");
-
+            
             assertEquals(LoginService.LOCKED, result);
             assertEquals("", service.loggedInRole);
             assertEquals("", service.loggedInRollNo);
         }
     }
-
+    
     @Test
     void testLoginLockedExpired() throws Exception {
         String username = "testuser";
         // Set lock time to past
-        ((java.util.HashMap<String, Long>) lockTimeField.get(null)).put(username, System.currentTimeMillis() - 10000);
-
+        @SuppressWarnings("unchecked")
+        var lockMap = (HashMap<String, Long>) lockTimeField.get(null);
+        lockMap.put(username, System.currentTimeMillis() - 10000);
+        
         loginResult user = new loginResult();
         user.hashPass = "dummyhash";
         user.role = "student";
         user.rollNo = "1";
-
+        
         try (
             MockedStatic<AuthCommandRunner> mockAuth = Mockito.mockStatic(AuthCommandRunner.class);
             MockedStatic<HashGenerator> mockHash = Mockito.mockStatic(HashGenerator.class)
@@ -102,7 +117,7 @@ class LoginServiceTest {
             assertEquals("", service.loggedInRollNo);
         }
     }
-
+    
     @Test
     void testLoginWrongPasswordFirstAttempt() throws Exception {
         String username = "testuser";
@@ -124,10 +139,12 @@ class LoginServiceTest {
             assertEquals("", service.loggedInRole);
             assertEquals("", service.loggedInRollNo);
             // Check bad attempts = 1
-            assertEquals(1, ((java.util.HashMap<String, Integer>) badAttemptsField.get(null)).get(username));
+            @SuppressWarnings("unchecked")
+            var badMap = (HashMap<String, Integer>) badAttemptsField.get(null);
+            assertEquals(1, badMap.get(username));
         }
-    }
-    
+    }    
+
     @Test
     void testLoginWrongPasswordThirdAttemptLocked() throws Exception {
         String username = "testuser";
@@ -152,14 +169,17 @@ class LoginServiceTest {
             assertEquals(LoginService.LOCKED, result);
             assertEquals("", service.loggedInRole);
             assertEquals("", service.loggedInRollNo);
-            // Check lock time set
-            Long unlockTime = ((java.util.HashMap<String, Long>) lockTimeField.get(null)).get(username);
+            // Check lock time set (with suppressed cast)
+            @SuppressWarnings("unchecked")
+            var lockMap = (HashMap<String, Long>) lockTimeField.get(null);
+            Long unlockTime = lockMap.get(username);
             assertNotNull(unlockTime);
             assertTrue(unlockTime > System.currentTimeMillis());
         }
     }
+  
 
-    @Test
+   @Test
     void testLoginSuccess() throws Exception {
         String username = "testuser";
         loginResult user = new loginResult();
@@ -180,8 +200,12 @@ class LoginServiceTest {
             assertEquals("instructor", service.loggedInRole);
             assertEquals("101", service.loggedInRollNo);
             // Check attempts cleared
-            assertNull(((java.util.HashMap<String, Integer>) badAttemptsField.get(null)).get(username));
-            assertNull(((java.util.HashMap<String, Long>) lockTimeField.get(null)).get(username));
+            @SuppressWarnings("unchecked")
+            var badMap = (HashMap<String, Integer>) badAttemptsField.get(null);
+            assertNull(badMap.get(username));
+            @SuppressWarnings("unchecked")
+            var lockMap = (HashMap<String, Long>) lockTimeField.get(null);
+            assertNull(lockMap.get(username));
         }
     }
 
