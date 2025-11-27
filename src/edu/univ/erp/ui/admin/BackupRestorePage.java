@@ -49,12 +49,11 @@ public class BackupRestorePage {
         gbc.gridx = 0;
         gbc.weightx = 1;
 
-        // Style Definitions
         Font btnFont = gFont.deriveFont(Font.PLAIN, 25f);
         Color btnBg = Color.decode("#2f77b1");
         Color txtColor = Color.WHITE;
 
-        // Button 1: Backup
+        // Backup
         JButton btnBackup = new JButton("Backup Database");
         btnBackup.setBackground(btnBg); 
         btnBackup.setForeground(txtColor);
@@ -63,7 +62,7 @@ public class BackupRestorePage {
         gbc.gridy = 0;
         p2.add(btnBackup, gbc);
 
-        // Button 2: Restore
+        // Restore
         JButton btnRestore = new JButton("Restore Database");
         btnRestore.setBackground(btnBg); 
         btnRestore.setForeground(txtColor);
@@ -72,7 +71,7 @@ public class BackupRestorePage {
         gbc.gridy = 1;
         p2.add(btnRestore, gbc);
 
-        // Button 3: Back
+        // Back
         JButton btnBack = new JButton("Back to Dashboard");
         btnBack.setBackground(Color.decode("#2f77b1")); 
         btnBack.setForeground(txtColor);
@@ -88,8 +87,8 @@ public class BackupRestorePage {
 
         f.add(container, BorderLayout.CENTER);
 
-        // --- ACTIONS  ---
-        // Hardcoded path for now
+        // --- Action Listeners ---
+        // Hardcoded path 
         String fixedPath = "AP_project/src/edu/univ/erp/BackupRestore/erp_backup.sql"; 
 
         btnBackup.addActionListener(new ActionListener() {
@@ -107,9 +106,7 @@ public class BackupRestorePage {
 
         btnRestore.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                int confirm = JOptionPane.showConfirmDialog(f, 
-                    "WARNING: This will DELETE current data and replace it from:\n" + fixedPath + "\nAre you sure?", 
-                    "Confirm Restore", JOptionPane.YES_NO_OPTION);
+                int confirm = JOptionPane.showConfirmDialog(f, "WARNING: This will DELETE current data and replace it from:\n" + fixedPath + "\nAre you sure?", "Confirm Restore", JOptionPane.YES_NO_OPTION);
                 
                 if (confirm == JOptionPane.YES_OPTION) {
                     File backupFile = new File(fixedPath);

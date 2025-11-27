@@ -1,28 +1,11 @@
-package edu.univ.erp.auth;
+package edu.univ.erp.ui.auth;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.UIManager;
-
+import javax.swing.*;
 import com.formdev.flatlaf.FlatLightLaf;
-
 import edu.univ.erp.service.LoginService;
-import edu.univ.erp.ui.auth.loginPage;
 import edu.univ.erp.util.BREATHEFONT;
 
 public class changePassword {
@@ -53,10 +36,9 @@ public class changePassword {
         p1.add(l0);
         f.add(p1, BorderLayout.NORTH);
 
-        // ---- MIDDLE ----
+        // ---- MIDDLE (Aligned to match loginPage) ----
         JPanel p2 = new JPanel(new GridBagLayout());
         p2.setBackground(Color.decode("#dbd3c5")); 
-        p2.setBorder(BorderFactory.createEmptyBorder(50, 100, 50, 100));
         
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10); 
@@ -66,15 +48,13 @@ public class changePassword {
         l1.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l1.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.EAST;
         p2.add(l1, gbc);
 
-        // Text Field 1 (Pre-filled)
-        JTextField tUsername = new JTextField(usernameIn, 50);
+        // Text Field 1 (Pre-filled, reduced size to 20 to match login)
+        JTextField tUsername = new JTextField(usernameIn, 20);
         tUsername.setFont(gFont.deriveFont(Font.PLAIN, 21));
-        tUsername.setEditable(false); // Lock it so they can't change someone else's pass
-        gbc.gridx = 1; gbc.gridy = 0; gbc.weightx = 1;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        tUsername.setEditable(false); 
+        gbc.gridx = 1; gbc.gridy = 0;
         p2.add(tUsername, gbc);
 
         // Label 2
@@ -82,32 +62,39 @@ public class changePassword {
         l2.setFont(gFont.deriveFont(Font.PLAIN, 24));
         l2.setForeground(Color.decode("#020A48"));
         gbc.gridx = 0; gbc.gridy = 1;
-        gbc.fill = GridBagConstraints.NONE;
         p2.add(l2, gbc);
 
         // Text Field 2
-        JTextField tNewPassword = new JTextField(50); 
+        JTextField tNewPassword = new JTextField(20); 
         tNewPassword.setFont(gFont.deriveFont(Font.PLAIN, 22));
-        gbc.gridx = 1; gbc.gridy = 1; gbc.weightx = 1;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridx = 1; gbc.gridy = 1;
         p2.add(tNewPassword, gbc);
 
         f.add(p2, BorderLayout.CENTER);
 
-        // ---- LOW ----
+        // ---- LOW (Buttons aligned) ----
         JPanel p3 = new JPanel();
         p3.setBackground(Color.decode("#dbd3c5"));
         p3.setBorder(BorderFactory.createEmptyBorder(0, 0, 50, 0));
-  
-        JButton bChange = new JButton("Change Password");
-        styleButton(bChange, breatheFont);
-        
-        JButton bBack = new JButton("Back");
-        styleButton(bBack, breatheFont);
 
-        p3.add(bChange);
-        p3.add(Box.createHorizontalStrut(20));
+        JButton bChange = new JButton("Change Password");
+        // Primary Button Style (Using the style from the previous fix)
+        bChange.setBackground(Color.decode("#87c3fa")); 
+        bChange.setForeground(Color.WHITE); 
+        bChange.setFont(breatheFont.deriveFont(Font.PLAIN, 32));
+        bChange.setMargin(new Insets(10, 30, 5, 30));
+
+        JButton bBack = new JButton("Back");
+        // Secondary Button Style (Using the style from the previous fix)
+        bBack.setBackground(Color.decode("#2f77b1")); 
+        bBack.setForeground(Color.WHITE); 
+        bBack.setFont(breatheFont.deriveFont(Font.PLAIN, 32));
+        bBack.setMargin(new Insets(10, 30, 5, 30));
+
+        // Swapped the order here: Back first, then Change Password
         p3.add(bBack);
+        p3.add(Box.createHorizontalStrut(20));
+        p3.add(bChange);
 
         f.add(p3, BorderLayout.SOUTH);
 
@@ -122,7 +109,6 @@ public class changePassword {
                 String user = tUsername.getText().trim();
                 String newPass = tNewPassword.getText().trim();
                 
-                // Call Service
                 LoginService service = new LoginService();
                 String result = service.changeUserPassword(user, newPass);
 
@@ -142,12 +128,5 @@ public class changePassword {
                 f.dispose();
             }
         });
-    }
-
-    private void styleButton(JButton b, Font font) {
-        b.setBackground(Color.decode("#2f77b1")); 
-        b.setForeground(Color.WHITE); 
-        b.setFont(font.deriveFont(Font.PLAIN, 35));
-        b.setMargin(new Insets(10, 30, 5, 30));
     }
 }

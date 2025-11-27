@@ -3,7 +3,6 @@ package edu.univ.erp.ui.auth;
 import javax.swing.*;
 import com.formdev.flatlaf.FlatLightLaf;
 import edu.univ.erp.util.BREATHEFONT;
-import edu.univ.erp.auth.changePassword;
 import edu.univ.erp.service.LoginService;
 import edu.univ.erp.ui.student.studentDashboard;
 import edu.univ.erp.ui.admin.adminDashboard;
@@ -64,7 +63,7 @@ public class loginPage {
         l2.setFont(gFont.deriveFont(Font.PLAIN, 24));
         gbc.gridx = 0; gbc.gridy = 1;
         p2.add(l2, gbc);
-
+                    
         JPasswordField tPassword = new JPasswordField(20);
         tPassword.setFont(gFont.deriveFont(Font.PLAIN, 22));
         gbc.gridx = 1; gbc.gridy = 1;

@@ -4,22 +4,20 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import javax.swing.*;
 
 import com.opencsv.CSVWriter;
 
-import edu.univ.erp.domain.Grades;
 import edu.univ.erp.service.StudentService;
 
 public class transcriptFrame {
     
-    public transcriptFrame(String username, String role, String in_pass, String rollNo) {
+    public transcriptFrame(String username, String role, String in_pass, String stdRollno) {
         
         // 1. Let user choose where to save
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Save Transcript");
-        fileChooser.setSelectedFile(new File("transcript_" + rollNo + ".csv"));
+        fileChooser.setSelectedFile(new File("transcript_" + stdRollno + ".csv"));
         
         int userSelection = fileChooser.showSaveDialog(null);
 
@@ -31,33 +29,35 @@ public class transcriptFrame {
             }
 
             boolean success = false;
+
             try {
                 StudentService service = new StudentService();
-                ArrayList<Grades> transcriptList = service.getTranscript(rollNo);
+                String[] row = service.getTranscript(stdRollno);
 
-                if (transcriptList == null || transcriptList.isEmpty()) {
+                if (row == null) {
                     JOptionPane.showMessageDialog(null, "No academic records found to export.", "Info", JOptionPane.INFORMATION_MESSAGE);
                 } else {
                     try (FileWriter outFile = new FileWriter(filePath);
-                         CSVWriter csvWriter = new CSVWriter(outFile)) {
-                        
+                        CSVWriter csvWriter = new CSVWriter(outFile)) {
+
+                        // Title line
+                        csvWriter.writeNext(new String[]{username + "'s result for semester " + row[4] + " and year " + row[5]});
+
                         // Header
-                        csvWriter.writeNext(new String[]{username + " Grades"});
-                        csvWriter.writeNext(new String[]{"Course Code", "Section", "Grade"});
-                        
-                        // Data
-                        for (Grades g : transcriptList) {
-                            csvWriter.writeNext(new String[]{ g.getCourseCode(), g.getSection(),  g.getGrade()});
-                        }
+                        csvWriter.writeNext(new String[]{"Course Code", "Section", "Title", "Credits", "Grade"});
+
+                        // Data (single row)
+                        csvWriter.writeNext(new String[] {row[0], row[1], row[2], row[3], row[6]});
+
                         success = true;
                     }
                 }
-
             } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(null, "Database Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 ex.printStackTrace();
             } catch (IOException ioex) {
                 JOptionPane.showMessageDialog(null, "File Write Error (Is the file open?): " + ioex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                ioex.printStackTrace();
             }
 
             if (success) {
@@ -67,6 +67,6 @@ public class transcriptFrame {
 
         // Return to dashboard regardless of whether they saved or cancelled
         System.out.println("\tGoing back to Student Dashboard..");
-        new studentDashboard(username, role, in_pass, rollNo);
+        new studentDashboard(username, role, in_pass, stdRollno);
     }
 }

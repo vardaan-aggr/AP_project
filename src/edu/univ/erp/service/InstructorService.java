@@ -53,7 +53,10 @@ public class InstructorService {
             boolean isEnrolled = ErpCommandRunner.isStudentEnrolled(stdRollno, courseCode, section);
             if (!isEnrolled) return "Error: Student is not enrolled.";
 
-            boolean saved = ErpCommandRunner.addGrade(stdRollno, courseCode, section, finalGrade);
+            boolean isMySection = ErpCommandRunner.isMySection(insRollno, courseCode, section);
+            if (!isMySection) return "Error: This is not your section.";
+
+            boolean saved = ErpCommandRunner.addGrade(stdRollno, courseCode, section, finalGrade, quiz, mid, end);
             if (saved) {
             try {
                 NotificationCommandRunner.sendNotification(Integer.parseInt(stdRollno), "Grades assigned for course code: " + courseCode);

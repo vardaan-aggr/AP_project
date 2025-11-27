@@ -41,6 +41,5 @@ delete from grades where section = 'B';
 select * from grades;
 Insert into courses(course_code, title, section, credits) VALUES 
     ('IP12', 'Intro to Plumbing', 'N', '6');
-use auth_db;
-select * from auth_table;
-delete from grades where roll_no = 4;
+use erp_db;
+delete from grades where roll_no = 7;
