@@ -3,7 +3,6 @@ package test.java.edu.univ.erp.service;
 import edu.univ.erp.data.ErpCommandRunner;
 import edu.univ.erp.data.NotificationCommandRunner;
 import edu.univ.erp.access.modeOps;
-import edu.univ.erp.domain.Grades;
 import edu.univ.erp.domain.Settings;
 import edu.univ.erp.service.StudentService;
 
@@ -14,8 +13,6 @@ import org.mockito.MockedStatic;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -243,31 +240,20 @@ public class StudentServiceTest {
         }
     }
 
+    
     @Test
-    void testGetTranscript_Success() throws SQLException {
-        try (MockedStatic<ErpCommandRunner> erpMock = mockStatic(ErpCommandRunner.class)) {
+    void testGetTranscriptValid() throws SQLException {
+        try (MockedStatic<ErpCommandRunner> mock = mockStatic(ErpCommandRunner.class)) {
 
-            Grades g1 = new Grades();
-            g1.setCourseCode("CS101");
-            g1.setGrade("A");
+            String[] transcript = {"CS101 A 3.0", "CS102 B 2.0"};
 
-            Grades g2 = new Grades();
-            g2.setCourseCode("MA101");
-            g2.setGrade("B+");
+            mock.when(() -> ErpCommandRunner.studentTranscriptHelper("1")).thenReturn(transcript);
 
-            ArrayList<Grades> list = new ArrayList<>(Arrays.asList(g1, g2));
+            String[] result = studentService.getTranscript("1");
 
-            erpMock.when(() -> ErpCommandRunner.studentTranscriptHelper(ROLL_NO))
-                   .thenReturn(list);
-
-            ArrayList<Grades> result = studentService.getTranscript(ROLL_NO);
-
-            assertEquals(2, result.size());
-            assertEquals("CS101", result.get(0).getCourseCode());
-            assertEquals("B+", result.get(1).getGrade());
+            assertArrayEquals(transcript, result);
         }
     }
-
     @Test
     void testGetTranscript_SQLExceptionIsPropagated() {
         try (MockedStatic<ErpCommandRunner> erpMock = mockStatic(ErpCommandRunner.class)) {
@@ -280,3 +266,33 @@ public class StudentServiceTest {
         }
     }
 }
+
+/*
+// TEST getTranscript()
+    // ───────────────────────────────────────────────
+    @Test
+    void testGetTranscriptValid() throws SQLException {
+        try (MockedStatic<ErpCommandRunner> mock = Mockito.mockStatic(ErpCommandRunner.class)) {
+
+            String[] transcript = {"CS101 A 3.0", "CS102 B 2.0"};
+
+            mock.when(() -> ErpCommandRunner.studentTranscriptHelper("1")).thenReturn(transcript);
+
+            String[] result = service.getTranscript("1");
+
+            assertArrayEquals(transcript, result);
+        }
+    }
+
+    @Test
+    void testGetTranscriptSQLException() throws SQLException {
+        try (MockedStatic<ErpCommandRunner> mock = Mockito.mockStatic(ErpCommandRunner.class)) {
+
+            mock.when(() -> ErpCommandRunner.studentTranscriptHelper("1")).thenThrow(new SQLException("DB error"));
+
+            assertThrows(SQLException.class, () ->
+                service.getTranscript("1")
+            );
+        }
+    }
+} */

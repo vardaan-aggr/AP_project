@@ -1,218 +1,264 @@
 package test.java.edu.univ.erp.service;
 
+import edu.univ.erp.auth.HashGenerator;
 import edu.univ.erp.data.AuthCommandRunner;
 import edu.univ.erp.data.AuthCommandRunner.loginResult;
 import edu.univ.erp.service.LoginService;
-import edu.univ.erp.service.LoginService.ServiceLoginResult;
-import edu.univ.erp.auth.HashGenerator;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
+import java.lang.reflect.Field;
 import java.sql.SQLException;
-import java.util.Map;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.times;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
 
-public class LoginServiceTest {
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
+
+class LoginServiceTest {
 
     private LoginService service;
-    
-    // Constants copied from LoginService for local testing reference (MAX_ATTEMPTS is private in service)
-    private static final int MAX_ATTEMPTS = 3;
-    private static final long LOCK_TIME_MS = 30 * 1000;
-
-    // Reflection Helper Method to safely clear static state
-    private void clearServiceState() {
-        try {
-            var failedAttemptsField = LoginService.class.getDeclaredField("failedAttempts");
-            failedAttemptsField.setAccessible(true);
-            ((Map<?, ?>) failedAttemptsField.get(null)).clear();
-
-            var activeLockoutsField = LoginService.class.getDeclaredField("activeLockouts");
-            activeLockoutsField.setAccessible(true);
-            ((Map<?, ?>) activeLockoutsField.get(null)).clear();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to clear static state for LoginService", e);
-        }
-    }
-    
-    // Reflection Helper Method to safely set a past timestamp for lockout testing
-    private void setLockoutTimePast(String username) throws Exception {
-        var activeLockoutsField = LoginService.class.getDeclaredField("activeLockouts");
-        activeLockoutsField.setAccessible(true);
-        var activeLockouts = (Map<String, Long>) activeLockoutsField.get(null);
-        
-        // Set the lockout time to 31 seconds ago (31000 ms)
-        long oldTimestamp = System.currentTimeMillis() - LOCK_TIME_MS - 1000;
-        activeLockouts.put(username, oldTimestamp);
-    }
-
-    // Reflection Helper Method to safely set failed attempts for lockout testing
-    private void setFailedAttemptsCount(String username) throws Exception {
-        var failedAttemptsField = LoginService.class.getDeclaredField("failedAttempts");
-        failedAttemptsField.setAccessible(true);
-        var failedAttempts = (Map<String, Integer>) failedAttemptsField.get(null);
-        
-        // Set attempts to maximum, so the next call triggers the lock logic check
-        failedAttempts.put(username, MAX_ATTEMPTS);
-    }
-
+    private Field badAttemptsField;
+    private Field lockTimeField;
 
     @BeforeEach
-    void setup() {
+    void setup() throws Exception {
         service = new LoginService();
-        clearServiceState(); // Ensure a clean state before each test
+
+        // Reset static maps using reflection
+        badAttemptsField = LoginService.class.getDeclaredField("badAttempts");
+        badAttemptsField.setAccessible(true);
+        ((java.util.HashMap<?, ?>) badAttemptsField.get(null)).clear();
+
+        lockTimeField = LoginService.class.getDeclaredField("lockTime");
+        lockTimeField.setAccessible(true);
+        ((java.util.HashMap<?, ?>) lockTimeField.get(null)).clear();
     }
 
     @AfterEach
-    void clear() {
-        clearServiceState(); // Clear state after each test
+    void tearDown() throws Exception {
+        if (badAttemptsField != null) badAttemptsField.set(null, new java.util.HashMap<>());
+        if (lockTimeField != null) lockTimeField.set(null, new java.util.HashMap<>());
     }
 
-    // 1. Successful Login
+    // ───────────────────────────────────────────────
+    // TEST login()
+    // ───────────────────────────────────────────────
     @Test
-    void testSuccessfulLogin() throws SQLException {
+    void testLoginLockedStillLocked() throws Exception {
+        String username = "testuser";
+        // Set lock time to future
+        ((java.util.HashMap<String, Long>) lockTimeField.get(null)).put(username, System.currentTimeMillis() + 10000);
+
+        try (MockedStatic<AuthCommandRunner> mockAuth = Mockito.mockStatic(AuthCommandRunner.class)) {
+            mockAuth.when(() -> AuthCommandRunner.fetchUser(username)).thenReturn(null);
+
+            int result = service.login(username, "wrongpass");
+
+            assertEquals(LoginService.LOCKED, result);
+            assertEquals("", service.loggedInRole);
+            assertEquals("", service.loggedInRollNo);
+        }
+    }
+
+    @Test
+    void testLoginLockedExpired() throws Exception {
+        String username = "testuser";
+        // Set lock time to past
+        ((java.util.HashMap<String, Long>) lockTimeField.get(null)).put(username, System.currentTimeMillis() - 10000);
+
+        loginResult user = new loginResult();
+        user.hashPass = "dummyhash";
+        user.role = "student";
+        user.rollNo = "1";
+
         try (
-            MockedStatic<AuthCommandRunner> mockACR = Mockito.mockStatic(AuthCommandRunner.class);
-            MockedStatic<HashGenerator> mockHashGen = Mockito.mockStatic(HashGenerator.class)
+            MockedStatic<AuthCommandRunner> mockAuth = Mockito.mockStatic(AuthCommandRunner.class);
+            MockedStatic<HashGenerator> mockHash = Mockito.mockStatic(HashGenerator.class)
         ) {
-            loginResult mockUser = new loginResult();
-            mockUser.hashPass = "$2a$10$abcdefg";
-            mockUser.role = "student";
-            mockUser.rollNo = "R123";
+            mockAuth.when(() -> AuthCommandRunner.fetchUser(username)).thenReturn(user);
+            mockHash.when(() -> HashGenerator.verifyHash("correctpass", user.hashPass)).thenReturn(true);
 
-            // Mock DAO fetch success
-            mockACR.when(() -> AuthCommandRunner.fetchUser("john")).thenReturn(mockUser);
-            // Mock Hash verification success
-            mockHashGen.when(() -> HashGenerator.verifyHash("password123", mockUser.hashPass)).thenReturn(true);
-            ServiceLoginResult result = service.attemptLogin("john", "password123");
+            int result = service.login(username, "correctpass");
 
-            assertEquals(LoginService.STATUS_SUCCESS, result.status);
-            assertNotNull(result.userDetails);
-            assertEquals("student", result.userDetails.role);
-            
-            // Verify resetFailure logic was called implicitly
-            assertTrue(result.lockoutEndsTimestamp == 0);
+            assertEquals(LoginService.SUCCESS, result);
+            assertEquals("student", service.loggedInRole);
+            assertEquals("1", service.loggedInRollNo);
         }
     }
 
-    
-    // 2. Wrong Password
     @Test
-    void testWrongPassword() throws SQLException {
+    void testLoginUserNotFound() throws Exception {
+        String username = "nonexistent";
+        try (MockedStatic<AuthCommandRunner> mockAuth = Mockito.mockStatic(AuthCommandRunner.class)) {
+            mockAuth.when(() -> AuthCommandRunner.fetchUser(username)).thenReturn(null);
+
+            int result = service.login(username, "pass");
+
+            assertEquals(LoginService.INVALID, result);
+            assertEquals("", service.loggedInRole);
+            assertEquals("", service.loggedInRollNo);
+        }
+    }
+
+    @Test
+    void testLoginWrongPasswordFirstAttempt() throws Exception {
+        String username = "testuser";
+        loginResult user = new loginResult();
+        user.hashPass = "dummyhash";
+        user.role = "student";
+        user.rollNo = "1";
+
         try (
-            MockedStatic<AuthCommandRunner> mockACR = Mockito.mockStatic(AuthCommandRunner.class);
-            MockedStatic<HashGenerator> mockHashGen = Mockito.mockStatic(HashGenerator.class)
+            MockedStatic<AuthCommandRunner> mockAuth = Mockito.mockStatic(AuthCommandRunner.class);
+            MockedStatic<HashGenerator> mockHash = Mockito.mockStatic(HashGenerator.class)
         ) {
-            loginResult mockUser = new loginResult();
-            mockUser.hashPass = "$2a$10$abcdefg";
+            mockAuth.when(() -> AuthCommandRunner.fetchUser(username)).thenReturn(user);
+            mockHash.when(() -> HashGenerator.verifyHash("wrongpass", user.hashPass)).thenReturn(false);
 
-            // Mock DAO fetch success
-            mockACR.when(() -> AuthCommandRunner.fetchUser("john")).thenReturn(mockUser);
-            // Mock Hash verification failure
-            mockHashGen.when(() -> HashGenerator.verifyHash("wrong", mockUser.hashPass)).thenReturn(false);
+            int result = service.login(username, "wrongpass");
 
-            ServiceLoginResult result = service.attemptLogin("john", "wrong");
-
-            assertEquals(LoginService.STATUS_INVALID, result.status);
-            assertNull(result.userDetails);
+            assertEquals(LoginService.INVALID, result);
+            assertEquals("", service.loggedInRole);
+            assertEquals("", service.loggedInRollNo);
+            // Check bad attempts = 1
+            assertEquals(1, ((java.util.HashMap<String, Integer>) badAttemptsField.get(null)).get(username));
         }
     }
-
     
-    // 3. User Not Found
     @Test
-    void testUserNotFound() throws SQLException {
-        try (MockedStatic<AuthCommandRunner> mockACR = Mockito.mockStatic(AuthCommandRunner.class)) {
+    void testLoginWrongPasswordThirdAttemptLocked() throws Exception {
+        String username = "testuser";
+        loginResult user = new loginResult();
+        user.hashPass = "dummyhash";
+        user.role = "student";
+        user.rollNo = "1";
 
-            // Mock DAO returns null
-            mockACR.when(() -> AuthCommandRunner.fetchUser("ghost")).thenReturn(null);
-
-            ServiceLoginResult result = service.attemptLogin("ghost", "pass");
-
-            assertEquals(LoginService.STATUS_INVALID, result.status);
-            assertNull(result.userDetails);
-        }
-    }
-
-    
-    // 4. Locked out before 30 seconds
-    @Test
-    void testLockoutBeforeExpiry() throws Exception {
         try (
-            MockedStatic<AuthCommandRunner> mockACR = Mockito.mockStatic(AuthCommandRunner.class);
-            MockedStatic<HashGenerator> mockHashGen = Mockito.mockStatic(HashGenerator.class)
+            MockedStatic<AuthCommandRunner> mockAuth = Mockito.mockStatic(AuthCommandRunner.class);
+            MockedStatic<HashGenerator> mockHash = Mockito.mockStatic(HashGenerator.class)
         ) {
-            // Arrange: Setup mock to always fail login
-            mockACR.when(() -> AuthCommandRunner.fetchUser("john")).thenReturn(null);
-            mockHashGen.when(() -> HashGenerator.verifyHash(anyString(), anyString())).thenReturn(false); 
+            mockAuth.when(() -> AuthCommandRunner.fetchUser(username)).thenReturn(user);
+            mockHash.when(() -> HashGenerator.verifyHash(anyString(), eq(user.hashPass))).thenReturn(false);
 
-            // 1. Fail 3 times -> lockout (MAX_ATTEMPTS = 3)
-            for (int i = 0; i < MAX_ATTEMPTS; i++) {
-                service.attemptLogin("john", "x");
-            }
-            
-            // 2. 4th attempt immediately after lock
-            ServiceLoginResult lockedResult = service.attemptLogin("john", "x");
+            // First two attempts
+            service.login(username, "wrong1");
+            service.login(username, "wrong2");
+            // Third attempt
+            int result = service.login(username, "wrong3");
 
-            assertEquals(LoginService.STATUS_LOCKED, lockedResult.status);
-            
-            // Lockout timestamp should be in the future
-            assertTrue(lockedResult.lockoutEndsTimestamp > System.currentTimeMillis());
-            
-            // Verify DAO was only called 3 times (the lock should prevent the 4th call)
-            mockACR.verify(() -> AuthCommandRunner.fetchUser(anyString()), times(MAX_ATTEMPTS));
+            assertEquals(LoginService.LOCKED, result);
+            assertEquals("", service.loggedInRole);
+            assertEquals("", service.loggedInRollNo);
+            // Check lock time set
+            Long unlockTime = ((java.util.HashMap<String, Long>) lockTimeField.get(null)).get(username);
+            assertNotNull(unlockTime);
+            assertTrue(unlockTime > System.currentTimeMillis());
         }
     }
 
     @Test
-    void testLockoutExpires() throws Exception {
+    void testLoginSuccess() throws Exception {
+        String username = "testuser";
+        loginResult user = new loginResult();
+        user.hashPass = "dummyhash";
+        user.role = "instructor";
+        user.rollNo = "101";
+
         try (
-            MockedStatic<AuthCommandRunner> mockACR = Mockito.mockStatic(AuthCommandRunner.class);
-            MockedStatic<HashGenerator> mockHashGen = Mockito.mockStatic(HashGenerator.class)
+            MockedStatic<AuthCommandRunner> mockAuth = Mockito.mockStatic(AuthCommandRunner.class);
+            MockedStatic<HashGenerator> mockHash = Mockito.mockStatic(HashGenerator.class)
         ) {
-            // Arrange: Mock failure for the attempt
-            mockACR.when(() -> AuthCommandRunner.fetchUser("john")).thenReturn(null);
-            mockHashGen.when(() -> HashGenerator.verifyHash(anyString(), anyString())).thenReturn(false);
+            mockAuth.when(() -> AuthCommandRunner.fetchUser(username)).thenReturn(user);
+            mockHash.when(() -> HashGenerator.verifyHash("correctpass", user.hashPass)).thenReturn(true);
 
-            // 1. Manually set state to be locked in the past
-            setFailedAttemptsCount("john");
-            setLockoutTimePast("john");
+            int result = service.login(username, "correctpass");
 
-            // 2. Now a new attempt should check the lock, reset, and fail normally
-            ServiceLoginResult result = service.attemptLogin("john", "x");
-
-            // Should be invalid credentials again (normal failure)
-            assertEquals(LoginService.STATUS_INVALID, result.status);
-            
-            // Lockout timestamp should be 0
-            assertEquals(0, result.lockoutEndsTimestamp);
-
-            // Verify DAO was called once (the attempt was not blocked)
-            mockACR.verify(() -> AuthCommandRunner.fetchUser(anyString()), times(1));
+            assertEquals(LoginService.SUCCESS, result);
+            assertEquals("instructor", service.loggedInRole);
+            assertEquals("101", service.loggedInRollNo);
+            // Check attempts cleared
+            assertNull(((java.util.HashMap<String, Integer>) badAttemptsField.get(null)).get(username));
+            assertNull(((java.util.HashMap<String, Long>) lockTimeField.get(null)).get(username));
         }
     }
 
-    
-    // 6. Database Error
     @Test
-    void testDatabaseError() throws SQLException {
-        try (MockedStatic<AuthCommandRunner> mockACR = Mockito.mockStatic(AuthCommandRunner.class)) {
+    void testLoginSQLException() throws Exception {
+        String username = "testuser";
+        try (MockedStatic<AuthCommandRunner> mockAuth = Mockito.mockStatic(AuthCommandRunner.class)) {
+            mockAuth.when(() -> AuthCommandRunner.fetchUser(username)).thenThrow(new SQLException("DB error"));
 
-            mockACR.when(() -> AuthCommandRunner.fetchUser("john"))
-                    .thenThrow(new SQLException("DB down"));
+            int result = service.login(username, "pass");
 
-            ServiceLoginResult result = service.attemptLogin("john", "pass");
+            assertEquals(LoginService.DB_ERROR, result);
+            assertEquals("", service.loggedInRole);
+            assertEquals("", service.loggedInRollNo);
+        }
+    }
 
-            assertEquals(LoginService.STATUS_ERROR, result.status);
-            assertNull(result.userDetails);
+    // ───────────────────────────────────────────────
+    // TEST changeUserPassword()
+    // ───────────────────────────────────────────────
+    @Test
+    void testChangeUserPasswordEmptyFields() {
+        String result1 = service.changeUserPassword("", "newpass");
+        assertEquals("Error: Fields cannot be empty.", result1);
+
+        String result2 = service.changeUserPassword("user", "");
+        assertEquals("Error: Fields cannot be empty.", result2);
+    }
+
+    @Test
+    void testChangeUserPasswordSuccess() throws Exception {
+        String username = "testuser";
+        String newHash = "newhashedpass";
+        try (
+            MockedStatic<HashGenerator> mockHash = Mockito.mockStatic(HashGenerator.class);
+            MockedStatic<AuthCommandRunner> mockAuth = Mockito.mockStatic(AuthCommandRunner.class)
+        ) {
+            mockHash.when(() -> HashGenerator.makeHash("newpass")).thenReturn(newHash);
+            mockAuth.when(() -> AuthCommandRunner.updatePasswordHelper(username, newHash)).thenReturn(1);
+
+            String result = service.changeUserPassword(username, "newpass");
+
+            assertEquals("Success", result);
+        }
+    }
+
+    @Test
+    void testChangeUserPasswordUserNotFound() throws Exception {
+        String username = "nonexistent";
+        String newHash = "newhashedpass";
+        try (
+            MockedStatic<HashGenerator> mockHash = Mockito.mockStatic(HashGenerator.class);
+            MockedStatic<AuthCommandRunner> mockAuth = Mockito.mockStatic(AuthCommandRunner.class)
+        ) {
+            mockHash.when(() -> HashGenerator.makeHash("newpass")).thenReturn(newHash);
+            mockAuth.when(() -> AuthCommandRunner.updatePasswordHelper(username, newHash)).thenReturn(0);
+
+            String result = service.changeUserPassword(username, "newpass");
+
+            assertEquals("Error: User not found (Check username).", result);
+        }
+    }
+
+    @Test
+    void testChangeUserPasswordSQLException() throws Exception {
+        String username = "testuser";
+        try (
+            MockedStatic<HashGenerator> mockHash = Mockito.mockStatic(HashGenerator.class);
+            MockedStatic<AuthCommandRunner> mockAuth = Mockito.mockStatic(AuthCommandRunner.class)
+        ) {
+            mockHash.when(() -> HashGenerator.makeHash("newpass")).thenReturn("hash");
+            mockAuth.when(() -> AuthCommandRunner.updatePasswordHelper(username, "hash"))
+                    .thenThrow(new SQLException("Update failed"));
+
+            String result = service.changeUserPassword(username, "newpass");
+
+            assertEquals("Database Error: Update failed", result);
         }
     }
 }
