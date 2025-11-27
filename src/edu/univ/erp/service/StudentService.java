@@ -32,11 +32,10 @@ public class StudentService {
                 LocalDate today = LocalDate.now();
 
                 if (today.isAfter(deadline)) {
-                    System.out.println("Drop failed: Deadline passed (" + deadline + ")");
                     return STATUS_DEADLINE_PASSED; 
                 }
             } catch (DateTimeParseException e) {
-                System.err.println("Error: Invalid deadline date format in DB. Expected YYYY-MM-DD.");
+                return -11;
             }
         }
 
