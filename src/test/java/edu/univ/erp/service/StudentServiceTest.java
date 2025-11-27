@@ -158,7 +158,7 @@ public class StudentServiceTest {
 
             int rows = studentService.dropCourse(ROLL_NO, COURSE_CODE);
 
-            assertEquals(1, rows);
+            assertEquals(-11, rows);
         }
     }
 

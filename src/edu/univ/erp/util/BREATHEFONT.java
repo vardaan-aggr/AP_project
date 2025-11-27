@@ -9,7 +9,7 @@ public class BREATHEFONT {
     public static Font fontGen() {
         Font breatheFont;
         try {
-            File fontFile = new File("C:\\Users\\DELL\\Desktop\\SEM 3\\AP\\project\\AP_project\\lib\\Compacta Std Bold.otf"); 
+            File fontFile = new File("/home/prabal/Documents/JavaProject/AP_project/lib/Compacta Std Bold.otf"); 
             breatheFont = Font.createFont(Font.TRUETYPE_FONT, fontFile);
         } catch (IOException | FontFormatException e) {
             e.printStackTrace();
@@ -20,7 +20,7 @@ public class BREATHEFONT {
     public static Font gFontGen() {
         Font gf;
         try {
-            File fontFile = new File("C:\\Users\\DELL\\Desktop\\SEM 3\\AP\\project\\AP_project\\lib\\GoogleSansFlex-VariableFont_GRAD,ROND,opsz,slnt,wdth,wght.ttf"); 
+            File fontFile = new File("/home/prabal/Documents/JavaProject/AP_project/lib/GoogleSansFlex-VariableFont_GRAD,ROND,opsz,slnt,wdth,wght.ttf"); 
             gf = Font.createFont(Font.TRUETYPE_FONT, fontFile);
         } catch (IOException | FontFormatException e) {
             e.printStackTrace();
