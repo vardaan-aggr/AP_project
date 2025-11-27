@@ -115,6 +115,10 @@ public class dropCourseFrame {
                     JOptionPane.showMessageDialog(null, "Drop failed: Maintenance Mode is ON.", "Info", JOptionPane.INFORMATION_MESSAGE);
                     System.out.println("Drop failed: Maintenance Mode is ON.");
                 }
+                else if (result == -11) {
+                    JOptionPane.showMessageDialog(null, "Drop failed: Invalid deadline date format in DB. Expected YYYY-MM-DD.", "Error", JOptionPane.ERROR_MESSAGE);
+                    System.out.println("Error: Invalid deadline date format in DB. Expected YYYY-MM-DD.");
+                }
                 else {
                     // Result is 0 or -1 (Not enrolled or DB error)
                     JOptionPane.showMessageDialog(null, "Error: Not enrolled or course invalid.", "Error", JOptionPane.ERROR_MESSAGE);
