@@ -30,7 +30,7 @@ class InstructorServiceTest {
     // TEST computeStats()
     // ───────────────────────────────────────────────
     @Test
-    void testComputeStatsValid() throws Exception {
+    void testComputeStatsValid() throws SQLException {
         try (MockedStatic<ErpCommandRunner> mock = Mockito.mockStatic(ErpCommandRunner.class)) {
 
             mock.when(() -> ErpCommandRunner.instructorStatsHelper("CS101", "A"))
@@ -43,7 +43,7 @@ class InstructorServiceTest {
     }
 
     @Test
-    void testComputeStatsNullArray() throws Exception {
+    void testComputeStatsNullArray() throws SQLException {
         try (MockedStatic<ErpCommandRunner> mock = Mockito.mockStatic(ErpCommandRunner.class)) {
 
             mock.when(() -> ErpCommandRunner.instructorStatsHelper("CS101", "A"))
@@ -54,7 +54,7 @@ class InstructorServiceTest {
     }
 
     @Test
-    void testComputeStatsEmptyArray() throws Exception {
+    void testComputeStatsEmptyArray() throws SQLException {
         try (MockedStatic<ErpCommandRunner> mock = Mockito.mockStatic(ErpCommandRunner.class)) {
 
             mock.when(() -> ErpCommandRunner.instructorStatsHelper("CS101", "A"))
@@ -65,7 +65,7 @@ class InstructorServiceTest {
     }
 
     @Test
-    void testComputeStatsSQLException() throws Exception {
+    void testComputeStatsSQLException() throws SQLException {
         try (MockedStatic<ErpCommandRunner> mock = Mockito.mockStatic(ErpCommandRunner.class)) {
 
             mock.when(() -> ErpCommandRunner.instructorStatsHelper("CS101", "A"))
@@ -81,26 +81,19 @@ class InstructorServiceTest {
     // TEST computeAndAssignGrade()
     // ───────────────────────────────────────────────
     @Test
-    void testComputeAssignGradeInvalidInteger() throws Exception{
-        // try (MockedStatic<ErpCommandRunner> mock = Mockito.mockStatic(ErpCommandRunner.class)) {
-        // mock.when(() -> ErpCommandRunner.isStudentEnrolled("ABC", "CS101", "A"))
-        //     .thenReturn(true);
-    
-        // mock.when(() -> ErpCommandRunner.addGrade("ABC", "CS101", "A", "B"))
-        //     .thenReturn(true);
+    void testComputeAssignGradeInvalidInteger() throws SQLException {
         String result = service.computeAndAssignGrade("101","1", "CS101", "A", "x", "5", "8");
         assertEquals("Error: Marks must be valid integers.", result);
-        // }
     }
 
     @Test
-    void testComputeAssignGradeMarksTooHigh() throws Exception {
+    void testComputeAssignGradeMarksTooHigh() throws SQLException {
         String result = service.computeAndAssignGrade("101","1", "CS101", "A", "11", "5", "8");
         assertEquals("Error: Marks cannot exceed 10.", result);
     }
 
     @Test
-    void testComputeAssignGradeStudentNotEnrolled() throws Exception {
+    void testComputeAssignGradeStudentNotEnrolled() throws SQLException {
         try (MockedStatic<ErpCommandRunner> mock = Mockito.mockStatic(ErpCommandRunner.class)) {
 
             mock.when(() -> ErpCommandRunner.isStudentEnrolled("1", "CS101", "A"))
@@ -113,7 +106,23 @@ class InstructorServiceTest {
     }
 
     @Test
-    void testComputeAssignGradeSuccess() throws Exception {
+    void testComputeAssignGradeNotMySection() throws SQLException {
+        try (MockedStatic<ErpCommandRunner> mock = Mockito.mockStatic(ErpCommandRunner.class)) {
+
+            mock.when(() -> ErpCommandRunner.isStudentEnrolled("1", "CS101", "A"))
+                .thenReturn(true);
+
+            mock.when(() -> ErpCommandRunner.isMySection("101", "CS101", "A"))
+                .thenReturn(false);
+
+            String result = service.computeAndAssignGrade("101","1", "CS101", "A", "5", "5", "5");
+
+            assertEquals("Error: This is not your section.", result);
+        }
+    }
+
+    @Test
+    void testComputeAssignGradeSuccess() throws SQLException {
         try (
             MockedStatic<ErpCommandRunner> mock = Mockito.mockStatic(ErpCommandRunner.class);
             MockedStatic<NotificationCommandRunner> notifyMock = Mockito.mockStatic(NotificationCommandRunner.class)
@@ -122,7 +131,10 @@ class InstructorServiceTest {
             mock.when(() -> ErpCommandRunner.isStudentEnrolled("1", "CS101", "A"))
                 .thenReturn(true);
 
-            mock.when(() -> ErpCommandRunner.addGrade("1", "CS101", "A", "B"))
+            mock.when(() -> ErpCommandRunner.isMySection("101", "CS101", "A"))
+                .thenReturn(true);
+
+            mock.when(() -> ErpCommandRunner.addGrade("1", "CS101", "A", "B", 5, 6, 7))
                 .thenReturn(true);
 
             notifyMock.when(() -> NotificationCommandRunner.sendNotification(1, "Grades assigned for course code: CS101"))
@@ -135,13 +147,16 @@ class InstructorServiceTest {
     }
 
     @Test
-    void testComputeAssignGradeSaveFailed() throws Exception {
+    void testComputeAssignGradeSaveFailed() throws SQLException {
         try (MockedStatic<ErpCommandRunner> mock = Mockito.mockStatic(ErpCommandRunner.class)) {
 
             mock.when(() -> ErpCommandRunner.isStudentEnrolled("1", "CS101", "A"))
                 .thenReturn(true);
 
-            mock.when(() -> ErpCommandRunner.addGrade("1", "CS101", "A", "B"))
+            mock.when(() -> ErpCommandRunner.isMySection("101", "CS101", "A"))
+                .thenReturn(true);
+
+            mock.when(() -> ErpCommandRunner.addGrade("1", "CS101", "A", "B", 5, 6, 7))
                 .thenReturn(false);
 
             String result = service.computeAndAssignGrade("101","1", "CS101", "A", "5", "6", "7");
@@ -151,13 +166,16 @@ class InstructorServiceTest {
     }
 
     @Test
-    void testComputeAssignGradeNotificationFailsDueToBadId() throws Exception {
+    void testComputeAssignGradeNotificationFailsDueToBadId() throws SQLException {
         try (MockedStatic<ErpCommandRunner> mock = Mockito.mockStatic(ErpCommandRunner.class)) {
 
             mock.when(() -> ErpCommandRunner.isStudentEnrolled("ABC", "CS101", "A"))
                 .thenReturn(true);
 
-            mock.when(() -> ErpCommandRunner.addGrade("ABC", "CS101", "A", "B"))
+            mock.when(() -> ErpCommandRunner.isMySection("101", "CS101", "A"))
+                .thenReturn(true);
+
+            mock.when(() -> ErpCommandRunner.addGrade("ABC", "CS101", "A", "B", 5, 6, 7))
                 .thenReturn(true);
 
             // Notification attempt fails due to parseInt("ABC") throwing NumberFormatException, caught internally
@@ -169,7 +187,7 @@ class InstructorServiceTest {
     }
 
     @Test
-    void testComputeAssignGradeSQLException() throws Exception {
+    void testComputeAssignGradeSQLException() throws SQLException {
         try (MockedStatic<ErpCommandRunner> mock = Mockito.mockStatic(ErpCommandRunner.class)) {
 
             mock.when(() -> ErpCommandRunner.isStudentEnrolled("1", "CS101", "A"))
@@ -216,7 +234,7 @@ class InstructorServiceTest {
     // TEST getMySections()
     // ───────────────────────────────────────────────
     @Test
-    void testGetMySectionsValid() throws Exception {
+    void testGetMySectionsValid() throws SQLException {
         try (MockedStatic<ErpCommandRunner> mock = Mockito.mockStatic(ErpCommandRunner.class)) {
 
             ArrayList<Sections> list = new ArrayList<>();
@@ -243,7 +261,7 @@ class InstructorServiceTest {
     }
 
     @Test
-    void testGetMySectionsSQLException() throws Exception {
+    void testGetMySectionsSQLException() throws SQLException {
         try (MockedStatic<ErpCommandRunner> mock = Mockito.mockStatic(ErpCommandRunner.class)) {
 
             mock.when(() -> ErpCommandRunner.instructorMySectionsHelper("101"))
