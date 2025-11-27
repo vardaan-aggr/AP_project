@@ -1,3 +1,4 @@
+drop database if exists erp_db;
 Create database IF NOT EXISTS erp_db;
 use erp_db;
 
