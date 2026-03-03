@@ -1,10 +1,6 @@
 # AP Project
 
-Java-based university management portal/ ERP to manage the academics between students, professors, admins with security and fast.
-
-## Overview
-
-**Built a secure role-based University ERP desktop system (Java Swing) with dual-database authentication, course registration, grading system, maintenance mode, CSV/PDF exports, backup/restore, and strict access control with hashed password security.**
+**Java-based University Management Portal (ERP) to manage academic operations among students, professors, and administrators with secure and efficient performance. Implements dual-database authentication, course registration, grading system, maintenance mode, CSV/PDF exports, backup and restore functionality, and strict role-based access control with hashed password security.**
 
 ## Files
 - `src/` — Main source code
