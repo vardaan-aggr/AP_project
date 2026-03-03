@@ -9,6 +9,7 @@ Java-based university management portal/ ERP to manage the academics between stu
 ## Files
 - `src/` — Main source code
 - `lib/` — External libraries
+- `All_Features.md` — All Features listed 
 - `Report.pdf` / `Report.docx` — Detailed project report
 - `Diagrams.png` — Architecture/use case/ER diagrams
 - `instructions to run.docx` — Setup and execution guide
