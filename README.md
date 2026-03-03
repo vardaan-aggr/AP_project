@@ -14,9 +14,6 @@ Java-based university management portal/ ERP to manage the academics between stu
 - `Diagrams.png` — Architecture/use case/ER diagrams
 - `instructions to run.docx` — Setup and execution guide
 
-## How to Run
-Refer to `instructions to run.docx` for detailed steps (likely involves compiling `src/` and running the main class via VS Code or command line).
-
 🎥 **Demo:** ...
 
 ---
