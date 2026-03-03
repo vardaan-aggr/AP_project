@@ -27,10 +27,13 @@ This project involves building a **Java Swing desktop application** to manage un
 - `Diagrams.png` — Architecture/use case/ER diagrams
 - `instructions to run.docx` — Setup and execution guide
 
-## Technologies
-- Java (100%)
-
 ## How to Run
 Refer to `instructions to run.docx` for detailed steps (likely involves compiling `src/` and running the main class via VS Code or command line).
 
-For issues, check the project report.
+🎥 **Demo:** ...
+
+---
+
+## Team Members
+- **Vardaan Aggarwal** – 2024602
+- **Prabaljeet** – 2024415
