@@ -10,8 +10,7 @@
 - `Diagrams.png` — Architecture/use case/ER diagrams
 - `instructions to run.docx` — Setup and execution guide
 
-🎥 **Demo:** ...
-https://youtu.be/HMGCVluede4
+🎥 **Demo:** https://youtu.be/HMGCVluede4
 ---
 
 ## Team Members
