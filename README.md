@@ -15,4 +15,4 @@
 
 ## Team Members
 - **Vardaan Aggarwal** – 2024602
-- **Prabaljeet** – 2024415
+- **Prabaljeet Singh** – 2024415
